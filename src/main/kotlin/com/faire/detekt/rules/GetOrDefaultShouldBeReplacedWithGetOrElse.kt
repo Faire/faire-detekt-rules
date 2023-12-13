@@ -14,8 +14,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
 /**
  * When using map.getOrDefault(key, defaultValue), it always executes the expression to evaluate the default value
- * and then it's thrown away most of the time.  Additionally, even when passing primitive values, those get autoboxed
- * so this causes unnecessary pressure on the garbage collector since these are ignored most of the time.
+ * and then it's thrown away some of the time.  Additionally, even when passing primitive values, those get autoboxed
+ * so this causes unnecessary pressure on the garbage collector since these are ignored some of the time.
  *
  * The getOrElse(key) { defaultValue } extension function is an inlined function which executes the lambda to generate
  * the default value only when it's actually needed resulting in zero memory overhead.
