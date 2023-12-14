@@ -1,9 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.20"
+    `maven-publish`
 }
 
 group = "com.faire.detektrules"
-version = "0.0.1"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -33,4 +34,12 @@ tasks.test {
 
 kotlin {
     jvmToolchain(8)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
 }
