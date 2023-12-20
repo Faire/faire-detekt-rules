@@ -15,7 +15,7 @@ and this in your `build.gradle` file:
 detektPlugins(rootProject.libs.faire.detekt.rules)
 ```
 
-You may need to add jitpack as a maveen repository:
+You may need to add jitpack as a maven repository:
 ```groovy
 maven {
   url = uri("https://jitpack.io")
@@ -99,5 +99,4 @@ It is strong recommended to configure this rule with `excludes: ["**/*Test.kt"]`
 convention of the project) to allow test code access to the annotated members.
 
 ## Type Resolution
-A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled 
-o function properly. If type resolution is not enabled, the rules will silently continue.
+A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled to function properly. If type resolution is not enabled, the rules will silently continue.
