@@ -1,10 +1,14 @@
 plugins {
     kotlin("jvm") version "1.9.20"
     `maven-publish`
+
+    id("io.gitlab.arturbosch.detekt") version "1.23.4"
 }
 
 group = "com.faire.detektrules"
 version = "0.1.0"
+
+val detektVersion = "1.23.4"
 
 repositories {
     mavenCentral()
@@ -25,8 +29,22 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors:$detektVersion")
+    detektPlugins("com.braisgabin.detekt:kotlin-compiler-wrapper:0.0.4")
+    detektPlugins(rootProject)
 }
 
+detekt {
+    parallel = true
+    autoCorrect = true
+
+    buildUponDefaultConfig = true
+    config.from(rootProject.file("detekt.yaml"))
+
+    allRules = false // activate all available (even unstable) rules.
+}
 
 tasks.test {
     useJUnitPlatform()

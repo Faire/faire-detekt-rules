@@ -81,9 +81,10 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
 
     /*
      * For some reasons, I was getting:
-     * Missing extension point: org.jetbrains.kotlin.com.intellij.treeCopyHandler in container com.faire.detekt.utils.MockApplication
-     * when running the whole test suite on the class for InternalTestClass.kt. Something in the MockApplication
-     * is not instantiation the treeCopyHandler extension point. This is a workaround to register it.
+     * Missing extension point: org.jetbrains.kotlin.com.intellij.treeCopyHandler in container
+     * com.faire.detekt.utils.MockApplication when running the whole test suite on the class for InternalTestClass.kt.
+     * Something in the MockApplication is not instantiation the treeCopyHandler extension point. This is a workaround
+     * to register it.
      */
     RegisterTreeCopyHandlerUtils.register()
 

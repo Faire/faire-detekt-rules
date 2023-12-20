@@ -49,7 +49,8 @@ internal class DoNotAccessVisibleForTesting(config: Config = Config.empty) : Rul
     }
     if (expression.getReferenceTargets(bindingContext).any {
           it.hasAnnotation("VisibleForTesting") && here.containingPackage() != it.containingPackage()
-        }) {
+        }
+    ) {
       report(
           CodeSmell(
               issue = issue,

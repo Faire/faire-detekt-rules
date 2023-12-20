@@ -43,7 +43,8 @@ internal class PreferIgnoreCase(config: Config = Config.empty) : Rule(config) {
     val selectorExpression = expression.selectorExpression ?: return
     val receiverExpression = expression.receiverExpression
     if (receiverExpression.lastChild.text in LOWERCASE_CALLS &&
-        selectorExpression.referenceExpression()?.text in IGNORE_CASE_FUNCTIONS) {
+        selectorExpression.referenceExpression()?.text in IGNORE_CASE_FUNCTIONS
+    ) {
       report(
           CodeSmell(
               issue = issue,

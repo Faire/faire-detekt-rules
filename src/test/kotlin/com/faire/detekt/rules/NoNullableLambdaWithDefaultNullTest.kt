@@ -27,7 +27,8 @@ internal class NoNullableLambdaWithDefaultNullTest {
 
   @Test
   fun `should not report non-nullable callback with empty lambda`() {
-    val findings = rule.lint("""
+    val findings = rule.lint(
+        """
             fun test1(callback: (Int) -> Unit = {}) {}
         """.trimIndent(),
     )

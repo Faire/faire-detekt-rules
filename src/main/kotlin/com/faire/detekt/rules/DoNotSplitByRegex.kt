@@ -43,7 +43,8 @@ internal class DoNotSplitByRegex(config: Config = Config.empty) : Rule(config) {
 
     val call = expression.getResolvedCall(bindingContext) ?: return
     if (call.extensionReceiver?.type.toString() == "String" &&
-        call.valueArguments.keys.any { it.type.toString() == "Regex" }) {
+        call.valueArguments.keys.any { it.type.toString() == "Regex" }
+    ) {
       report(
           CodeSmell(
               issue = issue,

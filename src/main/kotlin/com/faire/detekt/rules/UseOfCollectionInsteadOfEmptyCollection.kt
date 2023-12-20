@@ -21,7 +21,7 @@ internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.e
   override val issue: Issue = Issue(
       id = javaClass.simpleName,
       severity = Severity.Warning,
-      description = "replace emptySet(), emptyList(), or emptyMap() with setOf(), listOf(), or mapOf() respectively",
+      description = ISSUE,
       debt = FIVE_MINS,
   )
 
@@ -47,5 +47,9 @@ internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.e
         }
       }
     }
+  }
+
+  companion object {
+    const val ISSUE = "replace emptySet(), emptyList(), or emptyMap() with setOf(), listOf(), or mapOf() respectively"
   }
 }
