@@ -54,6 +54,6 @@ internal class FaireRulesProvider : RuleSetProvider {
       UseMapNotNullInsteadOfFilterNotNull(config),
       UseOfCollectionInsteadOfEmptyCollection(config),
       UseSetInsteadOfListToSet(config),
-    )
+    ),
   )
 }

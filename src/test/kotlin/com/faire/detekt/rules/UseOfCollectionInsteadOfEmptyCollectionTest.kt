@@ -1,9 +1,8 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection.Companion.ISSUE
 import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
-
-private const val ISSUE_DESCRIPTION = "replace emptySet(), emptyList(), or emptyMap() with setOf(), listOf(), or mapOf() respectively"
 
 internal class UseOfCollectionInsteadOfEmptyCollectionTest :
   AutoCorrectRuleTest<UseOfCollectionInsteadOfEmptyCollection>(
@@ -22,7 +21,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             val emptyList = listOf()
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 
@@ -39,7 +38,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             val emptyMap = mapOf()
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 
@@ -56,7 +55,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             val emptySet = setOf()
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 
@@ -77,7 +76,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             val map = mapOf()
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 
@@ -94,7 +93,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             set.toList()
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 
@@ -139,7 +138,7 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
             takeAMap(mapOf())
           }
         """.trimIndent(),
-        issueDescription = ISSUE_DESCRIPTION,
+        issueDescription = ISSUE,
     )
   }
 }
