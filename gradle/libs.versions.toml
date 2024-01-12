@@ -3,7 +3,7 @@ assertj = "3.20.2"
 detekt = "1.23.4"
 guava = "32.1.2-jre"
 junit-jupiter = "5.9.3"
-junit-platform = "1.9.3"
+junit-platform = "1.10.1"
 
 
 [libraries]
