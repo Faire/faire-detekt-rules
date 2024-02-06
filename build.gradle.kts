@@ -8,7 +8,7 @@ plugins {
 group = "com.faire.detektrules"
 version = "0.1.0"
 
-val detektVersion = "1.23.4"
+val detektVersion = "1.23.5"
 
 repositories {
     mavenCentral()
