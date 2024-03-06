@@ -56,6 +56,8 @@ FaireRuleSet:
     active: true
   GetOrDefaultShouldBeReplacedWithGetOrElse:
     active: true
+  NoExtensionFunctionOnNullableReceiver:
+    active: true
   NoNonPrivateGlobalVariables:
     active: true
   NoNullableLambdaWithDefaultNull:
