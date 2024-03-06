@@ -11,6 +11,7 @@ import com.faire.detekt.rules.DoNotUsePropertyAccessInAssert
 import com.faire.detekt.rules.DoNotUseSingleOnFilter
 import com.faire.detekt.rules.DoNotUseSizePropertyInAssert
 import com.faire.detekt.rules.GetOrDefaultShouldBeReplacedWithGetOrElse
+import com.faire.detekt.rules.NoExtensionFunctionOnNullableReceiver
 import com.faire.detekt.rules.NoNonPrivateGlobalVariables
 import com.faire.detekt.rules.NoNullableLambdaWithDefaultNull
 import com.faire.detekt.rules.NoPairWithAmbiguousTypes
@@ -43,6 +44,7 @@ internal class FaireRulesProvider : RuleSetProvider {
       DoNotUseSingleOnFilter(config),
       DoNotUseSizePropertyInAssert(config),
       GetOrDefaultShouldBeReplacedWithGetOrElse(config),
+      NoExtensionFunctionOnNullableReceiver(config),
       NoNonPrivateGlobalVariables(config),
       NoNullableLambdaWithDefaultNull(config),
       NoPairWithAmbiguousTypes(config),
