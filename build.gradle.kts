@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.23"
     `maven-publish`
 
-    id("io.gitlab.arturbosch.detekt") version "1.23.5"
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
 }
 
 group = "com.faire.detektrules"
