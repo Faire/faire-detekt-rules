@@ -10,7 +10,7 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 
 /**
- * No use of `::javaClass`; use `.javaClass` instead.
+ * Do not call `::javaClass`.
  *
  * `Foo::bar` gives you a reference to function/property `bar` on class `Foo`:
  * https://kotlinlang.org/docs/reflection.html#function-references
@@ -18,10 +18,13 @@ import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
  * https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/java-class.html
  *
  * 99% of the time, you want to get the JVM class of some class/object instead of the callable reference to this
- * extension function. This bug can hide deep if you then proceed to call any method on [Class]: e.g.
+ * extension function. This bug can hide deep if you then proceed to access a name that exists on both
+ * [java.base.Class] and [kotlin.reflect.KCallable] : e.g.
  * ```
- * println(Foo::javaClass.simpleName) // gives you "javaClass"
- * println(Foo.javaClass.simpleName)  // gives you "Foo"
+ * class Foo
+ * val foo = Foo()
+ * println(Foo::javaClass.name) // gives you "javaClass"
+ * println(foo.javaClass.name)  // gives you "Foo"
  * ```
  */
 internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : Rule(config) {
@@ -46,6 +49,7 @@ internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : R
     }
 
     companion object {
-        const val RULE_DESCRIPTION = "Do not call ::javaClass; did you mean .javaClass?"
+        const val RULE_DESCRIPTION = "Do not call ::javaClass; " +
+            "did you mean someObject.javaClass or SomeClass::class.java?"
     }
 }
