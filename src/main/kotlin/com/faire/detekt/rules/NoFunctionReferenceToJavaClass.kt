@@ -49,6 +49,7 @@ internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : R
     }
 
     companion object {
-        const val RULE_DESCRIPTION = "Do not call ::javaClass; did you mean someObject.javaClass or SomeClass::class.java?"
+        const val RULE_DESCRIPTION = "Do not call ::javaClass; " +
+            "did you mean someObject.javaClass or SomeClass::class.java?"
     }
 }
