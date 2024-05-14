@@ -30,3 +30,4 @@ junit-platform-reporting = { module = "org.junit.platform:junit-platform-reporti
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.28.0"}
