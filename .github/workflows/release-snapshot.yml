@@ -1,0 +1,38 @@
+name: Trigger Snapshot Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish_archives:
+    runs-on: ubuntu-latest
+
+    if: github.repository == 'Faire/faire-detekt-rules'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Set release snapshot version
+        run: |
+          sed -i.bak -e '/^VERSION_NAME*/ s/$/-'"$GITHUB_SHA"'-SNAPSHOT/' gradle.properties && rm gradle.properties.bak
+      - name: Setup gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
+      - name: Publish the artifacts
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-parallel
