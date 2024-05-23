@@ -7,6 +7,7 @@ import com.faire.detekt.rules.DoNotUseDirectReceiverReferenceInsideWith
 import com.faire.detekt.rules.DoNotUseHasSizeForEmptyListInAssert
 import com.faire.detekt.rules.DoNotUseIsEqualToWhenArgumentIsOne
 import com.faire.detekt.rules.DoNotUseIsEqualToWhenArgumentIsZero
+import com.faire.detekt.rules.DoNotUseIsOneAssertions
 import com.faire.detekt.rules.DoNotUsePropertyAccessInAssert
 import com.faire.detekt.rules.DoNotUseSingleOnFilter
 import com.faire.detekt.rules.DoNotUseSizePropertyInAssert
@@ -42,6 +43,7 @@ internal class FaireRulesProvider : RuleSetProvider {
       DoNotUseHasSizeForEmptyListInAssert(config),
       DoNotUseIsEqualToWhenArgumentIsOne(config),
       DoNotUseIsEqualToWhenArgumentIsZero(config),
+      DoNotUseIsOneAssertions(config),
       DoNotUseSingleOnFilter(config),
       DoNotUseSizePropertyInAssert(config),
       GetOrDefaultShouldBeReplacedWithGetOrElse(config),
