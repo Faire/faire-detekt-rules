@@ -22,4 +22,18 @@ internal class DoNotUseIsOneAssertionsTest : AutoCorrectRuleTest<DoNotUseIsOneAs
 
         assertThat(findings.first().message).isEqualTo(ISSUE_DESCRIPTION)
     }
+
+    @Test
+    fun `using isOne outside of an assertion does not cause failure`() {
+        val findings = rule.lint(
+            """
+           fun String.isOne(): Boolean = false
+           fun `test usage`() {
+               "test".isOne()
+           }
+        """.trimIndent(),
+        )
+
+        assertThat(findings).isEmpty()
+    }
 }
