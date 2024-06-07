@@ -4,23 +4,18 @@ An opinionated ruleset for Detekt, which aims to reduce bugs, improve readabilit
 ## Usage
 In the `dependencies` block of your `build.gradle` file, add the following:
 ```groovy
-detektPlugins("com.github.Faire:faire-detekt-rules:v0.1.1")
+detektPlugins("com.faire:faire-detekt-rules:0.2.4")
 ```
 or if you're using a `libs.version.toml` file, add this there:
 ```
-faire-detekt-rules = { module = "com.github.Faire:faire-detekt-rules", version = "v0.1.1" }
+faire-detekt-rules = { module = "com.faire:faire-detekt-rules", version = "0.2.4" }
 ```
 and this in your `build.gradle` file:
 ```groovy
 detektPlugins(rootProject.libs.faire.detekt.rules)
 ```
 
-You may need to add jitpack as a maven repository:
-```groovy
-maven {
-  url = uri("https://jitpack.io")
-}
-```
+You can find the latest version [here](https://central.sonatype.com/artifact/com.faire/faire-detekt-rules).
 
 ## Configuration
 The below block is a starting point for the configuration to add to `detekt.yml`, and can be modified as needed:

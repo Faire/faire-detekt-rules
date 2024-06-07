@@ -2,7 +2,6 @@ import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     kotlin("jvm") version "1.9.24"
-    `maven-publish`
     alias(libs.plugins.maven.publishing)
 
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
@@ -55,14 +54,6 @@ tasks.test {
 
 kotlin {
     jvmToolchain(8)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-        }
-    }
 }
 
 mavenPublishing {
