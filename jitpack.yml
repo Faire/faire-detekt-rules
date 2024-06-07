@@ -1,4 +1,0 @@
-jdk:
-  - openjdk18
-install:
-  - ./gradlew :assemble :publishToMavenLocal
