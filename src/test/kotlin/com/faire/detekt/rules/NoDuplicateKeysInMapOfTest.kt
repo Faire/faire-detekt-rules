@@ -99,4 +99,22 @@ internal class NoDuplicateKeysInMapOfTest {
     val findings = rule.lint(ktFile)
     assertThat(findings).isEmpty()
   }
+
+  @Test
+  fun `should not report for constant, variable, and function with same name`() {
+    val ktFile = compileContentForTest(
+      """
+          val key1 = "key1"
+          fun getKey() = "key1"
+          val map = mapOf(
+              "key1" to "value3",
+              key1 to "value2",
+              key1() to "value1",
+          )
+        """.trimIndent(),
+    )
+
+    val findings = rule.lint(ktFile)
+    assertThat(findings).isEmpty()
+  }
 }
