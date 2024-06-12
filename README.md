@@ -51,6 +51,8 @@ FaireRuleSet:
     active: true
   GetOrDefaultShouldBeReplacedWithGetOrElse:
     active: true
+  NoDuplicateKeysInMapOf:
+    active: true
   NoExtensionFunctionOnNullableReceiver:
     active: true
   NoNonPrivateGlobalVariables:
