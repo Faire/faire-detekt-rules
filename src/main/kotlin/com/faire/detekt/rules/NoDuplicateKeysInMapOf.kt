@@ -69,6 +69,9 @@ internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(conf
     // Handle key value pairs
     if (argumentExpression is KtBinaryExpression) {
       val leftExpression = argumentExpression.left
+      if (argumentExpression.operationReference.text != "to") {
+        return null
+      }
       return extractKeyFromExpression(leftExpression)
     }
 
