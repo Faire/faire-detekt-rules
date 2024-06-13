@@ -37,7 +37,7 @@ internal class WithReceiverShouldHaveMultipleActionsTest {
                     assertThat(length).isEqualTo(10)
                 }
             }
-        """.trimIndent()
+        """.trimIndent(),
         )
         assertThat(findings).hasSize(1)
         with(findings.first().issue) {
@@ -59,7 +59,7 @@ internal class WithReceiverShouldHaveMultipleActionsTest {
                     assertThat(length).isNotEqualTo(8)
                 }
             }
-        """.trimIndent()
+        """.trimIndent(),
         )
         assertThat(findings).isEmpty()
     }

@@ -52,7 +52,7 @@ internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.emp
                     issue = issue,
                     entity = Entity.from(parentWithStatement),
                     message = issue.description,
-                )
+                ),
             )
         }
     }
