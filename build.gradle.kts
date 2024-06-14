@@ -7,10 +7,15 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
 }
 
-group = "com.faire.detektrules"
+
+group = "com.faire"
 version = "0.2.5"
 
-val detektVersion = "1.23.6"
+if (!providers.environmentVariable("RELEASE").isPresent) {
+    version = "$version-SNAPSHOT"
+}
+
+val detektVersion = libs.versions.detekt.get()
 
 repositories {
     mavenCentral()

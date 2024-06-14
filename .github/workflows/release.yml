@@ -11,6 +11,9 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      RELEASE: true
+
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
