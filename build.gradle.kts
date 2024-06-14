@@ -1,12 +1,11 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-  kotlin("jvm") version "1.9.24"
+  alias(libs.plugins.kotlin)
   alias(libs.plugins.maven.publishing)
 
-  id("io.gitlab.arturbosch.detekt") version "1.23.6"
+  alias(libs.plugins.detekt)
 }
-
 
 group = "com.faire"
 version = "0.2.5"
@@ -49,7 +48,7 @@ dependencies {
 
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors:$detektVersion")
-  detektPlugins("com.braisgabin.detekt:kotlin-compiler-wrapper:0.0.4")
+  detektPlugins(libs.detekt.compiler.wrapper)
   detektPlugins(rootProject)
 }
 
