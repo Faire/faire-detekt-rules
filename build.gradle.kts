@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.faire.detektrules"
-version = "0.1.0"
+version = "0.2.5"
 
 val detektVersion = "1.23.6"
 
