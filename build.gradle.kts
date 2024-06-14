@@ -12,7 +12,15 @@ group = "com.faire"
 version = "0.2.5"
 
 if (!providers.environmentVariable("RELEASE").isPresent) {
-    version = "$version-SNAPSHOT"
+    val gitSha = providers.environmentVariable("GITHUB_SHA")
+        .orElse(
+            providers.exec { commandLine("git", "rev-parse", "--short", "HEAD") }
+                .standardOutput
+                .asText
+        )
+        .get()
+
+    version = "$version-$gitSha-SNAPSHOT"
 }
 
 val detektVersion = libs.versions.detekt.get()
