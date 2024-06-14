@@ -22,13 +22,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-      - name: Set release snapshot version
-        run: |
-          sed -i.bak -e '/^VERSION_NAME*/ s/$/-'"$GITHUB_SHA"'-SNAPSHOT/' gradle.properties && rm gradle.properties.bak
       - name: Setup gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
+
+      - name: Verify build
+        run: ./gradlew check
+
       - name: Publish the artifacts
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}

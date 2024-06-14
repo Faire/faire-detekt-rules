@@ -13,6 +13,9 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      RELEASE: true
+
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
@@ -26,6 +29,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
+
+      - name: Verify build
+        run: ./gradlew check
+
       - name: Publish the artifacts
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
