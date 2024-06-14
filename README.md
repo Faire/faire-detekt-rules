@@ -99,3 +99,10 @@ convention of the project) to allow test code access to the annotated members.
 
 ## Type Resolution
 A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled to function properly. If type resolution is not enabled, the rules will silently continue.
+
+# Releasing
+
+To release a new version: 
+
+1. Create a PR that bumps the `version` in [`build.gradle.kts`](./build.gradle.kts).
+2. Once this PR merges with the new version and completes CI, create a new version through Github releases
