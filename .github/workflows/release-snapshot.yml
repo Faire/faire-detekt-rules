@@ -22,9 +22,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-      - name: Set release snapshot version
-        run: |
-          sed -i.bak -e '/^VERSION_NAME*/ s/$/-'"$GITHUB_SHA"'-SNAPSHOT/' gradle.properties && rm gradle.properties.bak
       - name: Setup gradle
         uses: gradle/actions/setup-gradle@v3
         with:
