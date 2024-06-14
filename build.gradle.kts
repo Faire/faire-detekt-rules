@@ -48,8 +48,8 @@ dependencies {
 
   testRuntimeOnly(libs.junit.jupiter.engine)
 
-  detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
-  detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors:$detektVersion")
+  detektPlugins(libs.detekt.formatting)
+  detektPlugins(libs.detekt.ruleauthors)
   detektPlugins(libs.detekt.compiler.wrapper)
   detektPlugins(rootProject)
 }
