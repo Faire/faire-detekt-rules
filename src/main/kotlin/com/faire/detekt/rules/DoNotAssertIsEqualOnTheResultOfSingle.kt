@@ -18,6 +18,9 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 /**
  * Do not assert isEqual on the result of single(). Instead, use containsOnly.
  *
+ * Using .single() will throw an exception if the collection does not contain exactly one element.
+ * The exception results in the assertion failure message being hidden, which makes debugging more difficult.
+ *
  * ```
  * // Good
  * assertThat(listof("a")).containsOnly("a")
