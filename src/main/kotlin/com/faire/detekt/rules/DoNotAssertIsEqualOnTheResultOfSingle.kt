@@ -10,6 +10,9 @@ import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -34,14 +37,15 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
     override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
         super.visitDotQualifiedExpression(expression)
 
-        val selectorExpression = expression.selectorExpression ?: return
+        val isEqualExpression = expression.selectorExpression ?: return
         val receiverExpression = expression.receiverExpression
 
         if (!receiverExpression.isAssertThat()) return
-        if (selectorExpression.referenceExpression()?.text != "isEqualTo") return
+        if (isEqualExpression.referenceExpression()?.text != "isEqualTo") return
 
         val assertThatExpression = receiverExpression as? KtCallExpression ?: return
-        if (!assertThatExpression.isAssertingOnResultOfSingle()) return
+        val argumentForAssertThatExpression = assertThatExpression.valueArguments.singleOrNull()?.getArgumentExpression() ?: return
+        if (!argumentForAssertThatExpression.callsSingleWithNoArgumentAtTheEnd()) return
 
         report(
             CodeSmell(
@@ -50,11 +54,23 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
                 message = "containsOnly should be used instead of asserting isEqual on the result of single()",
             ),
         )
+
+        withAutoCorrect {
+            argumentForAssertThatExpression.lastChild.delete() // Delete "single()"
+            argumentForAssertThatExpression.lastChild.delete() // Delete "."
+
+            val argumentsForIsEqualExpression = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
+            isEqualExpression.astReplace(KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression"))
+        }
     }
 
-    private fun KtCallExpression.isAssertingOnResultOfSingle(): Boolean {
-        val argument = valueArguments.singleOrNull() ?: return false
+    private fun KtExpression.callsSingleWithNoArgumentAtTheEnd(): Boolean {
+        // If argument expression ends with single(), then the whole expression is a dot qualified expression with single as its selector expression
+        val selectorExpression = (this as? KtDotQualifiedExpression)?.selectorExpression ?: return false
 
-        return argument.text.endsWith(".single()")
+        // Check if the callee is single() with no arguments e.g. single { it > 0 }
+        val referenceExpression = selectorExpression.referenceExpression()?.text
+        val valueArguments = (selectorExpression as? KtCallExpression)?.valueArguments
+        return referenceExpression == "single" && valueArguments?.isEmpty() == true
     }
 }

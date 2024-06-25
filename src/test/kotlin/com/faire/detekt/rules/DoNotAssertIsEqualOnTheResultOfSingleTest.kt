@@ -1,16 +1,16 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.lint
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle> (
+private const val RULE_DESCRIPTION = "containsOnly should be used instead of asserting isEqual on the result of single()"
+
+internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle>(
     { DoNotAssertIsEqualOnTheResultOfSingle(it) },
 ) {
     @Test
     fun `asserting isEqualTo does not produce an error if there's no call to single()`() {
-        assertNoViolations(
+        assertNoViolationsAndNotFormatted(
             """
           fun foo() {
             assertThat(someValue).isEqualTo(someValue)
@@ -21,7 +21,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<D
 
     @Test
     fun `asserting isEqualTo does not produce an error if it's not called directly on the result of single()`() {
-        assertNoViolations(
+        assertNoViolationsAndNotFormatted(
             """
           fun foo() {
             assertThat(someList.single().someMethod()).isEqualTo(someValue)
@@ -32,14 +32,30 @@ internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<D
     }
 
     @Test
-    fun `asserting isEqualTo on the result of single() would produce an error`() {
-        val findings = rule.lint(
+    fun `asserting isEqualTo does not produce an error if a predicate is passed`() {
+        assertNoViolationsAndNotFormatted(
             """
           fun foo() {
-            assertThat(bar.baz.qux.single()).isEqualTo(someValue)
+            assertThat(someList.single { it > 0 }).isEqualTo(someValue)
           }
         """.trimIndent(),
         )
-        assertThat(findings.single().id).isEqualTo("DoNotAssertIsEqualOnTheResultOfSingle")
+    }
+
+    @Test
+    fun `asserting isEqualTo on the result of single() would produce an error`() {
+        assertLintAndFormat(
+            """
+            fun foo() {
+                assertThat(bar.baz.qux.single()).isEqualTo(someValue)
+            }
+            """.trimIndent(),
+            """
+            fun foo() {
+                assertThat(bar.baz.qux).containsOnly(someValue)
+            }
+            """.trimIndent(),
+            issueDescription = RULE_DESCRIPTION,
+        )
     }
 }
