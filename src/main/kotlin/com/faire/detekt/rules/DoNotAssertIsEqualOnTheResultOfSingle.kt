@@ -62,7 +62,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
 
             val argumentsForIsEqualExpression = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
             isEqualExpression.astReplace(
-                KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression")
+                KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression"),
             )
         }
     }
