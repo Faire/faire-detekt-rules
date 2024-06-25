@@ -41,7 +41,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
         if (selectorExpression.referenceExpression()?.text != "isEqualTo") return
 
         val assertThatExpression = receiverExpression as? KtCallExpression ?: return
-        if(!assertThatExpression.isAssertingOnResultOfSingle()) return
+        if (!assertThatExpression.isAssertingOnResultOfSingle()) return
 
         report(
             CodeSmell(
@@ -53,7 +53,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
     }
 
     private fun KtCallExpression.isAssertingOnResultOfSingle(): Boolean {
-        val argument = valueArguments.singleOrNull()?: return false
+        val argument = valueArguments.singleOrNull() ?: return false
 
         return argument.text.endsWith(".single()")
     }
