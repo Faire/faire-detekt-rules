@@ -44,7 +44,8 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
         if (isEqualExpression.referenceExpression()?.text != "isEqualTo") return
 
         val assertThatExpression = receiverExpression as? KtCallExpression ?: return
-        val argumentForAssertThatExpression = assertThatExpression.valueArguments.singleOrNull()?.getArgumentExpression() ?: return
+        val argumentForAssertThatExpression =
+            assertThatExpression.valueArguments.singleOrNull()?.getArgumentExpression() ?: return
         if (!argumentForAssertThatExpression.callsSingleWithNoArgumentAtTheEnd()) return
 
         report(
@@ -60,12 +61,15 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
             argumentForAssertThatExpression.lastChild.delete() // Delete "."
 
             val argumentsForIsEqualExpression = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
-            isEqualExpression.astReplace(KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression"))
+            isEqualExpression.astReplace(
+                KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression")
+            )
         }
     }
 
     private fun KtExpression.callsSingleWithNoArgumentAtTheEnd(): Boolean {
-        // If argument expression ends with single(), then the whole expression is a dot qualified expression with single as its selector expression
+        // If argument expression does actually end with single(), then this would mean that the whole expression is
+        // a dot qualified expression with single as its selector expression
         val selectorExpression = (this as? KtDotQualifiedExpression)?.selectorExpression ?: return false
 
         // Check if the callee is single() with no arguments e.g. single { it > 0 }

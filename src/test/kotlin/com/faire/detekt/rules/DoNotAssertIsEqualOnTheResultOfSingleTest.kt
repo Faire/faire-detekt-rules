@@ -3,7 +3,8 @@ package com.faire.detekt.rules
 import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
 
-private const val RULE_DESCRIPTION = "containsOnly should be used instead of asserting isEqual on the result of single()"
+private const val RULE_DESCRIPTION =
+    "containsOnly should be used instead of asserting isEqual on the result of single()"
 
 internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle>(
     { DoNotAssertIsEqualOnTheResultOfSingle(it) },
