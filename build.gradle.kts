@@ -18,6 +18,7 @@ if (!providers.environmentVariable("RELEASE").isPresent) {
         providers.exec { commandLine("git", "rev-parse", "--short", "HEAD") }
           .standardOutput
           .asText
+          .map { it.trim() }
           .get()
       }
     )
