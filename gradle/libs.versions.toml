@@ -4,7 +4,7 @@ detekt = "1.23.7"
 guava = "33.3.0-jre"
 kotlin = "1.9.24"
 junit-jupiter = "5.10.3"
-junit-platform = "1.10.3"
+junit-platform = "1.11.0"
 
 
 [libraries]
