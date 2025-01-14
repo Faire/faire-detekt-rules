@@ -3,6 +3,7 @@ package com.faire.detekt
 import com.faire.detekt.rules.AlwaysUseIsTrueOrIsFalse
 import com.faire.detekt.rules.DoNotAccessVisibleForTesting
 import com.faire.detekt.rules.DoNotAssertIsEqualOnTheResultOfSingle
+import com.faire.detekt.rules.DoNotNameCompanionObject
 import com.faire.detekt.rules.DoNotSplitByRegex
 import com.faire.detekt.rules.DoNotUseDirectReceiverReferenceInsideWith
 import com.faire.detekt.rules.DoNotUseHasSizeForEmptyListInAssert
@@ -40,6 +41,7 @@ internal class FaireRulesProvider : RuleSetProvider {
       AlwaysUseIsTrueOrIsFalse(config),
       DoNotAccessVisibleForTesting(config),
       DoNotAssertIsEqualOnTheResultOfSingle(config),
+      DoNotNameCompanionObject(config),
       DoNotSplitByRegex(config),
       DoNotUseDirectReceiverReferenceInsideWith(config),
       DoNotUsePropertyAccessInAssert(config),
