@@ -78,7 +78,7 @@ internal class DoNotNameCompanionObject(config: Config = Config.empty) : Rule(co
         issue = issue,
         entity = Entity.from(declaration),
         message = issue.description,
-      )
+      ),
     )
   }
 }
