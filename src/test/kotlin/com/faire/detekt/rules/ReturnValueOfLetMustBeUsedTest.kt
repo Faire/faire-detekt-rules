@@ -184,6 +184,22 @@ internal class ReturnValueOfLetMustBeUsedTest {
   }
 
   @Test
+  fun `let expression can be used in parameter default values`() {
+    val findings = rule.lint(
+        """
+        fun testFunc(
+            foo: Int?,
+            bar: Int? = foo?.let { it + 2 },
+        ): Int {
+            return (foo ?: 0) + (bar ?: 0)
+        }
+      """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `let expression can be used in anonymous interface implementations`() {
     val findings = rule.lint(
         """
