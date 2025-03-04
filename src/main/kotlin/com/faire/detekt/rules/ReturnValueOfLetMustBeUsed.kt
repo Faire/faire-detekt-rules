@@ -14,10 +14,12 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
+import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 /**
  * This rule checks that the return value of a let is used - assigned, returned or captured in a collection.
@@ -59,6 +61,7 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
         currentParent is KtValueArgument -> return
         currentParent is KtNamedFunction && isSingleLineFunction(currentParent) -> return
         currentParent is KtDestructuringDeclaration -> return
+        currentParent is KtParameter && currentParent.elementType == KtStubElementTypes.VALUE_PARAMETER -> return
 
         else -> {
           currentChild = currentChild.parent
