@@ -14,8 +14,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
 internal abstract class AutoCorrectRuleTest<T : Rule>(
-  factory: (config: Config) -> T,
-  additionalConfig: List<Pair<String, Any>> = listOf(),
+    factory: (config: Config) -> T,
+    additionalConfig: List<Pair<String, Any>> = listOf(),
 ) {
   val rule = factory(TestConfig("autoCorrect" to false, *additionalConfig.toTypedArray()))
   private val autoCorrectRule = factory(TestConfig("autoCorrect" to true, *additionalConfig.toTypedArray()))
@@ -32,19 +32,19 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
   }
 
   fun assertLintAndFormat(
-    @Language("kotlin")
-    codeToLint: String,
-    @Language("kotlin")
-    expectedPostFormattedCode: String,
-    issueDescription: String,
-    fileName: String = "Test.kt",
+      @Language("kotlin")
+      codeToLint: String,
+      @Language("kotlin")
+      expectedPostFormattedCode: String,
+      issueDescription: String,
+      fileName: String = "Test.kt",
   ) {
     val code = compileContentForTest(codeToLint, fileName)
     val findings = autoCorrectRule.lint(code)
     assertThat(findings)
-      .`as`("Expected issues to be: '$issueDescription'")
-      .extracting<String> { it.message }
-      .allMatch { it == issueDescription }
+        .`as`("Expected issues to be: '$issueDescription'")
+        .extracting<String> { it.message }
+        .allMatch { it == issueDescription }
     assertThat(code.text).isEqualTo(expectedPostFormattedCode)
 
     val postFormattedCode = compileContentForTest(code.text, fileName)
@@ -52,9 +52,9 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
   }
 
   fun assertNoViolationsAndNotFormatted(
-    @Language("kotlin")
-    codeToLint: String,
-    fileName: String = "Test.kt",
+      @Language("kotlin")
+      codeToLint: String,
+      fileName: String = "Test.kt",
   ) {
     val code = compileContentForTest(codeToLint, fileName)
     val findings = autoCorrectRule.lint(code)
@@ -64,8 +64,8 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
 
   // Lint the supplied code and ensure there are no detekted violations
   fun assertNoViolations(
-    @Language("kotlin")
-    codeToLint: String,
+      @Language("kotlin")
+      codeToLint: String,
   ) {
     val code = compileContentForTest(codeToLint)
     assertThat(rule.lint(code)).isEmpty()

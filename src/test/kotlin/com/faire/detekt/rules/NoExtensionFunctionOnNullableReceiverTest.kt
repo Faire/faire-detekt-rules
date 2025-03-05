@@ -16,7 +16,7 @@ internal class NoExtensionFunctionOnNullableReceiverTest {
   @Test
   fun `flag non-private extension function on nullable type`() {
     val findings = rule.compileAndLint(
-      """
+        """
           fun String?.foo(): String? = this
         """.trimIndent(),
     )
@@ -26,7 +26,7 @@ internal class NoExtensionFunctionOnNullableReceiverTest {
   @Test
   fun `do not flag extension function on non-nullable type`() {
     val findings = rule.compileAndLint(
-      """
+        """
           fun String.foo(): String? = this
         """.trimIndent(),
     )
@@ -36,7 +36,7 @@ internal class NoExtensionFunctionOnNullableReceiverTest {
   @Test
   fun `do not flag extension function that returns non-null type`() {
     val findings = rule.compileAndLint(
-      """
+        """
           fun String?.foo(): String = this ?: ""
         """.trimIndent(),
     )
@@ -46,7 +46,7 @@ internal class NoExtensionFunctionOnNullableReceiverTest {
   @Test
   fun `do not flag if manually suppressed`() {
     val findings = rule.compileAndLint(
-      """
+        """
           @Suppress("NoExtensionFunctionOnNullableReceiver")
           fun String?.foo(): String? = this
         """.trimIndent(),

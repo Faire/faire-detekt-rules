@@ -16,7 +16,7 @@ internal class DoNotNameCompanionObjectTest {
   @Test
   fun `named companion object is flagged`() {
     val findings = rule.lint(
-      """
+        """
           class Foo {
             companion object Bar
           }
@@ -28,7 +28,7 @@ internal class DoNotNameCompanionObjectTest {
   @Test
   fun `unnamed companion object is not flagged`() {
     val findings = rule.lint(
-      """
+        """
           class Foo {
             companion object
           }
@@ -40,7 +40,7 @@ internal class DoNotNameCompanionObjectTest {
   @Test
   fun `named non-companion object is not flagged`() {
     val findings = rule.lint(
-      """
+        """
           class Foo {
             object Bar
           }

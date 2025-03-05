@@ -5,9 +5,9 @@ import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
 
 internal class UseOfCollectionInsteadOfEmptyCollectionTest :
-  AutoCorrectRuleTest<UseOfCollectionInsteadOfEmptyCollection>(
-    { UseOfCollectionInsteadOfEmptyCollection(it) },
-) {
+    AutoCorrectRuleTest<UseOfCollectionInsteadOfEmptyCollection>(
+        { UseOfCollectionInsteadOfEmptyCollection(it) },
+    ) {
   @Test
   fun `emptyList is caught`() {
     assertLintAndFormat(

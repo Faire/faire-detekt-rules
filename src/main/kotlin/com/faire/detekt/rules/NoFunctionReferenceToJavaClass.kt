@@ -28,28 +28,28 @@ import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
  * ```
  */
 internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : Rule(config) {
-    override val issue = Issue(
-        id = javaClass.simpleName,
-        severity = Severity.CodeSmell,
-        description = RULE_DESCRIPTION,
-        debt = Debt.FIVE_MINS,
-    )
+  override val issue = Issue(
+      id = javaClass.simpleName,
+      severity = Severity.CodeSmell,
+      description = RULE_DESCRIPTION,
+      debt = Debt.FIVE_MINS,
+  )
 
-    override fun visitCallableReferenceExpression(expression: KtCallableReferenceExpression) {
-        super.visitCallableReferenceExpression(expression)
-        if (expression.callableReference.getReferencedName() == "javaClass") {
-            report(
-                CodeSmell(
-                    issue = issue,
-                    entity = Entity.from(expression),
-                    message = RULE_DESCRIPTION,
-                ),
-            )
-        }
+  override fun visitCallableReferenceExpression(expression: KtCallableReferenceExpression) {
+    super.visitCallableReferenceExpression(expression)
+    if (expression.callableReference.getReferencedName() == "javaClass") {
+      report(
+          CodeSmell(
+              issue = issue,
+              entity = Entity.from(expression),
+              message = RULE_DESCRIPTION,
+          ),
+      )
     }
+  }
 
-    companion object {
-        const val RULE_DESCRIPTION = "Do not call ::javaClass; " +
-            "did you mean someObject.javaClass or SomeClass::class.java?"
-    }
+  companion object {
+    const val RULE_DESCRIPTION = "Do not call ::javaClass; " +
+        "did you mean someObject.javaClass or SomeClass::class.java?"
+  }
 }

@@ -10,30 +10,30 @@ private const val ISSUE_DESCRIPTION = "Do not use isOne(), use isEqualTo(1) inst
 internal class DoNotUseIsOneAssertionsTest : AutoCorrectRuleTest<DoNotUseIsOneAssertions>(
     { DoNotUseIsOneAssertions(it) },
 ) {
-    @Test
-    fun `using isOne causes failure`() {
-        val findings = rule.lint(
-            """
+  @Test
+  fun `using isOne causes failure`() {
+    val findings = rule.lint(
+        """
            fun `test usage`() {
                assertThat(products).isOne()
            }
         """.trimIndent(),
-        )
+    )
 
-        assertThat(findings.first().message).isEqualTo(ISSUE_DESCRIPTION)
-    }
+    assertThat(findings.first().message).isEqualTo(ISSUE_DESCRIPTION)
+  }
 
-    @Test
-    fun `using isOne outside of an assertion does not cause failure`() {
-        val findings = rule.lint(
-            """
+  @Test
+  fun `using isOne outside of an assertion does not cause failure`() {
+    val findings = rule.lint(
+        """
            fun String.isOne(): Boolean = false
            fun `test usage`() {
                "test".isOne()
            }
         """.trimIndent(),
-        )
+    )
 
-        assertThat(findings).isEmpty()
-    }
+    assertThat(findings).isEmpty()
+  }
 }

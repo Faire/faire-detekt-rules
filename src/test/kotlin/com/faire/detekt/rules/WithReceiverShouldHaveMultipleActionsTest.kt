@@ -12,25 +12,25 @@ import org.junit.jupiter.api.Test
 private const val ISSUE_DESCRIPTION = "With block receiver should have multiple actions"
 
 internal class WithReceiverShouldHaveMultipleActionsTest {
-    private lateinit var rule: WithReceiverShouldHaveMultipleActions
-    private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
+  private lateinit var rule: WithReceiverShouldHaveMultipleActions
+  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
-    @BeforeEach
-    fun setUp() {
-        rule = WithReceiverShouldHaveMultipleActions()
-        envWrapper = createEnvironment(listOf())
-    }
+  @BeforeEach
+  fun setUp() {
+    rule = WithReceiverShouldHaveMultipleActions()
+    envWrapper = createEnvironment(listOf())
+  }
 
-    @AfterEach
-    fun tearDown() {
-        envWrapper.dispose()
-    }
+  @AfterEach
+  fun tearDown() {
+    envWrapper.dispose()
+  }
 
-    @Test
-    fun `with() having a single call to receiver is flagged`() {
-        val findings = rule.compileAndLintWithContext(
-            envWrapper.env,
-            """
+  @Test
+  fun `with() having a single call to receiver is flagged`() {
+    val findings = rule.compileAndLintWithContext(
+        envWrapper.env,
+        """
             fun foo() {
                 val receiver = "foobar"
                 with(receiver) {
@@ -38,20 +38,20 @@ internal class WithReceiverShouldHaveMultipleActionsTest {
                 }
             }
         """.trimIndent(),
-        )
-        assertThat(findings).hasSize(1)
-        with(findings.first().issue) {
-            assertThat(id).isEqualTo("WithReceiverShouldHaveMultipleActions")
-            assertThat(description).isEqualTo(ISSUE_DESCRIPTION)
-            assertThat(severity).isEqualTo(Severity.Style)
-        }
+    )
+    assertThat(findings).hasSize(1)
+    with(findings.first().issue) {
+      assertThat(id).isEqualTo("WithReceiverShouldHaveMultipleActions")
+      assertThat(description).isEqualTo(ISSUE_DESCRIPTION)
+      assertThat(severity).isEqualTo(Severity.Style)
     }
+  }
 
-    @Test
-    fun `with() having a multiple calls to receiver is not flagged`() {
-        val findings = rule.compileAndLintWithContext(
-            envWrapper.env,
-            """
+  @Test
+  fun `with() having a multiple calls to receiver is not flagged`() {
+    val findings = rule.compileAndLintWithContext(
+        envWrapper.env,
+        """
             fun foo() {
                 val receiver = "foobar"
                 with(receiver) {
@@ -60,7 +60,7 @@ internal class WithReceiverShouldHaveMultipleActionsTest {
                 }
             }
         """.trimIndent(),
-        )
-        assertThat(findings).isEmpty()
-    }
+    )
+    assertThat(findings).isEmpty()
+  }
 }
