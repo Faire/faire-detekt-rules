@@ -22,12 +22,12 @@ internal class NoFunctionReferenceToJavaClassTest {
 
   @Test
   fun `should not report dot javaClass`() {
-      val findings = rule.lint(
-          """
+    val findings = rule.lint(
+        """
           class Foo
           val correct = Foo.javaClass.name
           """.trimIndent(),
-      )
+    )
 
     assertThat(findings).isEmpty()
   }

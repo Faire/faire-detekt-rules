@@ -61,10 +61,10 @@ import org.jetbrains.kotlin.psi.KtObjectDeclaration
  */
 internal class DoNotNameCompanionObject(config: Config = Config.empty) : Rule(config) {
   override val issue: Issue = Issue(
-    id = javaClass.simpleName,
-    severity = Severity.Warning,
-    description = "Companion objects should not be named",
-    debt = Debt.FIVE_MINS,
+      id = javaClass.simpleName,
+      severity = Severity.Warning,
+      description = "Companion objects should not be named",
+      debt = Debt.FIVE_MINS,
   )
 
   override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
@@ -74,11 +74,11 @@ internal class DoNotNameCompanionObject(config: Config = Config.empty) : Rule(co
     if (declaration.nameIdentifier == null) return
 
     report(
-      CodeSmell(
-        issue = issue,
-        entity = Entity.from(declaration),
-        message = issue.description,
-      ),
+        CodeSmell(
+            issue = issue,
+            entity = Entity.from(declaration),
+            message = issue.description,
+        ),
     )
   }
 }

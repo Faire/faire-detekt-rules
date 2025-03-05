@@ -26,29 +26,29 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * ```
  */
 internal class DoNotUseIsOneAssertions(config: Config = Config.empty) : Rule(config) {
-    override val issue = Issue(
-        id = javaClass.simpleName,
-        severity = Severity.Style,
-        description = "Do not use isOne(), use isEqualTo(1) instead.",
-        debt = Debt.FIVE_MINS,
-    )
+  override val issue = Issue(
+      id = javaClass.simpleName,
+      severity = Severity.Style,
+      description = "Do not use isOne(), use isEqualTo(1) instead.",
+      debt = Debt.FIVE_MINS,
+  )
 
-    override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
-        super.visitDotQualifiedExpression(expression)
+  override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
+    super.visitDotQualifiedExpression(expression)
 
-        val selectorExpression = expression.selectorExpression ?: return
-        val receiverExpression = expression.receiverExpression
+    val selectorExpression = expression.selectorExpression ?: return
+    val receiverExpression = expression.receiverExpression
 
-        if (!receiverExpression.isAssertThat()) return
+    if (!receiverExpression.isAssertThat()) return
 
-        if (selectorExpression.referenceExpression()?.text == "isOne") {
-            report(
-                CodeSmell(
-                    issue = issue,
-                    entity = Entity.from(expression),
-                    message = issue.description,
-                ),
-            )
-        }
+    if (selectorExpression.referenceExpression()?.text == "isOne") {
+      report(
+          CodeSmell(
+              issue = issue,
+              entity = Entity.from(expression),
+              message = issue.description,
+          ),
+      )
     }
+  }
 }

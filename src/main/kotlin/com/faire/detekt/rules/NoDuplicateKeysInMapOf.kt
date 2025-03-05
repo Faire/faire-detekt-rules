@@ -32,10 +32,10 @@ import org.jetbrains.kotlin.psi.KtValueArgument
  */
 internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(config) {
   override val issue: Issue = Issue(
-    id = javaClass.simpleName,
-    severity = Severity.Warning,
-    description = "NoDuplicateKeysInMapOf",
-    debt = Debt.FIVE_MINS,
+      id = javaClass.simpleName,
+      severity = Severity.Warning,
+      description = "NoDuplicateKeysInMapOf",
+      debt = Debt.FIVE_MINS,
   )
 
   override fun visitCallExpression(expression: KtCallExpression) {
@@ -51,11 +51,11 @@ internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(conf
         if (key != null) {
           if (!keys.add(key)) {
             report(
-              CodeSmell(
-                issue,
-                Entity.from(argument),
-                message = "The key $key is duplicated in the map.",
-              ),
+                CodeSmell(
+                    issue,
+                    Entity.from(argument),
+                    message = "The key $key is duplicated in the map.",
+                ),
             )
           }
         }

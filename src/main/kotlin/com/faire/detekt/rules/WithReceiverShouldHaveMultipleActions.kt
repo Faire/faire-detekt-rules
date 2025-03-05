@@ -34,28 +34,28 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
  * ```
  */
 internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty) : Rule(config) {
-    override val issue: Issue = Issue(
-        id = javaClass.simpleName,
-        severity = Severity.Style,
-        description = "With block receiver should have multiple actions",
-        debt = Debt.FIVE_MINS,
-    )
+  override val issue: Issue = Issue(
+      id = javaClass.simpleName,
+      severity = Severity.Style,
+      description = "With block receiver should have multiple actions",
+      debt = Debt.FIVE_MINS,
+  )
 
-    override fun visitBlockExpression(expression: KtBlockExpression) {
-        super.visitBlockExpression(expression)
-        val parentWithStatement = expression.getParentOfType<KtCallExpression>(true) ?: return
-        if (!parentWithStatement.isWithExpr()) return
+  override fun visitBlockExpression(expression: KtBlockExpression) {
+    super.visitBlockExpression(expression)
+    val parentWithStatement = expression.getParentOfType<KtCallExpression>(true) ?: return
+    if (!parentWithStatement.isWithExpr()) return
 
-        if (expression.countChildren(null) <= 1) {
-            report(
-                CodeSmell(
-                    issue = issue,
-                    entity = Entity.from(parentWithStatement),
-                    message = issue.description,
-                ),
-            )
-        }
+    if (expression.countChildren(null) <= 1) {
+      report(
+          CodeSmell(
+              issue = issue,
+              entity = Entity.from(parentWithStatement),
+              message = issue.description,
+          ),
+      )
     }
+  }
 }
 
 private fun KtCallExpression.isWithExpr(): Boolean = calleeExpression?.textMatches("with") == true

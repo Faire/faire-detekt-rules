@@ -34,10 +34,10 @@ import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
  */
 internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.empty) : Rule(config) {
   override val issue: Issue = Issue(
-    id = javaClass.simpleName,
-    severity = Severity.Warning,
-    description = "This rule reports extension functions on nullable types.",
-    debt = Debt.FIVE_MINS,
+      id = javaClass.simpleName,
+      severity = Severity.Warning,
+      description = "This rule reports extension functions on nullable types.",
+      debt = Debt.FIVE_MINS,
   )
 
   override fun visitNamedFunction(function: KtNamedFunction) {
@@ -48,11 +48,11 @@ internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.emp
     if (function.typeReference?.text?.endsWith("?") != true) return
 
     report(
-      CodeSmell(
-        issue = issue,
-        entity = Entity.from(function),
-        message = "No extension functions on nullable types",
-      ),
+        CodeSmell(
+            issue = issue,
+            entity = Entity.from(function),
+            message = "No extension functions on nullable types",
+        ),
     )
   }
 }
