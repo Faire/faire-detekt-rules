@@ -1,7 +1,11 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.lint
+import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
+import io.github.detekt.test.utils.createEnvironment
+import io.gitlab.arturbosch.detekt.api.Finding
+import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -9,184 +13,243 @@ private const val ISSUE_DESCRIPTION = "Do not use size property in assertion, us
 
 internal class DoNotUseSizePropertyInAssertTest {
   private lateinit var rule: DoNotUseSizePropertyInAssert
+  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
   @BeforeEach
   fun setup() {
     rule = DoNotUseSizePropertyInAssert()
+    envWrapper = createEnvironment(listOf())
+  }
+
+  @AfterEach
+  fun tearDown() {
+    envWrapper.dispose()
   }
 
   @Test
-  fun `collection size is caught`() {
-    val findings = rule.lint(
+  fun `collection size is invalid in assertion when coming from a collection or map`() {
+    assertInvalid(
         """
-          fun `test usage`() {
-            assertThat(someCollection.size).isEqualTo(1)
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isEqualTo(1)
+        """,
     )
 
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
+    assertInvalid(
+        """
+        val set = setOf(1, 2, 3)
+        assertThat(set.size).isEqualTo(1)
+        """,
+    )
+
+    assertInvalid(
+        """
+        val map = mapOf("foo" to 1)
+        assertThat(map.size).isEqualTo(1)
+        """,
+    )
+
+    assertValid(
+        """
+        val s = Sizeable(size = 1)
+        assertThat(s.size).isEqualTo(1)
+        """,
+    )
   }
 
   @Test
-  fun `collection size is okay`() {
-    val findings = rule.lint(
+  fun `collection size is valid outside of assertions`() {
+    assertValid(
         """
-          fun usage() {
-            val size = someCollection.size
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3)
+        val size = list.size"
+        """,
     )
-
-    assertThat(findings).isEmpty()
   }
 
   @Test
-  fun `size property is okay when isEqual is not a number`() {
-    val findings = rule.lint(
+  fun `size property is only invalid when isEqual is a number`() {
+    assertInvalid(
         """
-          fun `test usage`() {
-            assertThat(sizingQuantities.first().size).isEqualTo("S")
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isEqualTo(1)
+        """,
     )
 
-    assertThat(findings).isEmpty()
+    assertInvalid(
+        """
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isEqualTo(3L)
+        """,
+    )
+
+    assertValid(
+        """
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isEqualTo("S")
+        """,
+    )
+
+    assertValid(
+        """
+        val list = listOf<Sizeable>()
+        assertThat(list.first().size).isEqualTo("S")
+        """,
+    )
   }
 
   @Test
-  fun `size property is caught when isEqual is a number`() {
-    val findings = rule.lint(
+  fun `size property is invalid when isEqual is a number`() {
+    assertInvalid(
         """
-          fun `test usage`() {
-            assertThat(sizingQuantities.first().size).isEqualTo(0)
-          }
-        """.trimIndent(),
+        val sizingQuantities = listOf<Map<String, Int>>()
+        assertThat(sizingQuantities.first().size).isEqualTo(0)
+        """,
     )
-
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
   }
 
   @Test
-  fun `size property is okay when isEqual has a size`() {
-    val findings = rule.lint(
+  fun `size property on assert is valid when comparing to another size property`() {
+    assertValid(
         """
-          fun `test usage`() {
-            assertThat(sizingQuantities.first().size).isEqualTo(someCollection.size)
-          }
-        """.trimIndent(),
+        val list = listOf<Map<String, Int>>()
+        assertThat(list.first().size).isEqualTo(list.size)
+        """,
     )
-
-    assertThat(findings).isEmpty()
   }
 
   @Test
-  fun `sizesSummary is okay`() {
-    val findings = rule.lint(
+  fun `size property on other classes is valid`() {
+    assertValid(
         """
-          fun `test usage`() {
-            assertThat(flashSalePrepack.sizesSummary).isEqualTo("1–2–0–0 (S–XL)")
-          }
-        """.trimIndent(),
+        val list = listOf<Sizeable>()
+        assertThat(list.first().size).isEqualTo(0)
+        """,
     )
-
-    assertThat(findings).isEmpty()
+    assertInvalid(
+        """
+        val list = listOf<Sizeable>()
+        assertThat(list.size).isEqualTo(0)
+        """,
+    )
   }
 
   @Test
-  fun `collection returned from function is caught`() {
-    val findings = rule.lint(
+  fun `collection returned from function is invalid`() {
+    assertInvalid(
         """
-          fun `test usage`() {
-            assertThat(someCollection().size).isEqualTo(3)
-          }
-        """.trimIndent(),
+        fun makeList(): List<Int> = listOf(1, 2, 3)
+        assertThat(makeList().size).isEqualTo(3)
+        """,
     )
-
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
   }
 
   @Test
-  fun `isGreaterThan is okay`() {
-    val findings = rule.lint(
+  fun `non-isEqualTo assertions are valid`() {
+    assertValid(
         """
-          fun `test usage`() {
-            assertThat(someCollection.size).isGreaterThan(1)
-            assertThat(otherValue).isEqualTo(5)
-            assertThat(otherValue.property).isEqualTo(5)
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isGreaterThan(1)
+        """,
     )
-
-    assertThat(findings).isEmpty()
+    assertValid(
+        """
+        val list = listOf(1, 2, 3)
+        assertThat(list.size).isLessOrEqualTo(1)
+        """,
+    )
   }
 
   @Test
   fun `expression containing size is okay`() {
-    val findings = rule.lint(
+    assertValid(
         """
-          fun `test usage`() {
-            assertThat(durationWeeks - instalments.size).isEqualTo(1)
-            assertThat(durationWeeks + instalments.size).isEqualTo(1)
-            assertThat(durationWeeks * instalments.size).isEqualTo(1)
-            assertThat(durationWeeks / instalments.size).isEqualTo(1)
-            assertThat(durationWeeks % instalments.size).isEqualTo(1)
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3)
+        val durationWeeks = 2
+        assertThat(durationWeeks - list.size).isEqualTo(1)
+        assertThat(durationWeeks + list.size).isEqualTo(1)
+        assertThat(durationWeeks * list.size).isEqualTo(1)
+        assertThat(durationWeeks / list.size).isEqualTo(1)
+        assertThat(durationWeeks % list.size).isEqualTo(1)
+        """,
     )
-
-    assertThat(findings).isEmpty()
   }
 
   @Test
-  fun `size only is caught`() {
-    val findings = rule.lint(
+  fun `size from a with context`() {
+    assertInvalid(
         """
-          fun `test usage`() {
+        with(listOf(1, 2, 3)) {
             assertThat(size).isEqualTo(1)
-          }
-        """.trimIndent(),
+        }
+        """,
     )
 
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
+    assertValid(
+        """
+        with(Sizeable(size = 1)) {
+            assertThat(size).isEqualTo(1)
+        }
+        """,
+    )
+  }
+
+  @Test
+  fun `size from a extension function context`() {
+    assertInvalid(
+        """
+        fun List<*>.foo() {
+            assertThat(size).isEqualTo(1)
+        }
+        """,
+    )
+    assertInvalid(
+        """
+        fun Map<*, *>.foo() {
+            assertThat(size).isEqualTo(1)
+        }
+        """,
+    )
+    assertValid(
+        """
+        fun Sizeable.foo() {
+            assertThat(size).isEqualTo(1)
+        }
+        """,
+    )
   }
 
   @Test
   fun `size property is caught when using isZero`() {
-    val findings = rule.lint(
+    assertInvalid(
         """
-          fun `test usage`() {
-            assertThat(someCollection.size).isZero()
-          }
-        """.trimIndent(),
+        val list = listOf(1, 2, 3) 
+        assertThat(list.size).isZero()
+        """,
     )
-
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
   }
 
   @Test
   fun `size property is caught when isEqualTo is a long`() {
-    val findings = rule.lint(
-        """
-          fun `test usage`() {
-            assertThat(someCollection.size).isEqualTo(5L)
-          }
-        """.trimIndent(),
-    )
-
-    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
+    assertInvalid("assertThat(listOf(1, 2, 3).size).isEqualTo(5L)")
   }
 
-  @Test
-  fun `size property is not caught when isEqualTo is L`() {
-    val findings = rule.lint(
+  private fun assertValid(code: String) = assertThat(runLint(code)).isEmpty()
+  private fun assertInvalid(code: String) = assertThat(runLint(code).single().message).isEqualTo(ISSUE_DESCRIPTION)
+
+  private fun runLint(code: String): List<Finding> {
+    return rule.compileAndLintWithContext(
+        envWrapper.env,
         """
-          fun `test usage`() {
-            assertThat(size).isEqualTo("L")
-          }
+        import kotlin.collections.List
+        import kotlin.collections.Map
+
+        data class Sizeable(val size: Int)
+
+        fun `test usage`() {
+            ${code.trimIndent()}
+        }
         """.trimIndent(),
     )
-
-    assertThat(findings.map { it.message }).isEmpty()
   }
 }
