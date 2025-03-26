@@ -1,7 +1,7 @@
 [versions]
 assertj = "3.20.2"
 detekt = "1.23.8"
-guava = "33.4.5-jre"
+guava = "33.4.6-jre"
 kotlin = "2.1.20"
 junit-jupiter = "5.11.4"
 junit-platform = "1.12.1"
