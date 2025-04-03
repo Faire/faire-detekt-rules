@@ -1,11 +1,8 @@
 [versions]
 assertj = "3.20.2"
 detekt = "1.23.8"
-guava = "33.4.6-jre"
 kotlin = "2.1.20"
 junit-jupiter = "5.11.4"
-junit-platform = "1.12.1"
-
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
@@ -19,19 +16,9 @@ detekt-ruleauthors = { group = "io.gitlab.arturbosch.detekt", name = "detekt-rul
 
 detekt-compiler-wrapper = { group = "com.braisgabin.detekt", name = "kotlin-compiler-wrapper", version = "0.0.4" }
 
-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-
 # JUnit 5 libs.
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
-junit-jupiter-core = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }
-junit-platform-commons = { module = "org.junit.platform:junit-platform-commons", version.ref = "junit-platform" }
-junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-platform" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
-junit-platform-reporting = { module = "org.junit.platform:junit-platform-reporting", version.ref = "junit-platform" }
-
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
