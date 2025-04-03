@@ -34,4 +34,5 @@ junit-platform-reporting = { module = "org.junit.platform:junit-platform-reporti
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.14.0" }
 maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.30.0"}

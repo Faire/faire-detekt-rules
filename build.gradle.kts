@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
   alias(libs.plugins.kotlin)
   alias(libs.plugins.maven.publishing)
+  alias(libs.plugins.dependency.analysis)
 
   alias(libs.plugins.detekt)
 }
