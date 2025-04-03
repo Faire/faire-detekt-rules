@@ -40,8 +40,6 @@ dependencies {
 
   implementation(libs.detekt.api)
 
-  runtimeOnly(libs.detekt.formatting)
-
   testImplementation(libs.assertj)
   testImplementation(libs.detekt.test)
   testImplementation(libs.guava)
