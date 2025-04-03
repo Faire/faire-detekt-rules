@@ -40,10 +40,11 @@ dependencies {
   runtimeOnly(kotlin("reflect"))
 
   implementation(libs.detekt.api)
+  implementation(libs.detekt.psi.utils)
 
   testImplementation(libs.assertj)
   testImplementation(libs.detekt.test)
-  testImplementation(libs.guava)
+  testImplementation(libs.detekt.test.utils)
   testImplementation(libs.junit.jupiter.api)
 
   testRuntimeOnly(libs.junit.jupiter.engine)
