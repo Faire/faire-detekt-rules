@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.faire"
-version = "0.5.0"
+version = "0.5.1"
 
 if (!providers.environmentVariable("RELEASE").isPresent) {
   val gitSha = providers.environmentVariable("GITHUB_SHA")
