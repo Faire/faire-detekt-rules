@@ -1,6 +1,5 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.rules.FilterNotNullOverMapNotNullForFiltering
 import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
 
