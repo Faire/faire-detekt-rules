@@ -13,6 +13,7 @@ import com.faire.detekt.rules.DoNotUseIsOneAssertions
 import com.faire.detekt.rules.DoNotUsePropertyAccessInAssert
 import com.faire.detekt.rules.DoNotUseSingleOnFilter
 import com.faire.detekt.rules.DoNotUseSizePropertyInAssert
+import com.faire.detekt.rules.FilterNotNullOverMapNotNullForFiltering
 import com.faire.detekt.rules.GetOrDefaultShouldBeReplacedWithGetOrElse
 import com.faire.detekt.rules.NoDuplicateKeysInMapOf
 import com.faire.detekt.rules.NoExtensionFunctionOnNullableReceiver
@@ -51,6 +52,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           DoNotUseIsOneAssertions(config),
           DoNotUseSingleOnFilter(config),
           DoNotUseSizePropertyInAssert(config),
+          FilterNotNullOverMapNotNullForFiltering(config),
           GetOrDefaultShouldBeReplacedWithGetOrElse(config),
           NoDuplicateKeysInMapOf(config),
           NoExtensionFunctionOnNullableReceiver(config),
