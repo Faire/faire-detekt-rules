@@ -25,6 +25,7 @@ import com.faire.detekt.rules.PreferIgnoreCase
 import com.faire.detekt.rules.PreventBannedImports
 import com.faire.detekt.rules.ReturnValueOfLetMustBeUsed
 import com.faire.detekt.rules.UseEntriesInsteadOfValuesOnEnum
+import com.faire.detekt.rules.UseFirstNotNullOf
 import com.faire.detekt.rules.UseFirstOrNullInsteadOfFind
 import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
 import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection
@@ -64,6 +65,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           PreventBannedImports(config),
           ReturnValueOfLetMustBeUsed(config),
           UseEntriesInsteadOfValuesOnEnum(config),
+          UseFirstNotNullOf(config),
           UseFirstOrNullInsteadOfFind(config),
           UseMapNotNullInsteadOfFilterNotNull(config),
           UseOfCollectionInsteadOfEmptyCollection(config),
