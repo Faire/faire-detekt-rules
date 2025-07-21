@@ -11,7 +11,7 @@ internal class UseFirstNotNullOfTest : AutoCorrectRuleTest<UseFirstNotNullOf>(
     { UseFirstNotNullOf(it) },
 ) {
   @Test
-  fun `mapNotNull {} and first() consecutive call pair is caught and corrected, also redundant asSequence is removed`() {
+  fun `mapNotNull {} and first() consecutive call pair is corrected, and redundant asSequence is removed`() {
     assertLintAndFormat(
         """
            fun `test usage`() {
