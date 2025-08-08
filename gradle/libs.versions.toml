@@ -24,4 +24,4 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.19.0" }
-maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.32.0"}
+maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.34.0"}
