@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
   alias(libs.plugins.kotlin)
   alias(libs.plugins.maven.publishing)
@@ -9,7 +7,7 @@ plugins {
 }
 
 group = "com.faire"
-version = "0.5.1"
+version = "0.5.2"
 
 if (!providers.environmentVariable("RELEASE").isPresent) {
   val gitSha = providers.environmentVariable("GITHUB_SHA")
@@ -74,7 +72,7 @@ kotlin {
 }
 
 mavenPublishing {
-  publishToMavenCentral(SonatypeHost.DEFAULT, true)
+  publishToMavenCentral(true)
   signAllPublications()
 
   pom {
