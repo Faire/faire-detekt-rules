@@ -164,7 +164,7 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
                 )
             )
         }
-        """.trimIndent()
+        """.trimIndent(),
     )
 
     assertThat(findings).isEmpty()
