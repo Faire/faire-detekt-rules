@@ -11,7 +11,9 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgumentList
+import org.jetbrains.kotlin.psi.KtValueArgumentName
 
 internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty) : Rule(config) {
   override val issue: Issue = Issue(
@@ -44,7 +46,13 @@ internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty)
   override fun visitExpression(expression: KtExpression) {
     super.visitExpression(expression)
     if (receiverList.isEmpty()) return
-    if (receiverList.contains(expression.text) && !expression.isReceiverParam() && !expression.isProperty()) {
+
+    if (
+        receiverList.contains(expression.text)
+        && !expression.isReceiverParam()
+        && !expression.isProperty()
+        && !expression.isNamedArgument()
+    ) {
       report(
           CodeSmell(
               issue = issue,
@@ -68,3 +76,5 @@ private fun KtExpression.isProperty(): Boolean {
 }
 
 private fun KtCallExpression.isWithExpr(): Boolean = calleeExpression?.textMatches("with") == true
+
+private fun KtExpression.isNamedArgument(): Boolean = this is KtNameReferenceExpression && parent is KtValueArgumentName
