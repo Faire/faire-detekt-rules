@@ -151,6 +151,26 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
   }
 
   @Test
+  fun `using a named argument with the receiver name has no errors `() {
+    val findings = rule.lint(
+        """
+        val request = with(entrepreneur) {
+            ConfirmCustomerTypeRequest(
+                companySearch = null,
+                entrepreneur = EntrepreneurCustomerInfo(
+                    companyName = Property(companyName),
+                    ico = Property(ico.value),
+                    dic = Property(dic?.value)
+                )
+            )
+        }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `using a parameter within a function has no errors`() {
     val findings = rule.lint(
         """
