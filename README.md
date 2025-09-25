@@ -4,11 +4,11 @@ An opinionated ruleset for Detekt, which aims to reduce bugs, improve readabilit
 ## Usage
 In the `dependencies` block of your `build.gradle` file, add the following:
 ```groovy
-detektPlugins("com.faire:faire-detekt-rules:0.2.4")
+detektPlugins("com.faire:faire-detekt-rules:0.5.3")
 ```
 or if you're using a `libs.version.toml` file, add this there:
 ```
-faire-detekt-rules = { module = "com.faire:faire-detekt-rules", version = "0.2.4" }
+faire-detekt-rules = { module = "com.faire:faire-detekt-rules", version = "0.5.3" }
 ```
 and this in your `build.gradle` file:
 ```groovy
