@@ -2,7 +2,7 @@
 assertj = "3.20.2"
 detekt = "1.23.8"
 kotlin = "2.1.21"
-junit-jupiter = "5.11.4"
+junit-jupiter = "6.0.0"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
