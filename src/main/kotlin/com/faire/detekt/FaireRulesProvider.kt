@@ -28,6 +28,7 @@ import com.faire.detekt.rules.UseEntriesInsteadOfValuesOnEnum
 import com.faire.detekt.rules.UseFirstNotNullOf
 import com.faire.detekt.rules.UseFirstOrNullInsteadOfFind
 import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
+import com.faire.detekt.rules.UseNoneMatchInsteadOfFirstOrNullIsNull
 import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection
 import com.faire.detekt.rules.UseSetInsteadOfListToSet
 import io.gitlab.arturbosch.detekt.api.Config
@@ -68,6 +69,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           UseFirstNotNullOf(config),
           UseFirstOrNullInsteadOfFind(config),
           UseMapNotNullInsteadOfFilterNotNull(config),
+          UseNoneMatchInsteadOfFirstOrNullIsNull(config),
           UseOfCollectionInsteadOfEmptyCollection(config),
           UseSetInsteadOfListToSet(config),
       ),
