@@ -9,9 +9,10 @@ private const val ISSUE_DESCRIPTION =
     "Use assertThat(collection).noneMatch { predicate } instead of " +
         "assertThat(collection.firstOrNull { predicate }).isNull()"
 
-internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest : AutoCorrectRuleTest<UseNoneMatchInsteadOfFirstOrNullIsNull>({
-  UseNoneMatchInsteadOfFirstOrNullIsNull(it)
-}) {
+internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
+    AutoCorrectRuleTest<UseNoneMatchInsteadOfFirstOrNullIsNull>({
+      UseNoneMatchInsteadOfFirstOrNullIsNull(it)
+    }) {
 
   @Test
   fun `firstOrNull with lambda followed by isNull is caught`() {
@@ -151,4 +152,3 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest : AutoCorrectRuleTest<
     assertThat(findings).isEmpty()
   }
 }
-

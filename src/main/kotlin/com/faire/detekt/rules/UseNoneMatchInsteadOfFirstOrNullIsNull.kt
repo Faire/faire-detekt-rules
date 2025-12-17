@@ -55,7 +55,7 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
 
     val hasLambdaOrFunctionArg = firstOrNullCall.lambdaArguments.isNotEmpty() ||
         firstOrNullCall.valueArguments.isNotEmpty()
-        
+
     if (!hasLambdaOrFunctionArg) return
     if (firstOrNullCall.children.count { it is KtLambdaArgument } > 1) return
 
@@ -68,4 +68,3 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
     )
   }
 }
-
