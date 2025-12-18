@@ -15,50 +15,61 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
     }) {
 
   @Test
-  fun `firstOrNull with lambda followed by isNull is caught`() {
-    val findings = rule.lint(
+  fun `firstOrNull with lambda followed by isNull is caught and corrected`() {
+    assertLintAndFormat(
         """
           fun `test usage`() {
             assertThat(items.firstOrNull { it.type == DELETED }).isNull()
           }
         """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(items).noneMatch { it.type == DELETED }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
     )
-
-    assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo(ISSUE_DESCRIPTION)
   }
 
   @Test
-  fun `firstOrNull with function reference followed by isNull is caught`() {
-    val findings = rule.lint(
+  fun `firstOrNull with function reference followed by isNull is caught and corrected`() {
+    assertLintAndFormat(
         """
           fun `test usage`() {
             val predicate = { item: Item -> item.isDeleted }
             assertThat(items.firstOrNull(predicate)).isNull()
           }
         """.trimIndent(),
+        """
+          fun `test usage`() {
+            val predicate = { item: Item -> item.isDeleted }
+            assertThat(items).noneMatch(predicate)
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
     )
-
-    assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo(ISSUE_DESCRIPTION)
   }
 
   @Test
-  fun `chained calls before firstOrNull is caught`() {
-    val findings = rule.lint(
+  fun `chained calls before firstOrNull is caught and corrected`() {
+    assertLintAndFormat(
         """
           fun `test usage`() {
             assertThat(order.items.filter { it.active }.firstOrNull { it.type == TAX }).isNull()
           }
         """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(order.items.filter { it.active }).noneMatch { it.type == TAX }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
     )
-
-    assertThat(findings).hasSize(1)
   }
 
   @Test
-  fun `nested assertThat with firstOrNull isNull is caught`() {
-    val findings = rule.lint(
+  fun `nested assertThat with firstOrNull isNull is caught and corrected`() {
+    assertLintAndFormat(
         """
           fun `test usage`() {
             with(response) {
@@ -66,9 +77,15 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
             }
           }
         """.trimIndent(),
+        """
+          fun `test usage`() {
+            with(response) {
+              assertThat(discounts).noneMatch { it.brandToken == brand.token }
+            }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
     )
-
-    assertThat(findings).hasSize(1)
   }
 
   @Test

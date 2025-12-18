@@ -10,6 +10,8 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
+import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -66,5 +68,22 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
             message = issue.description,
         ),
     )
+
+    withAutoCorrect {
+      // Get the collection (receiver of firstOrNull)
+      val collectionExpression = assertThatArgument.receiverExpression.text
+
+      // Get the predicate arguments from firstOrNull
+      val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {
+        " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
+      } else {
+        "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
+      }
+
+      val newExpression = KtPsiFactory(expression.project).createExpression(
+          "assertThat($collectionExpression).noneMatch$predicateArgs",
+      )
+      expression.astReplace(newExpression)
+    }
   }
 }
