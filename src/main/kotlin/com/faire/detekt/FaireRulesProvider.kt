@@ -1,4 +1,3 @@
-package com.faire.detekt
 
 import com.faire.detekt.rules.AlwaysUseIsTrueOrIsFalse
 import com.faire.detekt.rules.DoNotAccessVisibleForTesting
@@ -10,6 +9,7 @@ import com.faire.detekt.rules.DoNotUseHasSizeForEmptyListInAssert
 import com.faire.detekt.rules.DoNotUseIsEqualToWhenArgumentIsOne
 import com.faire.detekt.rules.DoNotUseIsEqualToWhenArgumentIsZero
 import com.faire.detekt.rules.DoNotUseIsOneAssertions
+import com.faire.detekt.rules.DoNotUseIsZeroAssertions
 import com.faire.detekt.rules.DoNotUsePropertyAccessInAssert
 import com.faire.detekt.rules.DoNotUseSingleOnFilter
 import com.faire.detekt.rules.DoNotUseSizePropertyInAssert
@@ -52,6 +52,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           DoNotUseIsEqualToWhenArgumentIsOne(config),
           DoNotUseIsEqualToWhenArgumentIsZero(config),
           DoNotUseIsOneAssertions(config),
+          DoNotUseIsZeroAssertions(config),
           DoNotUseSingleOnFilter(config),
           DoNotUseSizePropertyInAssert(config),
           FilterNotNullOverMapNotNullForFiltering(config),
