@@ -1,3 +1,4 @@
+package com.faire.detekt
 
 import com.faire.detekt.rules.AlwaysUseIsTrueOrIsFalse
 import com.faire.detekt.rules.DoNotAccessVisibleForTesting
