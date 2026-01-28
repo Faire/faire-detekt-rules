@@ -1,15 +1,20 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.utils.AutoCorrectRuleTest
 import io.gitlab.arturbosch.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use isZero(), use isEqualTo(0) instead."
 
-internal class DoNotUseIsZeroAssertionsTest : AutoCorrectRuleTest<DoNotUseIsZeroAssertions>(
-    { DoNotUseIsZeroAssertions(it) },
-) {
+internal class DoNotUseIsZeroAssertionsTest {
+
+  private lateinit var rule: DoNotUseIsZeroAssertions
+
+  @BeforeEach
+  fun setup() {
+    rule = DoNotUseIsZeroAssertions()
+  }
   @Test
   fun `using isZero causes failure`() {
     val findings = rule.lint(
