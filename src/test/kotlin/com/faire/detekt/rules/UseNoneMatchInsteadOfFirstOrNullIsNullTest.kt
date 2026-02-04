@@ -168,4 +168,27 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
 
     assertThat(findings).isEmpty()
   }
+
+  @Test
+  fun `multiline assertThat with firstOrNull preserves formatting`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            assertThat(
+                retailerUser.getProductPage(productToken = jeansProduct.token)
+                    .layoutElements.firstOrNull { it.onClickEventName == "web_pdp_shop_by_attributes" },
+            ).isNull()
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(
+                retailerUser.getProductPage(productToken = jeansProduct.token)
+                    .layoutElements,
+            ).noneMatch { it.onClickEventName == "web_pdp_shop_by_attributes" }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
 }
