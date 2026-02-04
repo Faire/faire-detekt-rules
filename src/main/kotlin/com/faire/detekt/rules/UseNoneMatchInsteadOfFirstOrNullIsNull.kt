@@ -70,9 +70,6 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
     )
 
     withAutoCorrect {
-      // Get the collection (receiver of firstOrNull)
-      val collectionExpression = assertThatArgument.receiverExpression.text
-
       // Get the predicate arguments from firstOrNull
       val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {
         " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
@@ -80,10 +77,15 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
       }
 
-      val newExpression = KtPsiFactory(expression.project).createExpression(
-          "assertThat($collectionExpression).noneMatch$predicateArgs",
+      // Replace the assertThat argument (collection.firstOrNull{}) with just the collection
+      // This preserves the original formatting of the collection expression
+      assertThatArgument.astReplace(assertThatArgument.receiverExpression)
+
+      // Replace isNull() with noneMatch { predicate }
+      val noneMatchExpression = KtPsiFactory(expression.project).createExpression(
+          "noneMatch$predicateArgs",
       )
-      expression.astReplace(newExpression)
+      selectorExpression.astReplace(noneMatchExpression)
     }
   }
 }
