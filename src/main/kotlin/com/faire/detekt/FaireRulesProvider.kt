@@ -74,6 +74,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           UseNoneMatchInsteadOfFirstOrNullIsNull(config),
           UseOfCollectionInsteadOfEmptyCollection(config),
           UseSetInsteadOfListToSet(config),
+          NoEmptyLinesInConstructorParameters(config),
       ),
   )
 }
