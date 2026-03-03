@@ -1,14 +1,10 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.isSuppressedBy
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtParameterList
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -59,14 +55,7 @@ private const val description = "Constructor parameter lists should not contain 
  * )
  * ```
  */
-internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = description,
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty) : Rule(config, description = description) {
   override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
     super.visitPrimaryConstructor(constructor)
     checkConstructorParameters(constructor.valueParameterList)
@@ -94,16 +83,12 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
 
     // Report a code smell for the parameter list
     report(
-        CodeSmell(
-            issue = issue,
-            entity = Entity.from(parameterList),
-            message = description,
-        ),
+        Finding(entity = Entity.from(parameterList), message = description),
     )
 
     // Auto-correct by removing blank lines
-    withAutoCorrect {
-      if (!parameterList.isSuppressedBy(ruleId, aliases)) {
+    if (autoCorrect) {
+//      if (!parameterList.isSuppressedBy(ruleId, aliases)) {
         for (whitespaceNode in nodesWithBlankLines) {
           // Replace multiple consecutive newlines with a single newline
           // Preserve the indentation from the last line
@@ -116,6 +101,6 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
           whitespaceNode.replace(newWhitespace)
         }
       }
-    }
+//    }
   }
 }

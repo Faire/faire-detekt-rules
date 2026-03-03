@@ -1,27 +1,17 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.getTypeName
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 
-internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) : Rule(config, "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)
 
@@ -29,8 +19,7 @@ internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) : Rule(co
 
     for (offendingParameter in offendingParameters) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(function),
               message = "The function ${function.name} has parameter ${offendingParameter.name} which should be " +
                   "a class instead",
@@ -40,8 +29,7 @@ internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) : Rule(co
 
     if (function.typeReference?.isOffendingType() == true) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(function),
               message = "The function ${function.name} has a return type which should be a class instead",
           ),

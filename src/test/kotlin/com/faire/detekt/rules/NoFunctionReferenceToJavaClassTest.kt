@@ -1,6 +1,6 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

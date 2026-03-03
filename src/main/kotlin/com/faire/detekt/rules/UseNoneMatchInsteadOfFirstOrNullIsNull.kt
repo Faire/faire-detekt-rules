@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
@@ -30,15 +27,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * when the assertion fails, showing which elements matched rather than just indicating
  * that the result was not null.
  */
-internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Use assertThat(collection).noneMatch { predicate } instead of " +
-          "assertThat(collection.firstOrNull { predicate }).isNull()",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty) : Rule(config, "Use assertThat(collection).noneMatch { predicate } instead of assertThat(collection.firstOrNull { predicate }).isNull()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -62,14 +51,13 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
     if (firstOrNullCall.children.count { it is KtLambdaArgument } > 1) return
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
 
-    withAutoCorrect {
+    if (autoCorrect) {
       // Get the collection (receiver of firstOrNull)
       val collectionExpression = assertThatArgument.receiverExpression.text
 

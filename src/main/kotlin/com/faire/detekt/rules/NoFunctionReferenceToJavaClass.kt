@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 
 /**
@@ -27,20 +24,12 @@ import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
  * println(foo.javaClass.name)  // gives you "Foo"
  * ```
  */
-internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.CodeSmell,
-      description = RULE_DESCRIPTION,
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class NoFunctionReferenceToJavaClass(config: Config = Config.empty) : Rule(config, RULE_DESCRIPTION) {
   override fun visitCallableReferenceExpression(expression: KtCallableReferenceExpression) {
     super.visitCallableReferenceExpression(expression)
     if (expression.callableReference.getReferencedName() == "javaClass") {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
               message = RULE_DESCRIPTION,
           ),

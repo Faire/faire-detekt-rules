@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Config.Companion.empty
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Config.Companion.empty
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -15,14 +12,7 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 
-internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "Do not use a direct receiver reference inside a with block, instead use the properties",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty) : Rule(config, "Do not use a direct receiver reference inside a with block, instead use the properties") {
   private val receiverList = mutableListOf<String>()
 
   override fun visitCallExpression(expression: KtCallExpression) {
@@ -54,10 +44,9 @@ internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty)
         && !expression.isNamedArgument()
     ) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
     }

@@ -1,12 +1,10 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt.Companion.FIVE_MINS
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity.Warning
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
+import dev.detekt.api.Severity.Warning
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
@@ -23,15 +21,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * Good: `map.getOrElse(key) { defaultValue }`
  * Bad: `map.getOrDefault(key, defaultValue)`
  */
-internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty) : Rule(config) {
-  override val defaultRuleIdAliases = setOf("USE_GET_OR_ELSE_INSTEAD_OF_GET_OR_DEFAULT")
-
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Warning,
-      description = "replace map.getOrDefault(key, defaultValue) with map.getOrElse(key) { defaultValue }",
-      debt = FIVE_MINS,
-  )
+internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty) : Rule(config, "replace map.getOrDefault(key, defaultValue) with map.getOrElse(key) { defaultValue }") {
+//  override val defaultRuleIdAliases = setOf("USE_GET_OR_ELSE_INSTEAD_OF_GET_OR_DEFAULT")
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
@@ -46,10 +37,9 @@ internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config
 
     if (callee.text == "getOrDefault" && expression.containsTwoArguments()) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
     }

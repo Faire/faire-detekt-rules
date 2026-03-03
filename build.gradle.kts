@@ -34,11 +34,9 @@ repositories {
 
 dependencies {
   implementation(kotlin("stdlib"))
-  implementation(kotlin("compiler-embeddable"))
-  runtimeOnly(kotlin("reflect"))
 
-  implementation(libs.detekt.api)
-  implementation(libs.detekt.psi.utils)
+  compileOnly(libs.detekt.api)
+  compileOnly(libs.detekt.psi.utils)
 
   testImplementation(libs.assertj)
   testImplementation(libs.detekt.test)

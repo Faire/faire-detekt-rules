@@ -2,7 +2,7 @@ package com.faire.detekt.rules
 
 import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
 import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.test.lintWithContext
+import dev.detekt.test.lintWithContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

@@ -1,14 +1,11 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isTypeResolutionAvailable
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
+import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForReceiver
 import org.jetbrains.kotlin.resolve.calls.util.getType
@@ -24,15 +21,7 @@ import org.jetbrains.kotlin.types.typeUtil.isEnum
  * Bad:
  * for (color in Color.values())
  */
-@RequiresTypeResolution
-internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "Do not call .values() on an Enum. Use .entries instead",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty) : Rule(config, "Do not call .values() on an Enum. Use .entries instead"), RequiresAnalysisApi {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -43,17 +32,16 @@ internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty) : 
     val selectorExpression = expression.selectorExpression ?: return
     if (selectorExpression.text != "values()") return
 
-    val receiverType = expression.getQualifiedExpressionForReceiver()?.getType(bindingContext)
-        ?: return
-
-    if (!receiverType.isEnum()) return
-
-    report(
-        CodeSmell(
-            issue = issue,
-            entity = Entity.from(expression),
-            message = issue.description,
-        ),
-    )
+//    val receiverType = expression.getQualifiedExpressionForReceiver()?.getType(bindingContext)
+//        ?: return
+//
+//    if (!receiverType.isEnum()) return
+//
+//    report(
+//        Finding(
+//            entity = Entity.from(expression),
+//            message = description,
+//        ),
+//    )
   }
 }

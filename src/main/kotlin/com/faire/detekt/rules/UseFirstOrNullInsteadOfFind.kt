@@ -2,14 +2,11 @@ package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isTypeInClassFqNames
 import com.faire.detekt.utils.isTypeResolutionAvailable
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
+import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -40,15 +37,7 @@ private val bannedClasses = setOf(
  *  process the entire collection.
  */
 
-@RequiresTypeResolution
-internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Use firstOrNull() instead of find()",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()"), RequiresAnalysisApi {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     if (!isTypeResolutionAvailable()) {
@@ -61,18 +50,17 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule
     if (selectorExpression.referenceExpression()?.text != "find") return
     val findExpression = selectorExpression as? KtCallExpression ?: return
 
-    val receiverType = receiverExpression.getType(bindingContext) ?: return
-    if (!isBannedClassType(receiverType)) return
+//    val receiverType = receiverExpression.getType(bindingContext) ?: return
+//    if (!isBannedClassType(receiverType)) return
+//
+//    report(
+//        Finding(
+//            entity = Entity.from(expression),
+//            message = description,
+//        ),
+//    )
 
-    report(
-        CodeSmell(
-            issue = issue,
-            entity = Entity.from(expression),
-            message = issue.description,
-        ),
-    )
-
-    withAutoCorrect {
+    if (autoCorrect) {
       val arguments = if ((findExpression).lambdaArguments.isNotEmpty()) {
         " ${findExpression.lambdaArguments.joinToString { it.text }}"
       } else {

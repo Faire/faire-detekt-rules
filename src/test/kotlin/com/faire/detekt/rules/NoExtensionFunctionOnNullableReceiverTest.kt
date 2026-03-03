@@ -1,7 +1,7 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.assertThat
-import io.gitlab.arturbosch.detekt.test.compileAndLint
+import dev.detekt.test.assertThat
+import dev.detekt.test.compileAndLint
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

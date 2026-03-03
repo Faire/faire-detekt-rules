@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
@@ -25,14 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class DoNotUseIsOneAssertions(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Do not use isOne(), use isEqualTo(1) instead.",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotUseIsOneAssertions(config: Config = Config.empty) : Rule(config, "Do not use isOne(), use isEqualTo(1) instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -43,10 +33,9 @@ internal class DoNotUseIsOneAssertions(config: Config = Config.empty) : Rule(con
 
     if (selectorExpression.referenceExpression()?.text == "isOne") {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
     }

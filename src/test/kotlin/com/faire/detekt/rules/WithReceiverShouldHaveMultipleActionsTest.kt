@@ -2,8 +2,8 @@ package com.faire.detekt.rules
 
 import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
 import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
+import dev.detekt.api.Severity
+import dev.detekt.test.compileAndLintWithContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

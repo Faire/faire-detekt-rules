@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
@@ -21,27 +18,22 @@ import org.jetbrains.kotlin.resolve.ImportPath
  * Good: `import kotlin.math.max`
  * Bad: `import java.lang.Integer.max`
  */
-internal open class PreventBannedImports(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "Prevent unwanted imports",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal open class PreventBannedImports(config: Config = Config.empty) : Rule(config, "Prevent unwanted imports") {
   private val withAlternatives: Map<String, String> by lazy { getConfiguredWithAlternatives() }
   private val withoutAlternatives: List<String> by lazy { getConfiguredWithoutAlternatives() }
 
   protected open fun getConfiguredWithAlternatives(): Map<String, String> {
-    val withAlternativesConfig: List<String> = valueOrDefault("withAlternatives", listOf())
-    return withAlternativesConfig.asSequence()
-        .map { it.split("=") }
-        .map { Pair(it[0], it[1]) }
-        .associate { it }
+//    val withAlternativesConfig: List<String> = valueOrDefault("withAlternatives", listOf())
+//    return withAlternativesConfig.asSequence()
+//        .map { it.split("=") }
+//        .map { Pair(it[0], it[1]) }
+//        .associate { it }
+    return emptyMap()
   }
 
   protected open fun getConfiguredWithoutAlternatives(): List<String> {
-    return this.valueOrDefault("withoutAlternatives", listOf())
+//    return this.valueOrDefault("withoutAlternatives", listOf())
+    return emptyList()
   }
 
   private fun maybeReportIssue(
@@ -54,8 +46,7 @@ internal open class PreventBannedImports(config: Config = Config.empty) : Rule(c
     if (trailingImport.isNotEmpty() && !trailingImport.startsWith(".")) return false
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(importDirective),
             message = message,
         ),
@@ -74,7 +65,7 @@ internal open class PreventBannedImports(config: Config = Config.empty) : Rule(c
             message = "Replace $invalidImport import with $validImport",
         )
         if (!didReportIssue) continue
-        withAutoCorrect {
+        if (autoCorrect) {
           val newImport = KtPsiFactory(importDirective)
               .createImportDirective(
                   ImportPath.fromString(

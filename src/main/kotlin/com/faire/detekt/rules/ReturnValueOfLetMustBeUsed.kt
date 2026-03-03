@@ -1,14 +1,10 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.rules.LET_LITERAL
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElement
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
@@ -35,18 +31,11 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
  * user?.let { updateState(it) }
  *
  */
-internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Must use return value of let",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(config, "Must use return value of let") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
-    if (!expression.isLetExpr()) return
+//    if (!expression.isLetExpr()) return
 
     var currentParent = expression.parent
     var currentChild: PsiElement = expression
@@ -71,10 +60,9 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     }
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
   }
@@ -89,4 +77,4 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
   }
 }
 
-private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches(LET_LITERAL) == true
+//private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches(LET_LITERAL) == true

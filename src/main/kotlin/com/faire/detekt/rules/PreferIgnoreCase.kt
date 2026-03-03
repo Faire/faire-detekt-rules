@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
@@ -30,14 +27,7 @@ private val IGNORE_CASE_FUNCTIONS = setOf(
  * Good: `someString.contains("foo", ignoreCase = true)`
  * Bad: `someString.lowercase().contains("foo")`
  */
-internal class PreferIgnoreCase(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Performance,
-      description = "use ignoreCase=true with various string matching functions without converting to lowercase",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class PreferIgnoreCase(config: Config = Config.empty) : Rule(config, "use ignoreCase=true with various string matching functions without converting to lowercase") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     val selectorExpression = expression.selectorExpression ?: return
@@ -46,17 +36,16 @@ internal class PreferIgnoreCase(config: Config = Config.empty) : Rule(config) {
         selectorExpression.referenceExpression()?.text in IGNORE_CASE_FUNCTIONS
     ) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
-      withAutoCorrect {
+      if (autoCorrect) {
         val arguments = selectorExpression.lastChild
         if (arguments.text.last() != ')') {
           // Unknown format. Don't try to auto correct.
-          return@withAutoCorrect
+          return
         }
         val newArguments = arguments.text.dropLast(1) + ", ignoreCase = true)"
         arguments.astReplace(KtPsiFactory(expression).createCallArguments(newArguments))

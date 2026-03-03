@@ -2,20 +2,27 @@ package com.faire.detekt.rules
 
 import com.faire.detekt.utils.getAnnotationName
 import com.faire.detekt.utils.isTypeResolutionAvailable
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.RequiresAnalysisApi
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaSession
+import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.descriptors.containingPackage
+import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtFunctionLiteral
+import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtNamedDeclaration
+import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getEnclosingDescriptor
+import org.jetbrains.kotlin.resolve.bindingContextUtil.getParentOfTypeCodeFragmentAware
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getReferenceTargets
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyAnnotationDescriptor
+import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 
 /**
  * [com.google.common.annotations.VisibleForTesting] annotates symbols that have to be made public for tests to use.
@@ -26,38 +33,41 @@ import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyAnnotationDescriptor
  * This rule itself isn't aware of the difference between production and test code. Path filters should be used to skip
  * all test files.
  */
-@RequiresTypeResolution
-internal class DoNotAccessVisibleForTesting(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Defect,
-      description = "Do not access symbols annotated with @VisibleForTesting from other packages. " +
-          "These symbols are made public for testing only.",
-      debt = Debt.TEN_MINS,
-  )
-
+internal class DoNotAccessVisibleForTesting(config: Config = Config.empty) : Rule(config, "Do not access symbols annotated with @VisibleForTesting from other packages. These symbols are made public for testing only."), RequiresAnalysisApi {
   override fun visitSimpleNameExpression(expression: KtSimpleNameExpression) {
     super.visitSimpleNameExpression(expression)
     if (!isTypeResolutionAvailable()) {
       return
     }
-    val here = try {
-      getEnclosingDescriptor(bindingContext, expression)
-    } catch (e: Exception) {
-      // Skip elements without a descriptor (e.g. package names, import directives).
-      return
+
+    analyze(expression) {
+      val here = getParentOfTypeCodeFragmentAware(expression, KtNamedDeclaration::class.java)
+//      if (expression.getReferenceTargets(bindingContext).any {
+//            it.hasAnnotation("VisibleForTesting") && here.containingPackage() != it.containingPackage()
+//          }
+//      ) {
+//        report(
+//            Finding(
+//                entity = Entity.from(expression),
+//                message = description,
+//            ),
+//        )
+//      }
     }
-    if (expression.getReferenceTargets(bindingContext).any {
-          it.hasAnnotation("VisibleForTesting") && here.containingPackage() != it.containingPackage()
-        }
-    ) {
-      report(
-          CodeSmell(
-              issue = issue,
-              entity = Entity.from(expression),
-              message = issue.description,
-          ),
-      )
+  }
+
+  private fun KaSession.getParentOfTypeCodeFragmentAware(
+      element: KtElement,
+      parentType: Class<KtNamedDeclaration>,
+  ): DeclarationDescriptor {
+    val declaration = element.getParentOfTypeCodeFragmentAware(parentType)
+            ?: throw KotlinExceptionWithAttachments("No parent KtNamedDeclaration for of type ${element.javaClass}")
+                .withPsiAttachment("element.kt", element)
+    return if (declaration is KtFunctionLiteral) {
+      this.getParentOfTypeCodeFragmentAware(declaration, parentType)
+    } else {
+      throw KotlinExceptionWithAttachments("No descriptor for named declaration of type ${declaration.javaClass}")
+              .withPsiAttachment("declaration.kt", declaration)
     }
   }
 }

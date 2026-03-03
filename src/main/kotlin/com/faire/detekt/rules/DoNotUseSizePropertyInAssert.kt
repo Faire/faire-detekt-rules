@@ -3,13 +3,10 @@ package com.faire.detekt.rules
 import com.faire.detekt.utils.isAssertThat
 import com.faire.detekt.utils.isTypeResolutionAvailable
 import com.faire.detekt.utils.usesSizeProperty
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.isCollectionOrNullableCollection
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.isMapOrNullableMap
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -46,14 +43,7 @@ import org.jetbrains.kotlin.types.KotlinType
  * }
  * ```
  */
-internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Do not use size property in assertion, use hasSize() instead.",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rule(config, "Do not use size property in assertion, use hasSize() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     if (!isTypeResolutionAvailable()) {
@@ -80,7 +70,7 @@ internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rul
       // assertThat(size)
       is KtNameReferenceExpression -> getImplicitThisType(assertArgument)
       // assertThat(something.something.size)
-      is KtDotQualifiedExpression -> assertArgument.receiverExpression.getType(bindingContext)
+//      is KtDotQualifiedExpression -> assertArgument.receiverExpression.getType(bindingContext)
       else -> null
     } ?: return
     if (!mapType.isCollectionOrMap()) {
@@ -88,25 +78,25 @@ internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rul
     }
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
   }
 
   private fun getImplicitThisType(expression: KtNameReferenceExpression): KotlinType? {
-    val descriptor = bindingContext[BindingContext.REFERENCE_TARGET, expression] ?: return null
-
-    // For a member property or function, find its dispatch receiver (implicit "this")
-    val containingClassType = when (descriptor) {
-      is PropertyDescriptor -> descriptor.dispatchReceiverParameter?.type
-      is FunctionDescriptor -> descriptor.dispatchReceiverParameter?.type
-      else -> null
-    }
-
-    return containingClassType
+//    val descriptor = bindingContext[BindingContext.REFERENCE_TARGET, expression] ?: return null
+//
+//    // For a member property or function, find its dispatch receiver (implicit "this")
+//    val containingClassType = when (descriptor) {
+//      is PropertyDescriptor -> descriptor.dispatchReceiverParameter?.type
+//      is FunctionDescriptor -> descriptor.dispatchReceiverParameter?.type
+//      else -> null
+//    }
+//
+//    return containingClassType
+    return null
   }
 }
 

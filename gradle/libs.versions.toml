@@ -1,18 +1,18 @@
 [versions]
 assertj = "3.20.2"
-detekt = "1.23.8"
-kotlin = "2.1.21"
+detekt = "2.0.0-alpha.2"
+kotlin = "2.3.0"
 junit-jupiter = "5.11.4"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
-detekt-api = { group = "io.gitlab.arturbosch.detekt", name = "detekt-api", version.ref = "detekt" }
-detekt-psi-utils = { group = "io.gitlab.arturbosch.detekt", name = "detekt-psi-utils", version.ref = "detekt" }
-detekt-test = { group = "io.gitlab.arturbosch.detekt", name = "detekt-test", version.ref = "detekt" }
-detekt-test-utils = { group = "io.gitlab.arturbosch.detekt", name = "detekt-test-utils", version.ref = "detekt" }
-detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
-detekt-ruleauthors = { group = "io.gitlab.arturbosch.detekt", name = "detekt-rules-ruleauthors", version.ref = "detekt" }
+detekt-api = { group = "dev.detekt", name = "detekt-api", version.ref = "detekt" }
+detekt-psi-utils = { group = "dev.detekt", name = "detekt-psi-utils", version.ref = "detekt" }
+detekt-test = { group = "dev.detekt", name = "detekt-test", version.ref = "detekt" }
+detekt-test-utils = { group = "dev.detekt", name = "detekt-test-utils", version.ref = "detekt" }
+detekt-formatting = { group = "dev.detekt", name = "detekt-formatting", version.ref = "detekt" }
+detekt-ruleauthors = { group = "dev.detekt", name = "detekt-rules-ruleauthors", version.ref = "detekt" }
 
 detekt-compiler-wrapper = { group = "com.braisgabin.detekt", name = "kotlin-compiler-wrapper", version = "0.0.4" }
 
@@ -22,6 +22,6 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.19.0" }
 maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.34.0"}

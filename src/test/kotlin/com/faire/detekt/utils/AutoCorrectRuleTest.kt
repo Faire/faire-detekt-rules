@@ -1,10 +1,10 @@
 package com.faire.detekt.utils
 
 import io.github.detekt.test.utils.compileContentForTest
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.test.TestConfig
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.api.Config
+import dev.detekt.api.Rule
+import dev.detekt.test.TestConfig
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.com.intellij.core.CoreFileTypeRegistry

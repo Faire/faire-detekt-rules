@@ -1,14 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.isSuppressedBy
-import io.gitlab.arturbosch.detekt.rules.isInternal
+import dev.detekt.api.Finding
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
@@ -31,33 +26,25 @@ import org.jetbrains.kotlin.psi.psiUtil.isPrivate
  * class InchesConverter
  * ```
  */
-internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.CodeSmell,
-      description = RULE_DESCRIPTION,
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) : Rule(config, RULE_DESCRIPTION) {
   override fun visitProperty(property: KtProperty) {
     if (property.isTopLevel && !property.isPrivate() && !property.isExtensionDeclaration()) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(property),
               message = RULE_DESCRIPTION,
           ),
       )
 
-      withAutoCorrect {
-        if (!property.isSuppressedBy(ruleId, aliases)) {
-          if (property.isInternal()) {
-            property.removeModifier(KtTokens.INTERNAL_KEYWORD)
-          }
-
-          property.addModifier(KtTokens.PRIVATE_KEYWORD)
-        }
-      }
+//      if (autoCorrect) {
+//        if (!property.isSuppressedBy(ruleId, aliases)) {
+//          if (property.isInternal()) {
+//            property.removeModifier(KtTokens.INTERNAL_KEYWORD)
+//          }
+//
+//          property.addModifier(KtTokens.PRIVATE_KEYWORD)
+//        }
+//      }
     }
   }
 
