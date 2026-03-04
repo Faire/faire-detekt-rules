@@ -35,7 +35,7 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
-//    if (!expression.isLetExpr()) return
+    if (!expression.isLetExpr()) return
 
     var currentParent = expression.parent
     var currentChild: PsiElement = expression
@@ -67,6 +67,8 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     )
   }
 
+  private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches("let") == true
+
   private fun isSingleLineFunction(expression: KtNamedFunction): Boolean {
     var child = expression.firstChild
     while (child != null) {
@@ -76,5 +78,3 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     return false
   }
 }
-
-//private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches(LET_LITERAL) == true

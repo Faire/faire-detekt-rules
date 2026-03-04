@@ -1,6 +1,6 @@
 package com.faire.detekt.rules
 
-import io.github.detekt.test.utils.compileContentForTest
+import dev.detekt.test.utils.compileContentForTest
 import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

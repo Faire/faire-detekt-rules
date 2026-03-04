@@ -6,7 +6,6 @@ import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Rule
-import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -37,7 +36,7 @@ private val bannedClasses = setOf(
  *  process the entire collection.
  */
 
-internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()"), RequiresAnalysisApi {
+internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     if (!isTypeResolutionAvailable()) {

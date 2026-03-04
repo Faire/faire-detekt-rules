@@ -23,17 +23,15 @@ internal open class PreventBannedImports(config: Config = Config.empty) : Rule(c
   private val withoutAlternatives: List<String> by lazy { getConfiguredWithoutAlternatives() }
 
   protected open fun getConfiguredWithAlternatives(): Map<String, String> {
-//    val withAlternativesConfig: List<String> = valueOrDefault("withAlternatives", listOf())
-//    return withAlternativesConfig.asSequence()
-//        .map { it.split("=") }
-//        .map { Pair(it[0], it[1]) }
-//        .associate { it }
-    return emptyMap()
+    val withAlternativesConfig: List<String> = config.valueOrDefault("withAlternatives", listOf())
+    return withAlternativesConfig.asSequence()
+        .map { it.split("=") }
+        .map { Pair(it[0], it[1]) }
+        .associate { it }
   }
 
   protected open fun getConfiguredWithoutAlternatives(): List<String> {
-//    return this.valueOrDefault("withoutAlternatives", listOf())
-    return emptyList()
+    return config.valueOrDefault("withoutAlternatives", listOf())
   }
 
   private fun maybeReportIssue(

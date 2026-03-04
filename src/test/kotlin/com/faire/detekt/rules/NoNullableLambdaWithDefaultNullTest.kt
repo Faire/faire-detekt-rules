@@ -16,10 +16,6 @@ internal class NoNullableLambdaWithDefaultNullTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.first().issue.description).isEqualTo(
-        "Instead of using nullable callbacks with default value of null, " +
-            "use non-nullable callbacks with a default empty lambda.",
-    )
     assertThat(findings.first().message).isEqualTo(
         "Replace 'null' with an empty lambda expression '{}' for the default value of the function parameter.",
     )

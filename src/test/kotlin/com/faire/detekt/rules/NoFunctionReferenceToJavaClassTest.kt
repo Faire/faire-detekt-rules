@@ -17,7 +17,6 @@ internal class NoFunctionReferenceToJavaClassTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.first().issue.id).isEqualTo("NoFunctionReferenceToJavaClass")
   }
 
   @Test

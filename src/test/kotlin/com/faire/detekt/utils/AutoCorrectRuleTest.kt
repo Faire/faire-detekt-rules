@@ -1,15 +1,15 @@
 package com.faire.detekt.utils
 
-import io.github.detekt.test.utils.compileContentForTest
+import dev.detekt.test.utils.compileContentForTest
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
-import org.jetbrains.kotlin.com.intellij.core.CoreFileTypeRegistry
-import org.jetbrains.kotlin.com.intellij.openapi.application.ApplicationManager
-import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import com.intellij.core.CoreFileTypeRegistry
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Disposer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
@@ -81,7 +81,7 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
 
     /*
      * For some reasons, I was getting:
-     * Missing extension point: org.jetbrains.kotlin.com.intellij.treeCopyHandler in container
+     * Missing extension point: com.intellij.treeCopyHandler in container
      * com.faire.detekt.utils.MockApplication when running the whole test suite on the class for InternalTestClass.kt.
      * Something in the MockApplication is not instantiation the treeCopyHandler extension point. This is a workaround
      * to register it.

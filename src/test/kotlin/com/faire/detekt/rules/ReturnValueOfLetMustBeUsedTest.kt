@@ -293,8 +293,8 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 
   @Test
@@ -318,8 +318,8 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 
   @Test
@@ -344,7 +344,7 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 }

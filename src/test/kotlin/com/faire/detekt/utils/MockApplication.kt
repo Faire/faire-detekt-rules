@@ -1,14 +1,14 @@
 package com.faire.detekt.utils
 
-import org.jetbrains.kotlin.com.intellij.lang.PsiBuilderFactory
-import org.jetbrains.kotlin.com.intellij.lang.impl.PsiBuilderFactoryImpl
-import org.jetbrains.kotlin.com.intellij.mock.MockApplication
-import org.jetbrains.kotlin.com.intellij.mock.MockFileDocumentManagerImpl
-import org.jetbrains.kotlin.com.intellij.openapi.Disposable
-import org.jetbrains.kotlin.com.intellij.openapi.editor.impl.DocumentImpl
-import org.jetbrains.kotlin.com.intellij.openapi.fileEditor.FileDocumentManager
-import org.jetbrains.kotlin.com.intellij.openapi.progress.ProgressManager
-import org.jetbrains.kotlin.com.intellij.openapi.progress.impl.CoreProgressManager
+import com.intellij.lang.PsiBuilderFactory
+import com.intellij.lang.impl.PsiBuilderFactoryImpl
+import com.intellij.mock.MockApplication
+import com.intellij.mock.MockFileDocumentManagerImpl
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.editor.impl.DocumentImpl
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.impl.CoreProgressManager
 
 internal class MockApplication(parentDisposable: Disposable) : MockApplication(parentDisposable) {
   init {

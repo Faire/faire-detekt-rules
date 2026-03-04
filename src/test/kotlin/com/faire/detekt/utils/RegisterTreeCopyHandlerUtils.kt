@@ -24,11 +24,11 @@
       "You" (or "Your") shall mean an individual or Legal Entity
       exercising permissions granted by this License.
 
-      "Source" form shall mean the preferred form for making modifications,
+      "Source form" shall mean the preferred form for making modifications,
       including but not limited to software source code, documentation
       source, and configuration files.
 
-      "Object" form shall mean any form resulting from mechanical
+      "Object form" shall mean any form resulting from mechanical
       transformation or translation of a Source form, including but
       not limited to compiled object code, generated documentation,
       and conversions to other media types.
@@ -49,8 +49,8 @@
       "Contribution" shall mean any work of authorship, including
       the original version of the Work and any modifications or additions
       to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
+      submitted for inclusion in the Work by the copyright owner or
+      by an individual or Legal Entity authorized to submit on behalf of
       the copyright owner. For the purposes of this definition, "submitted"
       means any form of electronic, verbal, or written communication sent
       to the Licensor or its representatives, including but not limited to
@@ -69,7 +69,7 @@
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       copyright license to reproduce, prepare Derivative Works of,
       publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+      Work and Derivative Works in Source or Object form.
 
    3. Grant of Patent License. Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
@@ -82,8 +82,8 @@
       with the Work to which such Contribution(s) was submitted. If You
       institute patent litigation against any entity (including a
       cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
+      or a Contribution incorporated therein constitutes direct or
+      contributory patent infringement, then any patent licenses
       granted to You under this License for that Work shall terminate
       as of the date such litigation is filed.
 
@@ -167,9 +167,9 @@
       the Work or Derivative Works thereof, You may choose to offer,
       and charge a fee for, acceptance of support, warranty, indemnity,
       or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
+      License. However, in accepting such obligations, you may act only
+      on your own behalf and on your sole responsibility, not on behalf
+      of any other Contributor, and only if you agree to indemnify,
       defend, and hold each Contributor harmless for any liability
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
@@ -204,9 +204,9 @@
 
 package com.faire.detekt.utils
 
-import org.jetbrains.kotlin.com.intellij.openapi.extensions.ExtensionPoint
-import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.TreeCopyHandler
+import com.intellij.openapi.extensions.ExtensionPoint
+import com.intellij.openapi.extensions.Extensions
+import com.intellij.psi.impl.source.tree.TreeCopyHandler
 
 internal object RegisterTreeCopyHandlerUtils {
   fun register() {
@@ -221,6 +221,6 @@ internal object RegisterTreeCopyHandlerUtils {
     }
   }
 
-  private const val EXTENSION_PATH = "org.jetbrains.kotlin.com.intellij.treeCopyHandler"
+  private const val EXTENSION_PATH = "com.intellij.treeCopyHandler"
   private val EXTENSION_CLASS_NAME = TreeCopyHandler::class.java.name
 }
