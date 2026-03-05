@@ -1,12 +1,14 @@
 package com.faire.detekt.rules
 
-import dev.detekt.test.lint
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-internal class UseFirstOrNullInsteadOfFindTest {
+@KotlinCoreEnvironmentTest
+internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: UseFirstOrNullInsteadOfFind
 
   @BeforeEach
@@ -15,16 +17,16 @@ internal class UseFirstOrNullInsteadOfFindTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
-  fun `find() is flagged`() {
+  fun `find{ } is flagged on collections`() {
     assertThat(
-        rule.lint(
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
 
               fun foo() {
-                val testList = listOf(0).find()
-                val testString = "test".find()
+                val testList = listOf(0).find { true }
+                val testString = "test".find { true }
               }
             """.trimIndent(),
         ),
@@ -32,10 +34,10 @@ internal class UseFirstOrNullInsteadOfFindTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `find{ } is flagged`() {
     assertThat(
-        rule.lint(
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
 
@@ -51,7 +53,8 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `find() on unrelated type is not flagged`() {
     assertThat(
-        rule.lint(
+        rule.lintWithContext(
+            env,
             """
               object TestQuery {
                 fun find(
@@ -73,7 +76,8 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `firstOrNull() is not flagged`() {
     assertThat(
-        rule.lint(
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
 
@@ -89,7 +93,8 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `firstOrNull{ } is not flagged`() {
     assertThat(
-        rule.lint(
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
 

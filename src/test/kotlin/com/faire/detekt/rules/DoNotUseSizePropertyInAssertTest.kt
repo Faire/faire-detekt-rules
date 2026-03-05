@@ -1,15 +1,17 @@
 package com.faire.detekt.rules
 
 import dev.detekt.api.Finding
-import dev.detekt.test.lint
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use size property in assertion, use hasSize() instead."
 
-internal class DoNotUseSizePropertyInAssertTest {
+@KotlinCoreEnvironmentTest
+internal class DoNotUseSizePropertyInAssertTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotUseSizePropertyInAssert
 
   @BeforeEach
@@ -18,7 +20,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `collection size is invalid in assertion when coming from a collection or map`() {
     assertInvalid(
         """
@@ -54,13 +55,12 @@ internal class DoNotUseSizePropertyInAssertTest {
     assertValid(
         """
         val list = listOf(1, 2, 3)
-        val size = list.size"
+        val size = list.size
         """,
     )
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size property is only invalid when isEqual is a number`() {
     assertInvalid(
         """
@@ -92,7 +92,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size property is invalid when isEqual is a number`() {
     assertInvalid(
         """
@@ -113,7 +112,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size property on other classes is valid`() {
     assertValid(
         """
@@ -130,7 +128,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `collection returned from function is invalid`() {
     assertInvalid(
         """
@@ -172,7 +169,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size from a with context`() {
     assertInvalid(
         """
@@ -192,7 +188,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size from a extension function context`() {
     assertInvalid(
         """
@@ -218,7 +213,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size property is caught when using isZero`() {
     assertInvalid(
         """
@@ -229,7 +223,6 @@ internal class DoNotUseSizePropertyInAssertTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `size property is caught when isEqualTo is a long`() {
     assertInvalid("assertThat(listOf(1, 2, 3).size).isEqualTo(5L)")
   }
@@ -238,12 +231,21 @@ internal class DoNotUseSizePropertyInAssertTest {
   private fun assertInvalid(code: String) = assertThat(runLint(code).single().message).isEqualTo(ISSUE_DESCRIPTION)
 
   private fun runLint(code: String): List<Finding> {
-    return rule.lint(
+    return rule.lintWithContext(
+        env,
         """
         import kotlin.collections.List
         import kotlin.collections.Map
 
         data class Sizeable(val size: Int)
+
+        fun <T> assertThat(value: T): AssertThat = TODO()
+        class AssertThat {
+            fun isEqualTo(value: Any?): AssertThat = TODO()
+            fun isZero(): AssertThat = TODO()
+            fun isGreaterThan(value: Any?): AssertThat = TODO()
+            fun isLessOrEqualTo(value: Any?): AssertThat = TODO()
+        }
 
         fun `test usage`() {
             ${code.trimIndent()}

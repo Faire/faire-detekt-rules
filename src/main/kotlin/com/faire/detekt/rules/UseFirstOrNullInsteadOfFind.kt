@@ -1,23 +1,22 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.utils.isTypeInClassFqNames
-import com.faire.detekt.utils.isTypeResolutionAvailable
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
-import org.jetbrains.kotlin.resolve.calls.util.getType
-import org.jetbrains.kotlin.types.KotlinType
 
-private val bannedClasses = setOf(
-    FqName("kotlin.String"),
-    FqName("kotlin.collections.Iterable"),
+private val BANNED_CLASS_IDS = listOf(
+    ClassId.topLevel(FqName("kotlin.String")),
+    ClassId.topLevel(FqName("kotlin.collections.Iterable")),
 )
 
 /**
@@ -36,12 +35,9 @@ private val bannedClasses = setOf(
  *  process the entire collection.
  */
 
-internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()") {
+internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()"), RequiresAnalysisApi {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
-    if (!isTypeResolutionAvailable()) {
-      return
-    }
 
     val selectorExpression = expression.selectorExpression ?: return
     val receiverExpression = expression.receiverExpression
@@ -49,15 +45,17 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule
     if (selectorExpression.referenceExpression()?.text != "find") return
     val findExpression = selectorExpression as? KtCallExpression ?: return
 
-//    val receiverType = receiverExpression.getType(bindingContext) ?: return
-//    if (!isBannedClassType(receiverType)) return
-//
-//    report(
-//        Finding(
-//            entity = Entity.from(expression),
-//            message = description,
-//        ),
-//    )
+    analyze(expression) {
+      val receiverType = receiverExpression.expressionType ?: return@analyze
+      if (BANNED_CLASS_IDS.none { receiverType.isSubtypeOf(it) }) return@analyze
+
+      report(
+          Finding(
+              entity = Entity.from(expression),
+              message = description,
+          ),
+      )
+    }
 
     if (autoCorrect) {
       val arguments = if ((findExpression).lambdaArguments.isNotEmpty()) {
@@ -68,9 +66,5 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule
 
       findExpression.astReplace(KtPsiFactory(findExpression).createExpression("firstOrNull$arguments"))
     }
-  }
-
-  private fun isBannedClassType(type: KotlinType): Boolean {
-    return type.isTypeInClassFqNames(bannedClasses)
   }
 }
