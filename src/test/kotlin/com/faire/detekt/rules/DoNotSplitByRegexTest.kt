@@ -1,12 +1,14 @@
 package com.faire.detekt.rules
 
-import dev.detekt.test.lint
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-internal class DoNotSplitByRegexTest {
+@KotlinCoreEnvironmentTest
+internal class DoNotSplitByRegexTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotSplitByRegex
 
   @BeforeEach
@@ -15,11 +17,11 @@ internal class DoNotSplitByRegexTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `split by regex is not allowed`() {
-    val findings = rule.lint(
+    val findings = rule.lintWithContext(
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ",".toRegex()
           return str.split(sep)
@@ -30,11 +32,11 @@ internal class DoNotSplitByRegexTest {
   }
 
   @Test
-  @Disabled("TODO: rule type-resolution logic needs Analysis API migration")
   fun `split by regex is not allowed even when it is not the first arg`() {
-    val findings = rule.lint(
+    val findings = rule.lintWithContext(
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ",".toRegex()
           return str.split(limit=2, regex=sep)
@@ -46,9 +48,10 @@ internal class DoNotSplitByRegexTest {
 
   @Test
   fun `split by string literal is fine`() {
-    val findings = rule.lint(
+    val findings = rule.lintWithContext(
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ","
           return str.split(sep)
