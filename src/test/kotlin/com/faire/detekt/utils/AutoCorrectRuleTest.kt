@@ -19,17 +19,6 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
 ) {
   val rule = factory(TestConfig("autoCorrect" to false, *additionalConfig.toTypedArray()))
   private val autoCorrectRule = factory(TestConfig("autoCorrect" to true, *additionalConfig.toTypedArray()))
-  private lateinit var mockApp: MockApplication
-
-  @BeforeEach
-  fun setup() {
-    mockApp = initMockApplication()
-  }
-
-  @AfterEach
-  fun tearDown() {
-    mockApp.dispose()
-  }
 
   fun assertLintAndFormat(
       @Language("kotlin")

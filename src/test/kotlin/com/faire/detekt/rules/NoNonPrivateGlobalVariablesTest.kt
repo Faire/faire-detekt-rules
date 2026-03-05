@@ -1,6 +1,8 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.junit.jupiter.api.Test
 
 internal class NoNonPrivateGlobalVariablesTest : AutoCorrectRuleTest<NoNonPrivateGlobalVariables>(

@@ -41,9 +41,11 @@ dependencies {
   testImplementation(libs.assertj)
   testImplementation(libs.detekt.test)
   testImplementation(libs.detekt.test.utils)
+  testImplementation(libs.detekt.test.junit)
   testImplementation(libs.junit.jupiter.api)
 
   testRuntimeOnly(libs.junit.jupiter.engine)
+  testRuntimeOnly(libs.junit.platform.launcher)
 
   detektPlugins(libs.detekt.formatting)
   detektPlugins(libs.detekt.ruleauthors)
