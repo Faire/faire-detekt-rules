@@ -1,13 +1,13 @@
 package com.faire.detekt.rules
 
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
 /**
@@ -42,11 +42,19 @@ internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.e
       )
 
       if (autoCorrect) {
-        val dotQualified = expression.parent as? KtDotQualifiedExpression ?: return
-        val receiver = dotQualified.receiverExpression.text
-        val psiFactory = KtPsiFactory(expression)
-        val newExpression = psiFactory.createExpression("$receiver.filterNotNull()")
-        dotQualified.replace(newExpression)
+        // Rename "mapNotNull" to "filterNotNull"
+        val calleeLeaf = callee.node.findChildByType(KtTokens.IDENTIFIER)
+        (calleeLeaf?.psi as? LeafPsiElement)?.rawReplaceWithText("filterNotNull")
+
+        // Remove lambda argument and any preceding whitespace
+        val expressionNode = expression.node
+        val lambdaArgNode = expression.lambdaArguments.first().node
+        lambdaArgNode.treePrev?.takeIf { it.text.isBlank() }?.let { expressionNode.removeChild(it) }
+        expressionNode.removeChild(lambdaArgNode)
+
+        // Add empty parentheses
+        expressionNode.addChild(LeafPsiElement(KtTokens.LPAR, "("), null)
+        expressionNode.addChild(LeafPsiElement(KtTokens.RPAR, ")"), null)
       }
     }
   }
