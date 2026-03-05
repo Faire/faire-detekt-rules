@@ -7,7 +7,6 @@ import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtParameterList
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
-import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 
@@ -88,7 +87,6 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
 
     // Auto-correct by removing blank lines
     if (autoCorrect) {
-//      if (!parameterList.isSuppressedBy(ruleId, aliases)) {
         for (whitespaceNode in nodesWithBlankLines) {
           // Replace multiple consecutive newlines with a single newline
           // Preserve the indentation from the last line
@@ -96,11 +94,8 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
           val lastLine = lines.lastOrNull() ?: ""
           val correctedWhitespace = "\n$lastLine"
 
-          val factory = KtPsiFactory(parameterList.project)
-          val newWhitespace = factory.createWhiteSpace(correctedWhitespace)
-          whitespaceNode.replace(newWhitespace)
+          whitespaceNode.rawReplaceWithText(correctedWhitespace)
         }
       }
-//    }
   }
 }
