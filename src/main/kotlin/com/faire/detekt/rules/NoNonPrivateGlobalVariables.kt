@@ -1,5 +1,7 @@
 package com.faire.detekt.rules
 
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
@@ -42,9 +44,37 @@ internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) : Rule
 
     if (autoCorrect) {
       for (property in violations.reversed()) {
-        property.removeModifier(KtTokens.INTERNAL_KEYWORD)
-        property.removeModifier(KtTokens.PUBLIC_KEYWORD)
-        property.addModifier(KtTokens.PRIVATE_KEYWORD)
+        val modifierList = property.modifierList
+        val internalNode = modifierList?.node?.findChildByType(KtTokens.INTERNAL_KEYWORD)
+        val publicNode = modifierList?.node?.findChildByType(KtTokens.PUBLIC_KEYWORD)
+        val existingVisibilityNode = internalNode ?: publicNode
+
+        if (existingVisibilityNode != null) {
+          // Replace existing visibility modifier text directly
+          (existingVisibilityNode.psi as LeafPsiElement).rawReplaceWithText("private")
+        } else if (modifierList != null) {
+          // Has modifier list but no visibility keyword (e.g., "const val")
+          val modifierListNode = modifierList.node
+          modifierListNode.addChild(
+            LeafPsiElement(KtTokens.PRIVATE_KEYWORD, "private"),
+            modifierListNode.firstChildNode,
+          )
+          modifierListNode.addChild(
+            PsiWhiteSpaceImpl(" "),
+            modifierListNode.firstChildNode.treeNext,
+          )
+        } else {
+          // No modifier list (e.g., bare "val bar = 1")
+          val propertyNode = property.node
+          propertyNode.addChild(
+            LeafPsiElement(KtTokens.PRIVATE_KEYWORD, "private"),
+            propertyNode.firstChildNode,
+          )
+          propertyNode.addChild(
+            PsiWhiteSpaceImpl(" "),
+            propertyNode.firstChildNode.treeNext,
+          )
+        }
       }
     }
   }
