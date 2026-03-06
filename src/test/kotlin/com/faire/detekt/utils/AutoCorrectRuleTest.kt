@@ -1,8 +1,5 @@
 package com.faire.detekt.utils
 
-import com.intellij.core.CoreFileTypeRegistry
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Disposer
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import dev.detekt.test.TestConfig
@@ -56,25 +53,5 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
   ) {
     val code = compileContentForTest(codeToLint)
     assertThat(rule.lint(code)).isEmpty()
-  }
-
-  // This sets up the Intellij "application" used for auto correction in non-unit
-  // test mode. This prevents a bug where valid changes are considered
-  // invalid, leading to a failure on CI
-  private fun initMockApplication(): MockApplication {
-    val disposable = Disposer.newDisposable()
-    val mockApp = MockApplication(disposable)
-    ApplicationManager.setApplication(mockApp, { CoreFileTypeRegistry() }, disposable)
-
-    /*
-     * For some reasons, I was getting:
-     * Missing extension point: com.intellij.treeCopyHandler in container
-     * com.faire.detekt.utils.MockApplication when running the whole test suite on the class for InternalTestClass.kt.
-     * Something in the MockApplication is not instantiation the treeCopyHandler extension point. This is a workaround
-     * to register it.
-     */
-    RegisterTreeCopyHandlerUtils.register()
-
-    return mockApp
   }
 }

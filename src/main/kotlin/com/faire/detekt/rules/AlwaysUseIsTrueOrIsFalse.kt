@@ -58,10 +58,10 @@ internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) :
 
       if (autoCorrect) {
           if (isEqualToExpression.isComparingToTrue()) {
-            val isTrueExpression = KtPsiFactory(isEqualToExpression).createExpression("isTrue()")
+            val isTrueExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isTrue()")
             isEqualToExpression.astReplace(isTrueExpression)
           } else {
-            val isFalseExpression = KtPsiFactory(isEqualToExpression).createExpression("isFalse()")
+            val isFalseExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isFalse()")
             isEqualToExpression.astReplace(isFalseExpression)
           }
       }
