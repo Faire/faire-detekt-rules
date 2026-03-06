@@ -1,5 +1,6 @@
 package com.faire.detekt.rules
 
+import dev.detekt.api.Alias
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
@@ -8,9 +9,13 @@ import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
 
+@Alias("NO_NULLABLE_CALLBACK_WITH_DEFAULT_NULL")
 internal class NoNullableLambdaWithDefaultNull(config: Config = Config.empty) :
-    Rule(config, "Instead of using nullable callbacks with default value of null, use non-nullable callbacks with a default empty lambda.") {
-//  override val defaultRuleIdAliases = setOf("NO_NULLABLE_CALLBACK_WITH_DEFAULT_NULL")
+    Rule(
+        config,
+        "Instead of using nullable callbacks with default value of null, " +
+            "use non-nullable callbacks with a default empty lambda.",
+    ) {
 
   override fun visitParameter(parameter: KtParameter) {
     super.visitParameter(parameter)

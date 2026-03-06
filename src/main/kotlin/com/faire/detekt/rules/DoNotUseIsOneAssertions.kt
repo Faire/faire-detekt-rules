@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class DoNotUseIsOneAssertions(config: Config = Config.empty,) :
+internal class DoNotUseIsOneAssertions(config: Config = Config.empty) :
     Rule(config, "Do not use isOne(), use isEqualTo(1) instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

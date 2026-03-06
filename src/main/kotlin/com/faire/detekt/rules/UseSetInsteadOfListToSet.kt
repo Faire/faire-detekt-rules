@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.psi.psiUtil.astReplace
  * session.createCriteria<T>.addEq("foo", it).list().toSet()
  * ```
  */
-internal class UseSetInsteadOfListToSet(config: Config = Config.empty,) :
+internal class UseSetInsteadOfListToSet(config: Config = Config.empty) :
     Rule(config, "Use set() instead of list().toSet()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

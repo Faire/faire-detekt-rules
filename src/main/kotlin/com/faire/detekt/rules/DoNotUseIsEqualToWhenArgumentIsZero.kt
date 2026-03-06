@@ -28,7 +28,7 @@ private val ZERO_TEXTS = setOf("0.0", "0", "0L", "0.0f", "0f", "0.0F", "0x0", "0
  * }
  * ```
  */
-internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty,) :
+internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty) :
     Rule(config, "Do not use isEqualTo(0), use isZero() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

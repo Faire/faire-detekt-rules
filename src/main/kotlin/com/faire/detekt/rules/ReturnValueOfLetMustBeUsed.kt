@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
  * user?.let { updateState(it) }
  *
  */
-internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty,) :
+internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) :
     Rule(config, "Must use return value of let") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)

@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * Good: `map.getOrElse(key) { defaultValue }`
  * Bad: `map.getOrDefault(key, defaultValue)`
  */
-internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty,) :
+internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty) :
     Rule(config, "replace map.getOrDefault(key, defaultValue) with map.getOrElse(key) { defaultValue }") {
 //  override val defaultRuleIdAliases = setOf("USE_GET_OR_ELSE_INSTEAD_OF_GET_OR_DEFAULT")
 

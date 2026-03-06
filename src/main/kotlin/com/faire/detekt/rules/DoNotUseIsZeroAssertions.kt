@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class DoNotUseIsZeroAssertions(config: Config = Config.empty,) :
+internal class DoNotUseIsZeroAssertions(config: Config = Config.empty) :
     Rule(config, description = "Do not use isZero(), use isEqualTo(0) instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

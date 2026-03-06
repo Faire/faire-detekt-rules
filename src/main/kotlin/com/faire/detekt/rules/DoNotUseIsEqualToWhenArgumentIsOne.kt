@@ -28,7 +28,7 @@ private val ONE_TEXTS = setOf("1.0", "1", "1L", "1.0f", "1f", "1.0F", "0x1", "0b
  * }
  * ```
  */
-internal class DoNotUseIsEqualToWhenArgumentIsOne(config: Config = Config.empty,) :
+internal class DoNotUseIsEqualToWhenArgumentIsOne(config: Config = Config.empty) :
     Rule(config, "Do not use isEqualTo(1), use isOne() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

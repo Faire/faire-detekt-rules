@@ -56,7 +56,7 @@ import org.jetbrains.kotlin.psi.KtObjectDeclaration
  * }
  * ```
  */
-internal class DoNotNameCompanionObject(config: Config = Config.empty,) :
+internal class DoNotNameCompanionObject(config: Config = Config.empty) :
     Rule(config, "Companion objects should not be named") {
   override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
     super.visitObjectDeclaration(declaration)

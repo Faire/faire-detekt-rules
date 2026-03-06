@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
  *    }
  * ```
  */
-internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty,) :
+internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty) :
     Rule(config, "With block receiver should have multiple actions") {
   override fun visitBlockExpression(expression: KtBlockExpression) {
     super.visitBlockExpression(expression)

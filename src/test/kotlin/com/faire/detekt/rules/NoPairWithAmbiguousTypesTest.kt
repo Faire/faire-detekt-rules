@@ -24,7 +24,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo("The function add has parameter pair which should be a class instead")
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -38,7 +39,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo("The function add has parameter pair which should be a class instead")
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -52,7 +54,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo("The function add has parameter pair which should be a class instead")
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -66,7 +69,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.single().message).isEqualTo("The function add has parameter pair which should be a class instead")
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test

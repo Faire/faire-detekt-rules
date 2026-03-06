@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * listOf(1, null, 2).filterNotNull()
  * ```
  */
-internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty,) :
+internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty) :
     Rule(config, "Use filterNotNull() instead of mapNotNull { it }") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
@@ -50,7 +50,10 @@ internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.e
         // Remove lambda argument and any preceding whitespace
         val expressionNode = expression.node
         val lambdaArgNode = expression.lambdaArguments.first().node
-        lambdaArgNode.treePrev?.takeIf { it.text.isBlank() }?.let { expressionNode.removeChild(it) }
+        val blankNode = lambdaArgNode.treePrev?.takeIf { it.text.isBlank() }
+        if (blankNode != null) {
+          expressionNode.removeChild(blankNode)
+        }
         expressionNode.removeChild(lambdaArgNode)
 
         // Add empty parentheses

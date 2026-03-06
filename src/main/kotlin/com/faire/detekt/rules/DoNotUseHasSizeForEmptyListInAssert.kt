@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.resolve.calls.util.getValueArgumentsInParentheses
  * }
  * ```
  */
-internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty,) :
+internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty) :
     Rule(config, "Do not call hasSize(0) on an empty collection, call isEmpty().") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

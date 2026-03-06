@@ -29,7 +29,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
  * fun String?.emptyIfNull(): String = this ?: ""
  * ```
  */
-internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.empty,) :
+internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.empty) :
     Rule(config, "This rule reports extension functions on nullable types.") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)

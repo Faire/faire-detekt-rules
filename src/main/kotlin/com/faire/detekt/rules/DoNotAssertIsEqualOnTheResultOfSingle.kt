@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * assertThat(listof("a").single()).isEqualTo("a")
  * ```
  */
-internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty,) :
+internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) :
     Rule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

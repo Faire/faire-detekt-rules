@@ -27,7 +27,7 @@ private val IGNORE_CASE_FUNCTIONS = setOf(
  * Good: `someString.contains("foo", ignoreCase = true)`
  * Bad: `someString.lowercase().contains("foo")`
  */
-internal class PreferIgnoreCase(config: Config = Config.empty,) :
+internal class PreferIgnoreCase(config: Config = Config.empty) :
     Rule(config, "use ignoreCase=true with various string matching functions without converting to lowercase") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

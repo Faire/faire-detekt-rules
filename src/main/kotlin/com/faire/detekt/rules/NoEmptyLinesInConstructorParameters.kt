@@ -10,8 +10,6 @@ import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 
-private const val description = "Constructor parameter lists should not contain empty lines"
-
 /**
  * Detects and removes empty lines within constructor parameter lists.
  *
@@ -54,8 +52,8 @@ private const val description = "Constructor parameter lists should not contain 
  * )
  * ```
  */
-internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty,) :
-    Rule(config, description = description) {
+internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty) :
+    Rule(config, description = "Constructor parameter lists should not contain empty lines") {
   override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
     super.visitPrimaryConstructor(constructor)
     checkConstructorParameters(constructor.valueParameterList)

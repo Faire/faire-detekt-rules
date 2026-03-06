@@ -21,7 +21,7 @@ private val MAP_NOT_NULL_REGEX = """.*\.*mapNotNull\s*[{(].+""".toRegex()
  *  Readability: `firstNotNullOf {}` clearly expresses the intent to select the first element after the transformation.
  *               Using `.mapNotNull { ... }.first()` is more verbose.
  */
-internal class UseFirstNotNullOf(config: Config = Config.empty,) :
+internal class UseFirstNotNullOf(config: Config = Config.empty) :
     Rule(config, "use firstNotNullOf() instead of mapNotNull followed by first()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)

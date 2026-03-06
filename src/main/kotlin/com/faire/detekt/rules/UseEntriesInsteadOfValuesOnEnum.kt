@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
  * Bad:
  * for (color in Color.values())
  */
-internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty,) :
+internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty) :
     Rule(config, "Do not call .values() on an Enum. Use .entries instead") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
