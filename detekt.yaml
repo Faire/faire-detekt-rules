@@ -1,26 +1,32 @@
 complexity:
   active: true
+  # TODO: these were turned off during the upgrade to 2.0.0-alpha.2. Revisit to see what make sense.
+  ReplaceSafeCallChainWithRun:
+    active: false
+  CognitiveComplexMethod:
+    active: false
+  # End of TODO
   ComplexCondition:
     active: true
-    threshold: 9
+    allowedConditions: 9
   ComplexInterface:
     active: true
-    threshold: 10
+    allowedDefinitions: 10
     includeStaticDeclarations: false
   CyclomaticComplexMethod:
     active: true
-    threshold: 180
+    allowedComplexity: 180
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
   LabeledExpression:
     active: false
   LargeClass:
     active: true
-    threshold: 300
+    allowedLines: 300
     excludes: ["**/*Test.kt"]
   LongMethod:
     active: true
-    threshold: 100
+    allowedLines: 100
     excludes:
       ["**/*Test.kt"]
   LongParameterList:
@@ -28,23 +34,23 @@ complexity:
     ignoreDefaultParameters: false
   MethodOverloading:
     active: false
-    threshold: 6
+    allowedOverloads: 6
   NestedBlockDepth:
     active: false
-    threshold: 4
+    allowedDepth: 4
   StringLiteralDuplication:
     active: false
-    threshold: 3
+    allowedDuplications: 3
     ignoreAnnotation: true
-    excludeStringsWithLessThan5Characters: true
+    allowedWithLengthLessThan: 5
     ignoreStringsRegex: $^
   TooManyFunctions:
     active: false
-    thresholdInFiles: 11
-    thresholdInClasses: 11
-    thresholdInInterfaces: 11
-    thresholdInObjects: 11
-    thresholdInEnums: 11
+    allowedFunctionsPerFile: 11
+    allowedFunctionsPerClass: 11
+    allowedFunctionsPerInterface: 11
+    allowedFunctionsPerObject: 11
+    allowedFunctionsPerEnum: 11
     ignoreDeprecated: false
     ignorePrivate: false
 
@@ -73,7 +79,7 @@ empty-blocks:
     active: true
   EmptyInitBlock:
     active: true
-  EmptyKtFile:
+  EmptyKotlinFile:
     active: true
     excludes: ["**/build.gradle.kts"]
   EmptySecondaryConstructor:
@@ -154,7 +160,7 @@ FaireRuleSet:
     active: true
     autoCorrect: true
 
-formatting:
+ktlint:
   active: true
   android: false
   autoCorrect: true
@@ -295,6 +301,10 @@ formatting:
 
 naming:
   active: true
+  # TODO: these were turned off during the upgrade to 2.0.0-alpha.2. Revisit to see what make sense.
+  BooleanPropertyNaming:
+    active: false
+  # End of TODO
   ClassNaming:
     active: true
     classPattern: "[A-Z$][a-zA-Z0-9$]*"
@@ -308,10 +318,10 @@ naming:
     enumEntryPattern: ^[A-Z][_a-zA-Z0-9]*
   ForbiddenClassName:
     active: false
-  FunctionMaxLength:
+  FunctionNameMaxLength:
     active: false
     maximumFunctionNameLength: 30
-  FunctionMinLength:
+  FunctionNameMinLength:
     active: false
     minimumFunctionNameLength: 3
   FunctionNaming:
@@ -422,6 +432,26 @@ potential-bugs:
 
 style:
   active: true
+  # TODO: these were turned off during the upgrade to 2.0.0-alpha.2. Revisit to see what make sense.
+  CanBeNonNullable:
+    active: false
+  UseEmptyCounterpart:
+    active: false
+  StringShouldBeRawString:
+    active: false
+  CascadingCallWrapping:
+    active: false
+  UnnecessaryFullyQualifiedName:
+    active: false
+  MultilineRawStringIndentation:
+    active: false
+  BracesOnWhenStatements:
+    active: false
+  UseLet:
+    active: false
+  UnusedVariable:
+    active: false
+  # End of TODO
   ClassOrdering:
     active: false
   CollapsibleIfStatements:
@@ -454,7 +484,7 @@ style:
   # We use PreventBannedImports instead which has autocorrect.
   ForbiddenImport:
     active: false
-    imports: []
+    forbiddenImports: []
   ForbiddenMethodCall:
     active: false
   ForbiddenVoid:
@@ -486,7 +516,7 @@ style:
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
-  MayBeConst:
+  MayBeConstant:
     active: false
   ModifierOrder:
     active: true
@@ -505,11 +535,9 @@ style:
     active: true
   OptionalUnit:
     active: false
-  PreferToOverPairSyntax:
-    active: false
   ProtectedMemberInFinalClass:
     active: false
-  RedundantVisibilityModifierRule:
+  RedundantVisibilityModifier:
     active: true
   ReturnCount:
     active: false
@@ -521,7 +549,7 @@ style:
     active: true
   SerialVersionUIDInSerializableClass:
     active: false
-  SpacingBetweenPackageAndImports:
+  SpacingAfterPackageDeclaration:
     active: false
   ThrowsCount:
     active: false
@@ -532,27 +560,17 @@ style:
     active: true
   UnderscoresInNumericLiterals:
     active: false
-  UnnecessaryAbstractClass:
-    active: false
-    ignoreAnnotated: [dagger.Module]
   UnnecessaryApply:
     active: false
   UnnecessaryInheritance:
-    active: false
-  UnnecessaryAnnotationUseSiteTarget:
     active: false
   UnnecessaryLet:
     active: true
   UnnecessaryParentheses:
     active: false
-  UntilInsteadOfRangeTo:
-    active: false
-  UnusedImports:
-    # Has false positives with type resolution enabled. Redundant with NoUnusedImports rule.
-    active: false
   UnusedPrivateClass:
     active: false
-  UnusedPrivateMember:
+  UnusedPrivateFunction:
     active: true
     allowedNames: (_|i|ignored|expected|serialVersionUID|session|module)
   # Replaced by UseFirstOrNullInsteadOfFind

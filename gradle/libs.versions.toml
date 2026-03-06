@@ -12,7 +12,7 @@ detekt-psi-utils = { group = "dev.detekt", name = "detekt-psi-utils", version.re
 detekt-test = { group = "dev.detekt", name = "detekt-test", version.ref = "detekt" }
 detekt-test-junit = { group = "dev.detekt", name = "detekt-test-junit", version.ref = "detekt" }
 detekt-test-utils = { group = "dev.detekt", name = "detekt-test-utils", version.ref = "detekt" }
-detekt-formatting = { group = "dev.detekt", name = "detekt-formatting", version.ref = "detekt" }
+detekt-rules-ktlint-wrapper = { group = "dev.detekt", name = "detekt-rules-ktlint-wrapper", version.ref = "detekt" }
 detekt-ruleauthors = { group = "dev.detekt", name = "detekt-rules-ruleauthors", version.ref = "detekt" }
 
 detekt-compiler-wrapper = { group = "com.braisgabin.detekt", name = "kotlin-compiler-wrapper", version = "0.0.4" }

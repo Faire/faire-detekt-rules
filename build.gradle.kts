@@ -47,7 +47,7 @@ dependencies {
   testRuntimeOnly(libs.junit.jupiter.engine)
   testRuntimeOnly(libs.junit.platform.launcher)
 
-  detektPlugins(libs.detekt.formatting)
+  detektPlugins(libs.detekt.rules.ktlint.wrapper)
   detektPlugins(libs.detekt.ruleauthors)
   detektPlugins(libs.detekt.compiler.wrapper)
   detektPlugins(rootProject)
