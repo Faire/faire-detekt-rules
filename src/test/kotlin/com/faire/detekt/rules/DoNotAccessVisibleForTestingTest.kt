@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @KotlinCoreEnvironmentTest
-internal class DoNotAccessVisibleForTestingTest (private val env: KotlinEnvironmentContainer) {
+internal class DoNotAccessVisibleForTestingTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotAccessVisibleForTesting
 
   @BeforeEach

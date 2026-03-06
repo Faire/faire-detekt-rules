@@ -6,9 +6,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
-private fun KotlinType.getClassFqName(): FqName? {
-  return (constructor.declarationDescriptor as? ClassDescriptor)?.fqNameSafe
-}
+private fun KotlinType.getClassFqName(): FqName? = (constructor.declarationDescriptor as? ClassDescriptor)?.fqNameSafe
 
 internal fun KotlinType.isTypeInClassFqNames(fqNames: Collection<FqName>): Boolean {
   if (getClassFqName() in fqNames) return true

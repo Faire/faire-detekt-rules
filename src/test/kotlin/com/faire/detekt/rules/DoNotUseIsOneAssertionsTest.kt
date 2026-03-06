@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use isOne(), use isEqualTo(1) instead."
 
-internal class DoNotUseIsOneAssertionsTest : AutoCorrectRuleTest<DoNotUseIsOneAssertions>(
+internal class DoNotUseIsOneAssertionsTest :
+    AutoCorrectRuleTest<DoNotUseIsOneAssertions>(
     { DoNotUseIsOneAssertions(it) },
 ) {
   @Test

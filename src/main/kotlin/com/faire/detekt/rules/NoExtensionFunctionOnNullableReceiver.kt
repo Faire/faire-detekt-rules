@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
@@ -29,7 +29,8 @@ import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
  * fun String?.emptyIfNull(): String = this ?: ""
  * ```
  */
-internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.empty) : Rule(config, "This rule reports extension functions on nullable types.") {
+internal class NoExtensionFunctionOnNullableReceiver(config: Config = Config.empty,) :
+    Rule(config, "This rule reports extension functions on nullable types.") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)
 

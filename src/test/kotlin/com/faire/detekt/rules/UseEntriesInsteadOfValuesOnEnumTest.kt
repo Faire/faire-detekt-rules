@@ -65,7 +65,5 @@ internal class UseEntriesInsteadOfValuesOnEnumTest {
     assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
   }
 
-  private fun lint(content: String): List<Finding> {
-    return rule.lint(content)
-  }
+  private fun lint(content: String): List<Finding> = rule.lint(content)
 }

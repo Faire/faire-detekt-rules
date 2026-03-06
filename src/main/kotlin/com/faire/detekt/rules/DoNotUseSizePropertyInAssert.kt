@@ -44,7 +44,9 @@ private val MAP_CLASS_ID = ClassId.topLevel(FqName("kotlin.collections.Map"))
  * }
  * ```
  */
-internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rule(config, "Do not use size property in assertion, use hasSize() instead."), RequiresAnalysisApi {
+internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty,) :
+    Rule(config, "Do not use size property in assertion, use hasSize() instead."),
+    RequiresAnalysisApi {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -73,8 +75,10 @@ internal class DoNotUseSizePropertyInAssert(config: Config = Config.empty) : Rul
           call?.partiallyAppliedSymbol?.dispatchReceiver?.type
               ?: call?.partiallyAppliedSymbol?.extensionReceiver?.type
         }
+
         // assertThat(something.size)
         is KtDotQualifiedExpression -> assertArgument.receiverExpression.expressionType
+
         else -> null
       }
 

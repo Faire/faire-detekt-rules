@@ -1,7 +1,7 @@
 package com.faire.detekt.rules
 
-import dev.detekt.test.utils.compileContentForTest
 import dev.detekt.test.lint
+import dev.detekt.test.utils.compileContentForTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

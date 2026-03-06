@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -30,9 +30,8 @@ internal open class PreventBannedImports(config: Config = Config.empty) : Rule(c
         .associate { it }
   }
 
-  protected open fun getConfiguredWithoutAlternatives(): List<String> {
-    return config.valueOrDefault("withoutAlternatives", listOf())
-  }
+  protected open fun getConfiguredWithoutAlternatives(): List<String> =
+      config.valueOrDefault("withoutAlternatives", listOf())
 
   private fun maybeReportIssue(
       invalidImport: String,

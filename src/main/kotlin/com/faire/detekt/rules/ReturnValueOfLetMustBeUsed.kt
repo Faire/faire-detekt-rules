@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.intellij.psi.PsiElement
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -31,7 +31,8 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
  * user?.let { updateState(it) }
  *
  */
-internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(config, "Must use return value of let") {
+internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty,) :
+    Rule(config, "Must use return value of let") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -42,14 +43,22 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     while (currentParent != null) {
       when {
         currentParent is KtReturnExpression -> return
+
         currentParent is KtProperty -> return
+
         currentParent is KtBinaryExpression -> return
+
         // that the let call is not last in a chain of dot qualified expressions
         currentParent is KtDotQualifiedExpression && currentChild == currentParent.receiverExpression -> return
+
         currentParent is KtSafeQualifiedExpression && currentChild == currentParent.receiverExpression -> return
+
         currentParent is KtValueArgument -> return
+
         currentParent is KtNamedFunction && isSingleLineFunction(currentParent) -> return
+
         currentParent is KtDestructuringDeclaration -> return
+
         currentParent is KtParameter && currentParent.elementType == KtStubElementTypes.VALUE_PARAMETER -> return
 
         else -> {

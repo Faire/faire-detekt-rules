@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test
 private const val RULE_DESCRIPTION =
     "containsOnly should be used instead of asserting isEqual on the result of single()"
 
-internal class DoNotAssertIsEqualOnTheResultOfSingleTest : AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle>(
+internal class DoNotAssertIsEqualOnTheResultOfSingleTest :
+    AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle>(
     { DoNotAssertIsEqualOnTheResultOfSingle(it) },
 ) {
   @Test

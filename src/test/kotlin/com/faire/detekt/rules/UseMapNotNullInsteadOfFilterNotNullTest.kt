@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "use mapNotNull() instead of map followed by filerNotNull()"
 
-internal class UseMapNotNullInsteadOfFilterNotNullTest : AutoCorrectRuleTest<UseMapNotNullInsteadOfFilterNotNull>(
+internal class UseMapNotNullInsteadOfFilterNotNullTest :
+    AutoCorrectRuleTest<UseMapNotNullInsteadOfFilterNotNull>(
     { UseMapNotNullInsteadOfFilterNotNull(it) },
 ) {
 

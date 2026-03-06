@@ -34,7 +34,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) : Rule(config, "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()") {
+internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty,) :
+    Rule(config, "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

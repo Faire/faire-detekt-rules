@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use isEqualTo(0), use isZero() instead."
 
-internal class DoNotUseIsEqualToWhenArgumentIsZeroTest : AutoCorrectRuleTest<DoNotUseIsEqualToWhenArgumentIsZero>(
+internal class DoNotUseIsEqualToWhenArgumentIsZeroTest :
+    AutoCorrectRuleTest<DoNotUseIsEqualToWhenArgumentIsZero>(
     { DoNotUseIsEqualToWhenArgumentIsZero(it) },
 ) {
   @Test

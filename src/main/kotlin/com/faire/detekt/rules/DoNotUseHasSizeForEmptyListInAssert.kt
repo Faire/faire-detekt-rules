@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -33,7 +33,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getValueArgumentsInParentheses
  * }
  * ```
  */
-internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty) : Rule(config, "Do not call hasSize(0) on an empty collection, call isEmpty().") {
+internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty,) :
+    Rule(config, "Do not call hasSize(0) on an empty collection, call isEmpty().") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

@@ -35,7 +35,9 @@ private val BANNED_CLASS_IDS = listOf(
  *  process the entire collection.
  */
 
-internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) : Rule(config, "Use firstOrNull() instead of find()"), RequiresAnalysisApi {
+internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
+    Rule(config, "Use firstOrNull() instead of find()"),
+    RequiresAnalysisApi {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

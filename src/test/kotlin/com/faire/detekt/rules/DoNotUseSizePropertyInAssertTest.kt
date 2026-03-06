@@ -230,8 +230,7 @@ internal class DoNotUseSizePropertyInAssertTest(private val env: KotlinEnvironme
   private fun assertValid(code: String) = assertThat(runLint(code)).isEmpty()
   private fun assertInvalid(code: String) = assertThat(runLint(code).single().message).isEqualTo(ISSUE_DESCRIPTION)
 
-  private fun runLint(code: String): List<Finding> {
-    return rule.lintWithContext(
+  private fun runLint(code: String): List<Finding> = rule.lintWithContext(
         env,
         """
         import kotlin.collections.List
@@ -252,5 +251,4 @@ internal class DoNotUseSizePropertyInAssertTest(private val env: KotlinEnvironme
         }
         """.trimIndent(),
     )
-  }
 }

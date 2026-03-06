@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.getTypeName
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtNullableType
@@ -11,7 +11,8 @@ import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 
-internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) : Rule(config, "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter") {
+internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) :
+    Rule(config, "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)
 
@@ -57,10 +58,8 @@ private fun KtTypeReference.isOffendingType(): Boolean {
       genericTypeNames.any { it == "Any:[]" }
 }
 
-private fun KtTypeElement.getGenericTypes(): List<KtTypeReference> {
-  return when (this) {
+private fun KtTypeElement.getGenericTypes(): List<KtTypeReference> = when (this) {
     is KtUserType -> this.typeArgumentsAsTypes
     is KtNullableType -> this.typeArgumentsAsTypes
     else -> listOf()
   }.filterNotNull()
-}

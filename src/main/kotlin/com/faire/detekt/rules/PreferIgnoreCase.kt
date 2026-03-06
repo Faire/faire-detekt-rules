@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -27,7 +27,8 @@ private val IGNORE_CASE_FUNCTIONS = setOf(
  * Good: `someString.contains("foo", ignoreCase = true)`
  * Bad: `someString.lowercase().contains("foo")`
  */
-internal class PreferIgnoreCase(config: Config = Config.empty) : Rule(config, "use ignoreCase=true with various string matching functions without converting to lowercase") {
+internal class PreferIgnoreCase(config: Config = Config.empty,) :
+    Rule(config, "use ignoreCase=true with various string matching functions without converting to lowercase") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     val selectorExpression = expression.selectorExpression ?: return

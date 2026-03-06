@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.simplifyCollectionPatterns
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
@@ -24,7 +24,8 @@ private val FILTER_REGEX = ".*\\.*filter\\s*(\\{|\\().+".toRegex()
  *
  * This augments the `UnnecessaryFilter` detekt rule which does not cover `.single` as of 1.21.0.
  */
-internal class DoNotUseSingleOnFilter(config: Config = Config.empty) : Rule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
+internal class DoNotUseSingleOnFilter(config: Config = Config.empty,) :
+    Rule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

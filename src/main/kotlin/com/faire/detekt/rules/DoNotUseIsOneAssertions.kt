@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
@@ -22,7 +22,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class DoNotUseIsOneAssertions(config: Config = Config.empty) : Rule(config, "Do not use isOne(), use isEqualTo(1) instead.") {
+internal class DoNotUseIsOneAssertions(config: Config = Config.empty,) :
+    Rule(config, "Do not use isOne(), use isEqualTo(1) instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

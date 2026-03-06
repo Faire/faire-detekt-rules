@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -23,7 +23,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * listOf(1, null, 2).filterNotNull()
  * ```
  */
-internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty) : Rule(config, "Use filterNotNull() instead of mapNotNull { it }") {
+internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty,) :
+    Rule(config, "Use filterNotNull() instead of mapNotNull { it }") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 

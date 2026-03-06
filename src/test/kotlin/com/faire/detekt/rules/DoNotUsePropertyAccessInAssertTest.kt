@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test
 private val ISSUE_DESCRIPTION = "Do not use property access syntax with assertion methods. " +
     "Do not remove the parenthesis."
 
-internal class DoNotUsePropertyAccessInAssertTest : AutoCorrectRuleTest<DoNotUsePropertyAccessInAssert>(
+internal class DoNotUsePropertyAccessInAssertTest :
+    AutoCorrectRuleTest<DoNotUsePropertyAccessInAssert>(
     { DoNotUsePropertyAccessInAssert(it) },
 ) {
 

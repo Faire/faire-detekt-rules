@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -19,7 +19,8 @@ import org.jetbrains.kotlin.psi.psiUtil.astReplace
  * session.createCriteria<T>.addEq("foo", it).list().toSet()
  * ```
  */
-internal class UseSetInsteadOfListToSet(config: Config = Config.empty) : Rule(config, "Use set() instead of list().toSet()") {
+internal class UseSetInsteadOfListToSet(config: Config = Config.empty,) :
+    Rule(config, "Use set() instead of list().toSet()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

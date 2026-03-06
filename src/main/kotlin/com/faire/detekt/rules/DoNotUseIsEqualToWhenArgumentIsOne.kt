@@ -2,9 +2,9 @@ package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
 import com.faire.detekt.utils.usesSizeProperty
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -28,7 +28,8 @@ private val ONE_TEXTS = setOf("1.0", "1", "1L", "1.0f", "1f", "1.0F", "0x1", "0b
  * }
  * ```
  */
-internal class DoNotUseIsEqualToWhenArgumentIsOne(config: Config = Config.empty) : Rule(config, "Do not use isEqualTo(1), use isOne() instead.") {
+internal class DoNotUseIsEqualToWhenArgumentIsOne(config: Config = Config.empty,) :
+    Rule(config, "Do not use isEqualTo(1), use isOne() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

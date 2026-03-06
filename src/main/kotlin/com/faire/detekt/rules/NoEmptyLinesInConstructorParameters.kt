@@ -54,7 +54,8 @@ private const val description = "Constructor parameter lists should not contain 
  * )
  * ```
  */
-internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty) : Rule(config, description = description) {
+internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty,) :
+    Rule(config, description = description) {
   override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
     super.visitPrimaryConstructor(constructor)
     checkConstructorParameters(constructor.valueParameterList)

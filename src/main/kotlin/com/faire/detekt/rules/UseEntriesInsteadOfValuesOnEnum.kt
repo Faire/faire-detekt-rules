@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
  * Bad:
  * for (color in Color.values())
  */
-internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty) : Rule(config, "Do not call .values() on an Enum. Use .entries instead") {
+internal class UseEntriesInsteadOfValuesOnEnum(config: Config = Config.empty,) :
+    Rule(config, "Do not call .values() on an Enum. Use .entries instead") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

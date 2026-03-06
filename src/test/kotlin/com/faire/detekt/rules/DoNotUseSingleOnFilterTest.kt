@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use single() with filter { ... }, use single { ... } instead"
 
-internal class DoNotUseSingleOnFilterTest : AutoCorrectRuleTest<DoNotUseSingleOnFilter>({
+internal class DoNotUseSingleOnFilterTest :
+    AutoCorrectRuleTest<DoNotUseSingleOnFilter>({
   DoNotUseSingleOnFilter(it)
 }) {
 

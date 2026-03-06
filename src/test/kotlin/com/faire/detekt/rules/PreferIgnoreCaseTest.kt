@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test
 private const val ISSUE_DESCRIPTION =
     "use ignoreCase=true with various string matching functions without converting to lowercase"
 
-internal class PreferIgnoreCaseTest : AutoCorrectRuleTest<PreferIgnoreCase>(
+internal class PreferIgnoreCaseTest :
+    AutoCorrectRuleTest<PreferIgnoreCase>(
     { PreferIgnoreCase(it) },
 ) {
   @Test

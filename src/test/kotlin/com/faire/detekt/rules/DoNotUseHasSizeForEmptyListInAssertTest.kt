@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not call hasSize(0) on an empty collection, call isEmpty()."
 
-internal class DoNotUseHasSizeForEmptyListInAssertTest : AutoCorrectRuleTest<DoNotUseHasSizeForEmptyListInAssert>(
+internal class DoNotUseHasSizeForEmptyListInAssertTest :
+    AutoCorrectRuleTest<DoNotUseHasSizeForEmptyListInAssert>(
     { DoNotUseHasSizeForEmptyListInAssert(it) },
 ) {
 

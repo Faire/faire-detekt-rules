@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -30,7 +30,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
  *    }
  * ```
  */
-internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty) : Rule(config, "With block receiver should have multiple actions") {
+internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty,) :
+    Rule(config, "With block receiver should have multiple actions") {
   override fun visitBlockExpression(expression: KtBlockExpression) {
     super.visitBlockExpression(expression)
     val parentWithStatement = expression.getParentOfType<KtCallExpression>(true) ?: return

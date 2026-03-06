@@ -24,7 +24,9 @@ private val REGEX_CLASS_ID = ClassId.topLevel(FqName("kotlin.text.Regex"))
  * There is a HUGE performance penalty in terms of both CPU and memory.
  * https://youtrack.jetbrains.com/issue/KT-16661/Performance-overhead-in-string-splitting-in-Kotlin-versus-Java
  */
-internal class DoNotSplitByRegex(config: Config = Config.empty) : Rule(config, "use string literals in split() whenever possible for better performance and less memory. If you have to use regexes, suppress the rule by @Suppress(\"DoNotSplitByRegex\"), and make sure the regex is initialized only once (i.e. statically)."), RequiresAnalysisApi {
+internal class DoNotSplitByRegex(config: Config = Config.empty,) :
+    Rule(config, "use string literals in split() whenever possible for better performance and less memory. If you have to use regexes, suppress the rule by @Suppress(\"DoNotSplitByRegex\"), and make sure the regex is initialized only once (i.e. statically)."),
+    RequiresAnalysisApi {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
     if (expression.referenceExpression()?.text != "split") {

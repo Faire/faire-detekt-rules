@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.simplifyCollectionPatterns
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
@@ -21,7 +21,8 @@ private val MAP_NOT_NULL_REGEX = """.*\.*mapNotNull\s*[{(].+""".toRegex()
  *  Readability: `firstNotNullOf {}` clearly expresses the intent to select the first element after the transformation.
  *               Using `.mapNotNull { ... }.first()` is more verbose.
  */
-internal class UseFirstNotNullOf(config: Config = Config.empty) : Rule(config, "use firstNotNullOf() instead of mapNotNull followed by first()") {
+internal class UseFirstNotNullOf(config: Config = Config.empty,) :
+    Rule(config, "use firstNotNullOf() instead of mapNotNull followed by first()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

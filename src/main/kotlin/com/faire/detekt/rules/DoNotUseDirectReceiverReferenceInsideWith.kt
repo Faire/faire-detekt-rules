@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Config.Companion.empty
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -12,7 +12,8 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 
-internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty) : Rule(config, "Do not use a direct receiver reference inside a with block, instead use the properties") {
+internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty) :
+    Rule(config, "Do not use a direct receiver reference inside a with block, instead use the properties") {
   private val receiverList = mutableListOf<String>()
 
   override fun visitCallExpression(expression: KtCallExpression) {
@@ -60,9 +61,8 @@ private fun KtExpression.isReceiverParam(): Boolean {
   return potentialWithExpression.isWithExpr() && potentialWithExpression.parent !is KtDotQualifiedExpression
 }
 
-private fun KtExpression.isProperty(): Boolean {
-  return parent is KtDotQualifiedExpression && parent.children.size == 2 && parent.children[1] == this
-}
+private fun KtExpression.isProperty(): Boolean =
+    parent is KtDotQualifiedExpression && parent.children.size == 2 && parent.children[1] == this
 
 private fun KtCallExpression.isWithExpr(): Boolean = calleeExpression?.textMatches("with") == true
 

@@ -6,9 +6,7 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
-internal fun KtExpression.isAssertThat(): Boolean {
-  return referenceExpression()?.text == "assertThat"
-}
+internal fun KtExpression.isAssertThat(): Boolean = referenceExpression()?.text == "assertThat"
 
 internal fun KtExpression.simplifyCollectionPatterns(replacedWith: String) {
   val filterExpression = this.lastChild

@@ -1,10 +1,9 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
-import dev.detekt.api.Severity.Warning
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
@@ -21,7 +20,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * Good: `map.getOrElse(key) { defaultValue }`
  * Bad: `map.getOrDefault(key, defaultValue)`
  */
-internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty) : Rule(config, "replace map.getOrDefault(key, defaultValue) with map.getOrElse(key) { defaultValue }") {
+internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config.empty,) :
+    Rule(config, "replace map.getOrDefault(key, defaultValue) with map.getOrElse(key) { defaultValue }") {
 //  override val defaultRuleIdAliases = setOf("USE_GET_OR_ELSE_INSTEAD_OF_GET_OR_DEFAULT")
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
@@ -46,6 +46,5 @@ internal class GetOrDefaultShouldBeReplacedWithGetOrElse(config: Config = Config
   }
 }
 
-private fun KtDotQualifiedExpression.containsTwoArguments(): Boolean {
-  return (lastChild as? KtCallExpression)?.valueArguments?.size == 2
-}
+private fun KtDotQualifiedExpression.containsTwoArguments(): Boolean =
+    (lastChild as? KtCallExpression)?.valueArguments?.size == 2

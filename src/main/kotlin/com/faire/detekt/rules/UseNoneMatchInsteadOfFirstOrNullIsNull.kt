@@ -1,8 +1,8 @@
 package com.faire.detekt.rules
 
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -27,7 +27,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * when the assertion fails, showing which elements matched rather than just indicating
  * that the result was not null.
  */
-internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty) : Rule(config, "Use assertThat(collection).noneMatch { predicate } instead of assertThat(collection.firstOrNull { predicate }).isNull()") {
+internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty,) :
+    Rule(config, "Use assertThat(collection).noneMatch { predicate } instead of assertThat(collection.firstOrNull { predicate }).isNull()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

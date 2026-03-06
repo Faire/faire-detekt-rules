@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -23,7 +23,8 @@ import org.jetbrains.kotlin.psi.psiUtil.astReplace
  * `assertThat(foo).isTrue`
  */
 
-internal class DoNotUsePropertyAccessInAssert(config: Config = Config.empty) : Rule(config, "Do not use property access syntax with assertion methods. Do not remove the parenthesis.") {
+internal class DoNotUsePropertyAccessInAssert(config: Config = Config.empty) :
+    Rule(config, "Do not use property access syntax with assertion methods. Do not remove the parenthesis.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

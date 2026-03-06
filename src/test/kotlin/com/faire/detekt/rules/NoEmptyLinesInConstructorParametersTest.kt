@@ -5,7 +5,8 @@ import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoEmptyLinesInConstructorParameters>(
+internal class NoEmptyLinesInConstructorParametersTest :
+    AutoCorrectRuleTest<NoEmptyLinesInConstructorParameters>(
     { NoEmptyLinesInConstructorParameters(it) },
 ) {
 

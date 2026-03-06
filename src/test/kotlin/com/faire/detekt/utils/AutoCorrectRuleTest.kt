@@ -1,17 +1,15 @@
 package com.faire.detekt.utils
 
-import dev.detekt.test.utils.compileContentForTest
+import com.intellij.core.CoreFileTypeRegistry
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Disposer
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
+import dev.detekt.test.utils.compileContentForTest
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
-import com.intellij.core.CoreFileTypeRegistry
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Disposer
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 
 internal abstract class AutoCorrectRuleTest<T : Rule>(
     factory: (config: Config) -> T,

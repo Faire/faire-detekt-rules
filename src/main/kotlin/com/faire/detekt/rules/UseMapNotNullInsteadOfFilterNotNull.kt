@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.simplifyCollectionPatterns
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
@@ -25,7 +25,8 @@ private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
  *  transformation and once for filtering, which can be less efficient especially
  *  for larger collections.
  */
-internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) : Rule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
+internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty,) :
+    Rule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

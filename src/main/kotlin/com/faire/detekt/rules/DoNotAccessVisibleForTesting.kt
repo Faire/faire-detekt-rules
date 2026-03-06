@@ -23,7 +23,9 @@ import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
  * This rule itself isn't aware of the difference between production and test code. Path filters should be used to skip
  * all test files.
  */
-internal class DoNotAccessVisibleForTesting(config: Config = Config.empty) : Rule(config, "Do not access symbols annotated with @VisibleForTesting from other packages. These symbols are made public for testing only."), RequiresAnalysisApi {
+internal class DoNotAccessVisibleForTesting(config: Config = Config.empty,) :
+    Rule(config, "Do not access symbols annotated with @VisibleForTesting from other packages. These symbols are made public for testing only."),
+    RequiresAnalysisApi {
   override fun visitSimpleNameExpression(expression: KtSimpleNameExpression) {
     super.visitSimpleNameExpression(expression)
     if (expression.getNonStrictParentOfType<KtImportDirective>() != null) return

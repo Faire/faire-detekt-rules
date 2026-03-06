@@ -6,7 +6,8 @@ import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class PreventBannedImportsTest : AutoCorrectRuleTest<PreventBannedImports>(
+internal class PreventBannedImportsTest :
+    AutoCorrectRuleTest<PreventBannedImports>(
     {
       PreventBannedImports(
           TestConfig(

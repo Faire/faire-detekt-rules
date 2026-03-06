@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "use firstNotNullOf() instead of mapNotNull followed by first()"
 
-internal class UseFirstNotNullOfTest : AutoCorrectRuleTest<UseFirstNotNullOf>(
+internal class UseFirstNotNullOfTest :
+    AutoCorrectRuleTest<UseFirstNotNullOf>(
     { UseFirstNotNullOf(it) },
 ) {
   @Test

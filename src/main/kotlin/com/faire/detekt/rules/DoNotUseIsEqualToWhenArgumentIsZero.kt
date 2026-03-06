@@ -2,9 +2,9 @@ package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
 import com.faire.detekt.utils.usesSizeProperty
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -28,7 +28,8 @@ private val ZERO_TEXTS = setOf("0.0", "0", "0L", "0.0f", "0f", "0.0F", "0x0", "0
  * }
  * ```
  */
-internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty) : Rule(config, "Do not use isEqualTo(0), use isZero() instead.") {
+internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty,) :
+    Rule(config, "Do not use isEqualTo(0), use isZero() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 

@@ -1,9 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import dev.detekt.api.Finding
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
+import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -26,7 +26,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * assertThat(listof("a").single()).isEqualTo("a")
  * ```
  */
-internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) : Rule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
+internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty,) :
+    Rule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
