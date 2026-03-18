@@ -25,5 +25,5 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
-dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.19.0" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "3.6.1" }
 maven-publishing = { id = "com.vanniktech.maven.publish", version = "0.34.0"}
