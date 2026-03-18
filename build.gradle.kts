@@ -39,10 +39,13 @@ dependencies {
   compileOnly(libs.detekt.psi.utils)
 
   testImplementation(libs.assertj)
+  testImplementation(libs.detekt.api)
+  testImplementation(libs.detekt.kotlin.analysis.api)
   testImplementation(libs.detekt.test)
   testImplementation(libs.detekt.test.utils)
   testImplementation(libs.detekt.test.junit)
   testImplementation(libs.junit.jupiter.api)
+  testImplementation(libs.kotlin.compiler)
 
   testRuntimeOnly(libs.junit.jupiter.engine)
   testRuntimeOnly(libs.junit.platform.launcher)
@@ -51,6 +54,16 @@ dependencies {
   detektPlugins(libs.detekt.ruleauthors)
   detektPlugins(libs.detekt.compiler.wrapper)
   detektPlugins(rootProject)
+}
+
+dependencyAnalysis {
+  issues {
+    all {
+      onDuplicateClassWarnings {
+        severity("ignore")
+      }
+    }
+  }
 }
 
 detekt {

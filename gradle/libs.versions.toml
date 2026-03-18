@@ -16,6 +16,9 @@ detekt-rules-ktlint-wrapper = { group = "dev.detekt", name = "detekt-rules-ktlin
 detekt-ruleauthors = { group = "dev.detekt", name = "detekt-rules-ruleauthors", version.ref = "detekt" }
 
 detekt-compiler-wrapper = { group = "com.braisgabin.detekt", name = "kotlin-compiler-wrapper", version = "0.0.4" }
+detekt-kotlin-analysis-api = { group = "dev.detekt", name = "detekt-kotlin-analysis-api", version.ref = "detekt" }
+
+kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler", version.ref = "kotlin" }
 
 # JUnit 5 libs.
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
