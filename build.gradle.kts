@@ -59,6 +59,9 @@ dependencies {
 dependencyAnalysis {
   issues {
     all {
+      // detekt-kotlin-analysis-api is a fat JAR that intentionally bundles kotlin-stdlib and
+      // jetbrains-annotations so it can use its own Kotlin compiler internals independently.
+      // This causes false-positive duplicate-class warnings that are safe to ignore.
       onDuplicateClassWarnings {
         severity("ignore")
       }
