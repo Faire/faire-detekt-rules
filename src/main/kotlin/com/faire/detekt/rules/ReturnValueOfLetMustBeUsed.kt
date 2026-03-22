@@ -1,14 +1,10 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.rules.LET_LITERAL
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElement
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
@@ -35,14 +31,8 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
  * user?.let { updateState(it) }
  *
  */
-internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Must use return value of let",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) :
+    Rule(config, "Must use return value of let") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -53,14 +43,22 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     while (currentParent != null) {
       when {
         currentParent is KtReturnExpression -> return
+
         currentParent is KtProperty -> return
+
         currentParent is KtBinaryExpression -> return
+
         // that the let call is not last in a chain of dot qualified expressions
         currentParent is KtDotQualifiedExpression && currentChild == currentParent.receiverExpression -> return
+
         currentParent is KtSafeQualifiedExpression && currentChild == currentParent.receiverExpression -> return
+
         currentParent is KtValueArgument -> return
+
         currentParent is KtNamedFunction && isSingleLineFunction(currentParent) -> return
+
         currentParent is KtDestructuringDeclaration -> return
+
         currentParent is KtParameter && currentParent.elementType == KtStubElementTypes.VALUE_PARAMETER -> return
 
         else -> {
@@ -71,13 +69,14 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     }
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
   }
+
+  private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches("let") == true
 
   private fun isSingleLineFunction(expression: KtNamedFunction): Boolean {
     var child = expression.firstChild
@@ -88,5 +87,3 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) : Rule(
     return false
   }
 }
-
-private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches(LET_LITERAL) == true

@@ -1,6 +1,6 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -293,8 +293,8 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 
   @Test
@@ -318,8 +318,8 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 
   @Test
@@ -344,7 +344,7 @@ internal class ReturnValueOfLetMustBeUsedTest {
       """.trimIndent(),
     )
 
-    assertThat(findings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
-    assertThat(multiLineFindings.single().id).isEqualTo("ReturnValueOfLetMustBeUsed")
+    assertThat(findings.single()).isNotNull()
+    assertThat(multiLineFindings.single()).isNotNull()
   }
 }

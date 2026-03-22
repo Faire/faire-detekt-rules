@@ -1,16 +1,13 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
 /**
@@ -26,14 +23,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * listOf(1, null, 2).filterNotNull()
  * ```
  */
-internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Use filterNotNull() instead of mapNotNull { it }",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty) :
+    Rule(config, "Use filterNotNull() instead of mapNotNull { it }") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -45,19 +36,29 @@ internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.e
 
     if (lambdaBody is KtNameReferenceExpression && lambdaBody.getReferencedName() == "it") {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
               message = "Replace mapNotNull { it } with filterNotNull()",
           ),
       )
 
-      withAutoCorrect {
-        val dotQualified = expression.parent as? KtDotQualifiedExpression ?: return@withAutoCorrect
-        val receiver = dotQualified.receiverExpression.text
-        val psiFactory = KtPsiFactory(expression)
-        val newExpression = psiFactory.createExpression("$receiver.filterNotNull()")
-        dotQualified.replace(newExpression)
+      if (autoCorrect) {
+        // Rename "mapNotNull" to "filterNotNull"
+        val calleeLeaf = callee.node.findChildByType(KtTokens.IDENTIFIER)
+        (calleeLeaf?.psi as? LeafPsiElement)?.rawReplaceWithText("filterNotNull")
+
+        // Remove lambda argument and any preceding whitespace
+        val expressionNode = expression.node
+        val lambdaArgNode = expression.lambdaArguments.first().node
+        val blankNode = lambdaArgNode.treePrev?.takeIf { it.text.isBlank() }
+        if (blankNode != null) {
+          expressionNode.removeChild(blankNode)
+        }
+        expressionNode.removeChild(lambdaArgNode)
+
+        // Add empty parentheses
+        expressionNode.addChild(LeafPsiElement(KtTokens.LPAR, "("), null)
+        expressionNode.addChild(LeafPsiElement(KtTokens.RPAR, ")"), null)
       }
     }
   }

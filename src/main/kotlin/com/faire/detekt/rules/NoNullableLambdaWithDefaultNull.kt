@@ -1,26 +1,21 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Alias
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
 
-internal class NoNullableLambdaWithDefaultNull(config: Config = Config.empty) : Rule(config) {
-  override val defaultRuleIdAliases = setOf("NO_NULLABLE_CALLBACK_WITH_DEFAULT_NULL")
-
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      debt = Debt.FIVE_MINS,
-      description = "Instead of using nullable callbacks with default value of null, " +
-          "use non-nullable callbacks with a default empty lambda.",
-  )
+@Alias("NO_NULLABLE_CALLBACK_WITH_DEFAULT_NULL")
+internal class NoNullableLambdaWithDefaultNull(config: Config = Config.empty) :
+    Rule(
+        config,
+        "Instead of using nullable callbacks with default value of null, " +
+            "use non-nullable callbacks with a default empty lambda.",
+    ) {
 
   override fun visitParameter(parameter: KtParameter) {
     super.visitParameter(parameter)
@@ -33,8 +28,7 @@ internal class NoNullableLambdaWithDefaultNull(config: Config = Config.empty) : 
       // examples of typeElement: (String) -> Unit, (Int) -> Unit, (String, Int) -> Unit
       if (typeElement?.startsWith("(") == true && typeElement.endsWith(") -> Unit")) {
         report(
-            CodeSmell(
-                issue = issue,
+            Finding(
                 entity = Entity.from(parameter),
                 message = "Replace 'null' with an empty lambda expression '{}' " +
                     "for the default value of the function parameter.",

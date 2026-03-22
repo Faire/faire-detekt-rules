@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -29,14 +26,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * assertThat(listof("a").single()).isEqualTo("a")
  * ```
  */
-internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "use containsOnly() instead of asserting isEqual() on the result of single()",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) :
+    Rule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -52,14 +43,13 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
     if (!argumentForAssertThatExpression.callsSingleWithNoArgumentAtTheEnd()) return
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
             message = "containsOnly should be used instead of asserting isEqual on the result of single()",
         ),
     )
 
-    withAutoCorrect {
+    if (autoCorrect) {
       argumentForAssertThatExpression.lastChild.delete() // Delete "single()"
       argumentForAssertThatExpression.lastChild.delete() // Delete "."
 

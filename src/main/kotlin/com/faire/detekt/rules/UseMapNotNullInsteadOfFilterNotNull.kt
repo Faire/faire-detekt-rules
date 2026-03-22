@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.simplifyCollectionPatterns
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
@@ -28,14 +25,8 @@ private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
  *  transformation and once for filtering, which can be less efficient especially
  *  for larger collections.
  */
-internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "use mapNotNull() instead of map followed by filerNotNull()",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) :
+    Rule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -46,14 +37,13 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     if (!receiverExpression.lastChild.text.matches(MAP_REGEX)) return
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
 
-    withAutoCorrect {
+    if (autoCorrect) {
       removeCallToFilterNotNull(expression)
       receiverExpression.simplifyCollectionPatterns("mapNotNull")
     }

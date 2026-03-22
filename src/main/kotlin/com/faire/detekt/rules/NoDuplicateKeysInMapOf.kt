@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -30,14 +27,7 @@ import org.jetbrains.kotlin.psi.KtValueArgument
  * )
  * ```
  */
-internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = "NoDuplicateKeysInMapOf",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(config, "NoDuplicateKeysInMapOf") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -51,8 +41,7 @@ internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(conf
         if (key != null) {
           if (!keys.add(key)) {
             report(
-                CodeSmell(
-                    issue,
+                Finding(
                     Entity.from(argument),
                     message = "The key $key is duplicated in the map.",
                 ),

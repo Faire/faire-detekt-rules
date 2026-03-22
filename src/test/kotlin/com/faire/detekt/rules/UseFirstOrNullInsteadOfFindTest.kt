@@ -1,39 +1,32 @@
 package com.faire.detekt.rules
 
-import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
-import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class UseFirstOrNullInsteadOfFindTest {
+@KotlinCoreEnvironmentTest
+internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: UseFirstOrNullInsteadOfFind
-  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
   @BeforeEach
   fun setup() {
     rule = UseFirstOrNullInsteadOfFind()
-    envWrapper = createEnvironment(listOf())
-  }
-
-  @AfterEach
-  fun tearDown() {
-    envWrapper.dispose()
   }
 
   @Test
-  fun `find() is flagged`() {
+  fun `find{ } is flagged on collections`() {
     assertThat(
-        rule.compileAndLintWithContext(
-            envWrapper.env,
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
-              
+
               fun foo() {
-                val testList = listOf(0).find()
-                val testString = "test".find()
+                val testList = listOf(0).find { true }
+                val testString = "test".find { true }
               }
             """.trimIndent(),
         ),
@@ -43,11 +36,11 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `find{ } is flagged`() {
     assertThat(
-        rule.compileAndLintWithContext(
-            envWrapper.env,
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
-              
+
               fun foo() {
                 val testList = listOf(0).find { it == 0 }
                 val testString = "test".find { it == 's' }
@@ -60,8 +53,8 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `find() on unrelated type is not flagged`() {
     assertThat(
-        rule.compileAndLintWithContext(
-            envWrapper.env,
+        rule.lintWithContext(
+            env,
             """
               object TestQuery {
                 fun find(
@@ -70,7 +63,7 @@ internal class UseFirstOrNullInsteadOfFindTest {
                   return name
                 }
               }
-              
+
               fun foo() {
                 val testQuery = TestQuery.find("test")
                 val regex = "sample_Regex".toRegex().find("string")
@@ -83,11 +76,11 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `firstOrNull() is not flagged`() {
     assertThat(
-        rule.compileAndLintWithContext(
-            envWrapper.env,
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
-              
+
               fun foo() {
                 val testList = listOf(0).firstOrNull()
                 val testString = "test".firstOrNull()
@@ -100,11 +93,11 @@ internal class UseFirstOrNullInsteadOfFindTest {
   @Test
   fun `firstOrNull{ } is not flagged`() {
     assertThat(
-        rule.compileAndLintWithContext(
-            envWrapper.env,
+        rule.lintWithContext(
+            env,
             """
               import kotlin.collections.List
-              
+
               fun foo() {
                 val testList = listOf(0).firstOrNull { it == 0 }
                 val testString = "test".firstOrNull { it == 's' }

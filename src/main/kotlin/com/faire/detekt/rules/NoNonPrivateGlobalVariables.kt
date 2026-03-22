@@ -1,15 +1,13 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.isSuppressedBy
-import io.gitlab.arturbosch.detekt.rules.isInternal
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
@@ -31,33 +29,59 @@ import org.jetbrains.kotlin.psi.psiUtil.isPrivate
  * class InchesConverter
  * ```
  */
-internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.CodeSmell,
-      description = RULE_DESCRIPTION,
-      debt = Debt.FIVE_MINS,
-  )
+internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) : Rule(config, RULE_DESCRIPTION) {
+  private val violations = mutableListOf<KtProperty>()
+
+  override fun visitKtFile(file: KtFile) {
+    violations.clear()
+    super.visitKtFile(file)
+
+    // Report all violations first using original offsets, then autocorrect in reverse
+    // order so that modifications to later properties don't invalidate earlier positions.
+    for (property in violations) {
+      report(Finding(entity = Entity.from(property), message = RULE_DESCRIPTION))
+    }
+
+    if (autoCorrect) {
+      for (property in violations.reversed()) {
+        val modifierList = property.modifierList
+        val internalNode = modifierList?.node?.findChildByType(KtTokens.INTERNAL_KEYWORD)
+        val publicNode = modifierList?.node?.findChildByType(KtTokens.PUBLIC_KEYWORD)
+        val existingVisibilityNode = internalNode ?: publicNode
+
+        if (existingVisibilityNode != null) {
+          // Replace existing visibility modifier text directly
+          (existingVisibilityNode.psi as LeafPsiElement).rawReplaceWithText("private")
+        } else if (modifierList != null) {
+          // Has modifier list but no visibility keyword (e.g., "const val")
+          val modifierListNode = modifierList.node
+          modifierListNode.addChild(
+            LeafPsiElement(KtTokens.PRIVATE_KEYWORD, "private"),
+            modifierListNode.firstChildNode,
+          )
+          modifierListNode.addChild(
+            PsiWhiteSpaceImpl(" "),
+            modifierListNode.firstChildNode.treeNext,
+          )
+        } else {
+          // No modifier list (e.g., bare "val bar = 1")
+          val propertyNode = property.node
+          propertyNode.addChild(
+            LeafPsiElement(KtTokens.PRIVATE_KEYWORD, "private"),
+            propertyNode.firstChildNode,
+          )
+          propertyNode.addChild(
+            PsiWhiteSpaceImpl(" "),
+            propertyNode.firstChildNode.treeNext,
+          )
+        }
+      }
+    }
+  }
 
   override fun visitProperty(property: KtProperty) {
     if (property.isTopLevel && !property.isPrivate() && !property.isExtensionDeclaration()) {
-      report(
-          CodeSmell(
-              issue = issue,
-              entity = Entity.from(property),
-              message = RULE_DESCRIPTION,
-          ),
-      )
-
-      withAutoCorrect {
-        if (!property.isSuppressedBy(ruleId, aliases)) {
-          if (property.isInternal()) {
-            property.removeModifier(KtTokens.INTERNAL_KEYWORD)
-          }
-
-          property.addModifier(KtTokens.PRIVATE_KEYWORD)
-        }
-      }
+      violations.add(property)
     }
   }
 

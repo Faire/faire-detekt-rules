@@ -1,13 +1,14 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use isEqualTo(1), use isOne() instead."
 
-internal class DoNotUseIsEqualToWhenArgumentIsOneTest : AutoCorrectRuleTest<DoNotUseIsEqualToWhenArgumentIsOne>(
+internal class DoNotUseIsEqualToWhenArgumentIsOneTest :
+    AutoCorrectRuleTest<DoNotUseIsEqualToWhenArgumentIsOne>(
     { DoNotUseIsEqualToWhenArgumentIsOne(it) },
 ) {
 

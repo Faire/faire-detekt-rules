@@ -2,13 +2,10 @@ package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
 import com.faire.detekt.utils.usesSizeProperty
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -31,14 +28,8 @@ private val ZERO_TEXTS = setOf("0.0", "0", "0L", "0.0f", "0f", "0.0F", "0x0", "0
  * }
  * ```
  */
-internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Do not use isEqualTo(0), use isZero() instead.",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty) :
+    Rule(config, "Do not use isEqualTo(0), use isZero() instead.") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -56,14 +47,13 @@ internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty
 
     if (isEqualToExpression.isComparingToZero()) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
 
-      withAutoCorrect {
+      if (autoCorrect) {
         val isZeroExpression = KtPsiFactory(isEqualToExpression).createExpression("isZero()")
         isEqualToExpression.astReplace(isZeroExpression)
       }

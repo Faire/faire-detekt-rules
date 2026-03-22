@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.simplifyCollectionPatterns
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentList
@@ -27,14 +24,8 @@ private val FILTER_REGEX = ".*\\.*filter\\s*(\\{|\\().+".toRegex()
  *
  * This augments the `UnnecessaryFilter` detekt rule which does not cover `.single` as of 1.21.0.
  */
-internal class DoNotUseSingleOnFilter(config: Config = Config.empty) : Rule(config) {
-  override val issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Do not use single() with filter { ... }, use single { ... } instead",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class DoNotUseSingleOnFilter(config: Config = Config.empty) :
+    Rule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -50,14 +41,13 @@ internal class DoNotUseSingleOnFilter(config: Config = Config.empty) : Rule(conf
     if (!receiverExpression.lastChild.text.matches(FILTER_REGEX)) return
 
     report(
-        CodeSmell(
-            issue = issue,
+        Finding(
             entity = Entity.from(expression),
-            message = issue.description,
+            message = description,
         ),
     )
 
-    withAutoCorrect {
+    if (autoCorrect) {
       removeCallToSingle(expression)
       receiverExpression.simplifyCollectionPatterns("single")
     }

@@ -1,6 +1,6 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
         }
       """.trimIndent(),
     )
-    assertThat(findings.single().id).isEqualTo("DoNotUseDirectReceiverReferenceInsideWith")
+    assertThat(findings.single()).isNotNull()
   }
 
   @Test
@@ -39,7 +39,7 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
         }
       """.trimIndent(),
     )
-    assertThat(findings.single().id).isEqualTo("DoNotUseDirectReceiverReferenceInsideWith")
+    assertThat(findings.single()).isNotNull()
   }
 
   @Test
@@ -55,7 +55,7 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
         }
       """.trimIndent(),
     )
-    assertThat(findings.single().id).isEqualTo("DoNotUseDirectReceiverReferenceInsideWith")
+    assertThat(findings.single()).isNotNull()
   }
 
   @Test
@@ -71,7 +71,7 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
         }
       """.trimIndent(),
     )
-    assertThat(findings.single().id).isEqualTo("DoNotUseDirectReceiverReferenceInsideWith")
+    assertThat(findings.single()).isNotNull()
   }
 
   @Test

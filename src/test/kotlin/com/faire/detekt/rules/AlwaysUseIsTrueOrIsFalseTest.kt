@@ -1,13 +1,14 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.assertThat
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()"
 
-internal class AlwaysUseIsTrueOrIsFalseTest : AutoCorrectRuleTest<AlwaysUseIsTrueOrIsFalse>(
+internal class AlwaysUseIsTrueOrIsFalseTest :
+    AutoCorrectRuleTest<AlwaysUseIsTrueOrIsFalse>(
     { AlwaysUseIsTrueOrIsFalse(it) },
 ) {
   @Test

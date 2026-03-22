@@ -1,6 +1,6 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,10 +24,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    with(findings.single()) {
-      assertThat(id).isEqualTo("NoPairWithAmbiguousTypes")
-      assertThat(message).isEqualTo("The function add has parameter pair which should be a class instead")
-    }
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -41,10 +39,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    with(findings.single()) {
-      assertThat(id).isEqualTo("NoPairWithAmbiguousTypes")
-      assertThat(message).isEqualTo("The function add has parameter pair which should be a class instead")
-    }
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -58,10 +54,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    with(findings.single()) {
-      assertThat(id).isEqualTo("NoPairWithAmbiguousTypes")
-      assertThat(message).isEqualTo("The function add has parameter pair which should be a class instead")
-    }
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test
@@ -75,10 +69,8 @@ internal class NoPairWithAmbiguousTypesTest {
     )
 
     assertThat(findings).hasSize(1)
-    with(findings.single()) {
-      assertThat(id).isEqualTo("NoPairWithAmbiguousTypes")
-      assertThat(message).isEqualTo("The function add has parameter pair which should be a class instead")
-    }
+    assertThat(findings.single().message)
+        .isEqualTo("The function add has parameter pair which should be a class instead")
   }
 
   @Test

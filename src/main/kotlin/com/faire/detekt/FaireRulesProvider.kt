@@ -33,49 +33,49 @@ import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
 import com.faire.detekt.rules.UseNoneMatchInsteadOfFirstOrNullIsNull
 import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection
 import com.faire.detekt.rules.UseSetInsteadOfListToSet
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.RuleSet
-import io.gitlab.arturbosch.detekt.api.RuleSetProvider
+import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetId
+import dev.detekt.api.RuleSetProvider
 
 internal class FaireRulesProvider : RuleSetProvider {
-  override val ruleSetId = "FaireRuleSet"
+  override val ruleSetId = RuleSetId("FaireRuleSet")
 
-  override fun instance(config: Config): RuleSet = RuleSet(
+  override fun instance(): RuleSet = RuleSet(
       ruleSetId,
       listOf(
-          AlwaysUseIsTrueOrIsFalse(config),
-          DoNotAccessVisibleForTesting(config),
-          DoNotAssertIsEqualOnTheResultOfSingle(config),
-          DoNotNameCompanionObject(config),
-          DoNotSplitByRegex(config),
-          DoNotUseDirectReceiverReferenceInsideWith(config),
-          DoNotUsePropertyAccessInAssert(config),
-          DoNotUseHasSizeForEmptyListInAssert(config),
-          DoNotUseIsEqualToWhenArgumentIsOne(config),
-          DoNotUseIsEqualToWhenArgumentIsZero(config),
-          DoNotUseIsOneAssertions(config),
-          DoNotUseIsZeroAssertions(config),
-          DoNotUseSingleOnFilter(config),
-          DoNotUseSizePropertyInAssert(config),
-          FilterNotNullOverMapNotNullForFiltering(config),
-          GetOrDefaultShouldBeReplacedWithGetOrElse(config),
-          NoDuplicateKeysInMapOf(config),
-          NoExtensionFunctionOnNullableReceiver(config),
-          NoFunctionReferenceToJavaClass(config),
-          NoNonPrivateGlobalVariables(config),
-          NoNullableLambdaWithDefaultNull(config),
-          NoPairWithAmbiguousTypes(config),
-          PreferIgnoreCase(config),
-          PreventBannedImports(config),
-          ReturnValueOfLetMustBeUsed(config),
-          UseEntriesInsteadOfValuesOnEnum(config),
-          UseFirstNotNullOf(config),
-          UseFirstOrNullInsteadOfFind(config),
-          UseMapNotNullInsteadOfFilterNotNull(config),
-          UseNoneMatchInsteadOfFirstOrNullIsNull(config),
-          UseOfCollectionInsteadOfEmptyCollection(config),
-          UseSetInsteadOfListToSet(config),
-          NoEmptyLinesInConstructorParameters(config),
+          { AlwaysUseIsTrueOrIsFalse(it) },
+          { DoNotAccessVisibleForTesting(it) },
+          { DoNotAssertIsEqualOnTheResultOfSingle(it) },
+          { DoNotNameCompanionObject(it) },
+          { DoNotSplitByRegex(it) },
+          { DoNotUseDirectReceiverReferenceInsideWith(it) },
+          { DoNotUsePropertyAccessInAssert(it) },
+          { DoNotUseHasSizeForEmptyListInAssert(it) },
+          { DoNotUseIsEqualToWhenArgumentIsOne(it) },
+          { DoNotUseIsEqualToWhenArgumentIsZero(it) },
+          { DoNotUseIsOneAssertions(it) },
+          { DoNotUseIsZeroAssertions(it) },
+          { DoNotUseSingleOnFilter(it) },
+          { DoNotUseSizePropertyInAssert(it) },
+          { FilterNotNullOverMapNotNullForFiltering(it) },
+          { GetOrDefaultShouldBeReplacedWithGetOrElse(it) },
+          { NoDuplicateKeysInMapOf(it) },
+          { NoEmptyLinesInConstructorParameters(it) },
+          { NoExtensionFunctionOnNullableReceiver(it) },
+          { NoFunctionReferenceToJavaClass(it) },
+          { NoNonPrivateGlobalVariables(it) },
+          { NoNullableLambdaWithDefaultNull(it) },
+          { NoPairWithAmbiguousTypes(it) },
+          { PreferIgnoreCase(it) },
+          { PreventBannedImports(it) },
+          { ReturnValueOfLetMustBeUsed(it) },
+          { UseEntriesInsteadOfValuesOnEnum(it) },
+          { UseFirstNotNullOf(it) },
+          { UseFirstOrNullInsteadOfFind(it) },
+          { UseMapNotNullInsteadOfFilterNotNull(it) },
+          { UseNoneMatchInsteadOfFirstOrNullIsNull(it) },
+          { UseOfCollectionInsteadOfEmptyCollection(it) },
+          { UseSetInsteadOfListToSet(it) },
       ),
   )
 }

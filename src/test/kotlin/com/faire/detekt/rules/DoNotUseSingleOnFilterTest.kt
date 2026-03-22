@@ -1,13 +1,14 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use single() with filter { ... }, use single { ... } instead"
 
-internal class DoNotUseSingleOnFilterTest : AutoCorrectRuleTest<DoNotUseSingleOnFilter>({
+internal class DoNotUseSingleOnFilterTest :
+    AutoCorrectRuleTest<DoNotUseSingleOnFilter>({
   DoNotUseSingleOnFilter(it)
 }) {
 

@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.isAssertThat
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -37,14 +34,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * }
  * ```
  */
-internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Style,
-      description = "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()",
-      debt = Debt.FIVE_MINS,
-  )
-
+internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) :
+    Rule(config, "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()") {
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -59,21 +50,20 @@ internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) : Rule(co
 
     if (isEqualToExpression.isComparingToTrue() || isEqualToExpression.isComparingToFalse()) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()",
           ),
       )
 
-      withAutoCorrect {
-        if (isEqualToExpression.isComparingToTrue()) {
-          val isTrueExpression = KtPsiFactory(isEqualToExpression).createExpression("isTrue()")
-          isEqualToExpression.astReplace(isTrueExpression)
-        } else {
-          val isFalseExpression = KtPsiFactory(isEqualToExpression).createExpression("isFalse()")
-          isEqualToExpression.astReplace(isFalseExpression)
-        }
+      if (autoCorrect) {
+          if (isEqualToExpression.isComparingToTrue()) {
+            val isTrueExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isTrue()")
+            isEqualToExpression.astReplace(isTrueExpression)
+          } else {
+            val isFalseExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isFalse()")
+            isEqualToExpression.astReplace(isFalseExpression)
+          }
       }
     }
   }

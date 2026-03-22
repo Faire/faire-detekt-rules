@@ -1,12 +1,13 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.TestConfig
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.TestConfig
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class PreventBannedImportsTest : AutoCorrectRuleTest<PreventBannedImports>(
+internal class PreventBannedImportsTest :
+    AutoCorrectRuleTest<PreventBannedImports>(
     {
       PreventBannedImports(
           TestConfig(

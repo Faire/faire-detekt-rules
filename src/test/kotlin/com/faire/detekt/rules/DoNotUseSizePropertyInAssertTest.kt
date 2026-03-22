@@ -1,29 +1,22 @@
 package com.faire.detekt.rules
 
-import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
-import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.api.Finding
-import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
+import dev.detekt.api.Finding
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not use size property in assertion, use hasSize() instead."
 
-internal class DoNotUseSizePropertyInAssertTest {
+@KotlinCoreEnvironmentTest
+internal class DoNotUseSizePropertyInAssertTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotUseSizePropertyInAssert
-  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
   @BeforeEach
   fun setup() {
     rule = DoNotUseSizePropertyInAssert()
-    envWrapper = createEnvironment(listOf())
-  }
-
-  @AfterEach
-  fun tearDown() {
-    envWrapper.dispose()
   }
 
   @Test
@@ -62,7 +55,7 @@ internal class DoNotUseSizePropertyInAssertTest {
     assertValid(
         """
         val list = listOf(1, 2, 3)
-        val size = list.size"
+        val size = list.size
         """,
     )
   }
@@ -223,7 +216,7 @@ internal class DoNotUseSizePropertyInAssertTest {
   fun `size property is caught when using isZero`() {
     assertInvalid(
         """
-        val list = listOf(1, 2, 3) 
+        val list = listOf(1, 2, 3)
         assertThat(list.size).isZero()
         """,
     )
@@ -237,19 +230,25 @@ internal class DoNotUseSizePropertyInAssertTest {
   private fun assertValid(code: String) = assertThat(runLint(code)).isEmpty()
   private fun assertInvalid(code: String) = assertThat(runLint(code).single().message).isEqualTo(ISSUE_DESCRIPTION)
 
-  private fun runLint(code: String): List<Finding> {
-    return rule.compileAndLintWithContext(
-        envWrapper.env,
+  private fun runLint(code: String): List<Finding> = rule.lintWithContext(
+        env,
         """
         import kotlin.collections.List
         import kotlin.collections.Map
 
         data class Sizeable(val size: Int)
 
+        fun <T> assertThat(value: T): AssertThat = TODO()
+        class AssertThat {
+            fun isEqualTo(value: Any?): AssertThat = TODO()
+            fun isZero(): AssertThat = TODO()
+            fun isGreaterThan(value: Any?): AssertThat = TODO()
+            fun isLessOrEqualTo(value: Any?): AssertThat = TODO()
+        }
+
         fun `test usage`() {
             ${code.trimIndent()}
         }
         """.trimIndent(),
     )
-  }
 }

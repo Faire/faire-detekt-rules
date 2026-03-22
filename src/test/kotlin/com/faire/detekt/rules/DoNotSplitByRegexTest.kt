@@ -1,34 +1,27 @@
 package com.faire.detekt.rules
 
-import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
-import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.test.lintWithContext
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class DoNotSplitByRegexTest {
+@KotlinCoreEnvironmentTest
+internal class DoNotSplitByRegexTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotSplitByRegex
-  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
   @BeforeEach
   fun setUp() {
     rule = DoNotSplitByRegex()
-    envWrapper = createEnvironment(listOf())
-  }
-
-  @AfterEach
-  fun tearDown() {
-    envWrapper.dispose()
   }
 
   @Test
   fun `split by regex is not allowed`() {
     val findings = rule.lintWithContext(
-        envWrapper.env,
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ",".toRegex()
           return str.split(sep)
@@ -41,9 +34,9 @@ internal class DoNotSplitByRegexTest {
   @Test
   fun `split by regex is not allowed even when it is not the first arg`() {
     val findings = rule.lintWithContext(
-        envWrapper.env,
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ",".toRegex()
           return str.split(limit=2, regex=sep)
@@ -56,9 +49,9 @@ internal class DoNotSplitByRegexTest {
   @Test
   fun `split by string literal is fine`() {
     val findings = rule.lintWithContext(
-        envWrapper.env,
+        env,
         """
-        fun func(): String {
+        fun func(): List<String> {
           val str = "a,b,c"
           val sep = ","
           return str.split(sep)

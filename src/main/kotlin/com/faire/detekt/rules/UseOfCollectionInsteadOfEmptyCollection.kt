@@ -1,12 +1,9 @@
 package com.faire.detekt.rules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt.Companion.FIVE_MINS
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
@@ -17,14 +14,7 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  *
  * This code convention exists for the purpose of consistency.
  */
-internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.empty) : Rule(config) {
-  override val issue: Issue = Issue(
-      id = javaClass.simpleName,
-      severity = Severity.Warning,
-      description = ISSUE,
-      debt = FIVE_MINS,
-  )
-
+internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.empty) : Rule(config, ISSUE) {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -32,14 +22,13 @@ internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.e
 
     if (callee.text in setOf("emptyList", "emptySet", "emptyMap")) {
       report(
-          CodeSmell(
-              issue = issue,
+          Finding(
               entity = Entity.from(expression),
-              message = issue.description,
+              message = description,
           ),
       )
 
-      withAutoCorrect {
+      if (autoCorrect) {
         when (callee.text) {
           "emptyList" -> callee.astReplace(KtPsiFactory(callee).createExpression("listOf"))
           "emptySet" -> callee.astReplace(KtPsiFactory(callee).createExpression("setOf"))

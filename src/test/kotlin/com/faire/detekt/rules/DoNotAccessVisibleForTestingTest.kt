@@ -1,37 +1,32 @@
 package com.faire.detekt.rules
 
-import io.github.detekt.test.utils.KotlinCoreEnvironmentWrapper
-import io.github.detekt.test.utils.createEnvironment
-import io.gitlab.arturbosch.detekt.test.lintWithContext
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class DoNotAccessVisibleForTestingTest {
+@KotlinCoreEnvironmentTest
+internal class DoNotAccessVisibleForTestingTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: DoNotAccessVisibleForTesting
-  private lateinit var envWrapper: KotlinCoreEnvironmentWrapper
 
   @BeforeEach
   fun setup() {
     rule = DoNotAccessVisibleForTesting()
-    envWrapper = createEnvironment(listOf())
-  }
-
-  @AfterEach
-  fun tearDown() {
-    envWrapper.dispose()
   }
 
   // We do not want to produce duplicate findings when the symbol is later used.
   @Test
   fun `test importing test-only symbol`() {
     val findings = rule.lintWithContext(
-        envWrapper.env,
+        env,
         """
           package bar
 
           import foo.test
+
+          fun bar() {}
         """,
         """
           package foo
@@ -48,13 +43,13 @@ internal class DoNotAccessVisibleForTestingTest {
   @Test
   fun `test accessing test-only members`() {
     val findings = rule.lintWithContext(
-        envWrapper.env,
+        env,
         """
           package bar
 
           import foo.Foo
 
-          fun bar(): Int {
+          fun bar() {
             val foo = Foo()
             foo.testMember()
             foo.testProperty
@@ -75,6 +70,5 @@ internal class DoNotAccessVisibleForTestingTest {
         """,
     )
     assertThat(findings).hasSize(2)
-    assertThat(findings).allMatch { it.id == "DoNotAccessVisibleForTesting" }
   }
 }

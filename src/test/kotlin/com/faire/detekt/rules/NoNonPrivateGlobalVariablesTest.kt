@@ -3,7 +3,8 @@ package com.faire.detekt.rules
 import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
 
-internal class NoNonPrivateGlobalVariablesTest : AutoCorrectRuleTest<NoNonPrivateGlobalVariables>(
+internal class NoNonPrivateGlobalVariablesTest :
+    AutoCorrectRuleTest<NoNonPrivateGlobalVariables>(
     { NoNonPrivateGlobalVariables(it) },
 ) {
   @Test

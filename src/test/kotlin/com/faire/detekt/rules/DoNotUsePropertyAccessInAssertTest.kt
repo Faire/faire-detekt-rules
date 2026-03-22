@@ -1,14 +1,15 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 private val ISSUE_DESCRIPTION = "Do not use property access syntax with assertion methods. " +
     "Do not remove the parenthesis."
 
-internal class DoNotUsePropertyAccessInAssertTest : AutoCorrectRuleTest<DoNotUsePropertyAccessInAssert>(
+internal class DoNotUsePropertyAccessInAssertTest :
+    AutoCorrectRuleTest<DoNotUsePropertyAccessInAssert>(
     { DoNotUsePropertyAccessInAssert(it) },
 ) {
 

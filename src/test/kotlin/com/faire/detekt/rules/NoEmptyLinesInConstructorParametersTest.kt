@@ -1,11 +1,12 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRuleTest
-import io.gitlab.arturbosch.detekt.test.assertThat
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.test.lint
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoEmptyLinesInConstructorParameters>(
+internal class NoEmptyLinesInConstructorParametersTest :
+    AutoCorrectRuleTest<NoEmptyLinesInConstructorParameters>(
     { NoEmptyLinesInConstructorParameters(it) },
 ) {
 
@@ -49,7 +50,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -72,7 +73,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -94,7 +95,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -116,7 +117,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -140,7 +141,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               )
             }
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -203,7 +204,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -220,7 +221,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
     )
 
     assertThat(findings).hasSize(1)
-    assertThat(findings.first()).hasMessage(rule.issue.description)
+    assertThat(findings.first().message).isEqualTo(rule.description)
   }
 
   @Test
@@ -244,7 +245,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
@@ -267,7 +268,7 @@ internal class NoEmptyLinesInConstructorParametersTest : AutoCorrectRuleTest<NoE
               val age: Int,
             )
             """.trimIndent(),
-        issueDescription = rule.issue.description,
+        issueDescription = rule.description,
     )
   }
 
