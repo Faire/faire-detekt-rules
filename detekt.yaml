@@ -1,11 +1,9 @@
 complexity:
   active: true
-  # TODO: these were turned off during the upgrade to 2.0.0-alpha.2. Revisit to see what make sense.
   ReplaceSafeCallChainWithRun:
     active: false
   CognitiveComplexMethod:
     active: false
-  # End of TODO
   ComplexCondition:
     active: true
     allowedConditions: 9
@@ -301,10 +299,8 @@ ktlint:
 
 naming:
   active: true
-  # TODO: these were turned off during the upgrade to 2.0.0-alpha.2. Revisit to see what make sense.
   BooleanPropertyNaming:
-    active: false
-  # End of TODO
+    active: true
   ClassNaming:
     active: true
     classPattern: "[A-Z$][a-zA-Z0-9$]*"
