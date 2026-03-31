@@ -1,12 +1,10 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 private val LOWERCASE_CALLS = setOf("lowercase()", "toLowerCase()")
@@ -28,7 +26,11 @@ private val IGNORE_CASE_FUNCTIONS = setOf(
  * Bad: `someString.lowercase().contains("foo")`
  */
 internal class PreferIgnoreCase(config: Config = Config.empty) :
-    Rule(config, "use ignoreCase=true with various string matching functions without converting to lowercase") {
+    AutoCorrectRule(
+        config,
+        "use ignoreCase=true with various string matching functions without converting to lowercase",
+    ) {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
     val selectorExpression = expression.selectorExpression ?: return
@@ -49,9 +51,11 @@ internal class PreferIgnoreCase(config: Config = Config.empty) :
           return
         }
         val newArguments = arguments.text.dropLast(1) + ", ignoreCase = true)"
-        arguments.astReplace(KtPsiFactory(expression).createCallArguments(newArguments))
-        // We can't just delete receiverExpression.lastChild; it'd create an empty/invalid DotQualifiedExpression node.
-        expression.firstChild.astReplace(receiverExpression.firstChild)
+        val functionName = selectorExpression.referenceExpression()?.text ?: return
+        // Strip .lowercase()/.toLowerCase() from receiver to get the base string expression
+        val baseReceiver = receiverExpression.firstChild.text
+
+        pending.add(expression.text to "$baseReceiver.$functionName$newArguments")
       }
     }
   }

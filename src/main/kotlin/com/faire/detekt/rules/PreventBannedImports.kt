@@ -1,13 +1,10 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtImportDirective
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
-import org.jetbrains.kotlin.resolve.ImportPath
 
 /**
  * Prevent a configurable list of imports, optionally with auto-correction to a configurable replacement import.
@@ -18,7 +15,8 @@ import org.jetbrains.kotlin.resolve.ImportPath
  * Good: `import kotlin.math.max`
  * Bad: `import java.lang.Integer.max`
  */
-internal open class PreventBannedImports(config: Config = Config.empty) : Rule(config, "Prevent unwanted imports") {
+internal open class PreventBannedImports(config: Config = Config.empty) :
+    AutoCorrectRule(config, "Prevent unwanted imports") {
   private val withAlternatives: Map<String, String> by lazy { getConfiguredWithAlternatives() }
   private val withoutAlternatives: List<String> by lazy { getConfiguredWithoutAlternatives() }
 
@@ -63,13 +61,8 @@ internal open class PreventBannedImports(config: Config = Config.empty) : Rule(c
         )
         if (!didReportIssue) continue
         if (autoCorrect) {
-          val newImport = KtPsiFactory(importDirective)
-              .createImportDirective(
-                  ImportPath.fromString(
-                      validImport + importReference.removePrefix(invalidImport),
-                  ),
-              )
-          importDirective.astReplace(newImport)
+          val newImportPath = validImport + importReference.removePrefix(invalidImport)
+          pending.add(importDirective.text to "import $newImportPath")
         }
       }
     }

@@ -1,14 +1,12 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.faire.detekt.utils.isAssertThat
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -35,7 +33,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * ```
  */
 internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) :
-    Rule(config, "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()") {
+    AutoCorrectRule(config, "Do not use isEqualTo(true) or isEqualTo(false), use isTrue() or isFalse()") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -57,13 +56,8 @@ internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) :
       )
 
       if (autoCorrect) {
-          if (isEqualToExpression.isComparingToTrue()) {
-            val isTrueExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isTrue()")
-            isEqualToExpression.astReplace(isTrueExpression)
-          } else {
-            val isFalseExpression = KtPsiFactory(isEqualToExpression.project).createExpression("isFalse()")
-            isEqualToExpression.astReplace(isFalseExpression)
-          }
+        val replacement = if (isEqualToExpression.isComparingToTrue()) "isTrue()" else "isFalse()"
+        pending.add(isEqualToExpression.text to replacement)
       }
     }
   }

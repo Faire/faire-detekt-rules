@@ -1,14 +1,12 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.faire.detekt.utils.isAssertThat
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 
 /**
  * Do not use property access syntax with assertion methods.
@@ -24,7 +22,11 @@ import org.jetbrains.kotlin.psi.psiUtil.astReplace
  */
 
 internal class DoNotUsePropertyAccessInAssert(config: Config = Config.empty) :
-    Rule(config, "Do not use property access syntax with assertion methods. Do not remove the parenthesis.") {
+    AutoCorrectRule(
+        config,
+        "Do not use property access syntax with assertion methods. Do not remove the parenthesis.",
+    ) {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -41,9 +43,7 @@ internal class DoNotUsePropertyAccessInAssert(config: Config = Config.empty) :
       )
 
       if (autoCorrect) {
-        val withParenthesisExpression = KtPsiFactory(selectorExpression)
-            .createExpression("${selectorExpression.text}()")
-        selectorExpression.astReplace(withParenthesisExpression)
+        pending.add(selectorExpression.text to "${selectorExpression.text}()")
       }
     }
   }

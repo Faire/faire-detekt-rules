@@ -1,17 +1,15 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 private val BANNED_CLASS_IDS = listOf(
@@ -36,16 +34,17 @@ private val BANNED_CLASS_IDS = listOf(
  */
 
 internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
-    Rule(config, "Use firstOrNull() instead of find()"),
+    AutoCorrectRule(config, "Use firstOrNull() instead of find()"),
     RequiresAnalysisApi {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
     val selectorExpression = expression.selectorExpression ?: return
-    val receiverExpression = expression.receiverExpression
-
     if (selectorExpression.referenceExpression()?.text != "find") return
+
     val findExpression = selectorExpression as? KtCallExpression ?: return
+    val receiverExpression = expression.receiverExpression
 
     analyze(expression) {
       val receiverType = receiverExpression.expressionType ?: return@analyze
@@ -59,14 +58,25 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
       )
     }
 
-    if (autoCorrect) {
-      val arguments = if ((findExpression).lambdaArguments.isNotEmpty()) {
-        " ${findExpression.lambdaArguments.joinToString { it.text }}"
-      } else {
-        "(${findExpression.valueArguments.joinToString { it.text }})"
+    if (!autoCorrect) return
+
+    val replacementText = buildString {
+      append("firstOrNull")
+
+      if (findExpression.typeArgumentList != null) {
+        append(findExpression.typeArgumentList!!.text)
       }
 
-      findExpression.astReplace(KtPsiFactory(findExpression).createExpression("firstOrNull$arguments"))
+      if (findExpression.lambdaArguments.isNotEmpty()) {
+        append(" ")
+        append(findExpression.lambdaArguments.joinToString(" ") { it.text })
+      } else {
+        append("(")
+        append(findExpression.valueArguments.joinToString(", ") { it.text })
+        append(")")
+      }
     }
+
+    pending.add(findExpression.text to replacementText)
   }
 }

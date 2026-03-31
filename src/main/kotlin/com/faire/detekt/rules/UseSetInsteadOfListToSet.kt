@@ -1,12 +1,10 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 
 /**
  * Use `set()` instead of `list().toSet()`
@@ -20,7 +18,8 @@ import org.jetbrains.kotlin.psi.psiUtil.astReplace
  * ```
  */
 internal class UseSetInsteadOfListToSet(config: Config = Config.empty) :
-    Rule(config, "Use set() instead of list().toSet()") {
+    AutoCorrectRule(config, "Use set() instead of list().toSet()") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -39,12 +38,14 @@ internal class UseSetInsteadOfListToSet(config: Config = Config.empty) :
     )
 
     if (autoCorrect) {
-      expression.lastChild.delete() // Delete "toSet()"
-      expression.lastChild.delete() // Delete "."
+      // Replace .list().toSet() with .set()
+      val receiverDotExpr = receiverExpression as? KtDotQualifiedExpression ?: return
+      val listCallText = receiverDotExpr.selectorExpression?.text ?: return // "list()"
+      val baseReceiverText = receiverDotExpr.receiverExpression.text
+      // Extract whitespace/dot between base receiver and list() from the expression text
+      val betweenBaseAndList = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(listCallText)
 
-      val expressionToReplace = receiverExpression.lastChild // "list()"
-
-      expressionToReplace.astReplace(KtPsiFactory(expressionToReplace).createExpression("set()"))
+      pending.add(expression.text to "$baseReceiverText${betweenBaseAndList}set()")
     }
   }
 }

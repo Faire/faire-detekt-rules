@@ -1,10 +1,10 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.utils.simplifyCollectionPatterns
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 private val MAP_NOT_NULL_REGEX = """.*\.*mapNotNull\s*[{(].+""".toRegex()
@@ -22,7 +22,8 @@ private val MAP_NOT_NULL_REGEX = """.*\.*mapNotNull\s*[{(].+""".toRegex()
  *               Using `.mapNotNull { ... }.first()` is more verbose.
  */
 internal class UseFirstNotNullOf(config: Config = Config.empty) :
-    Rule(config, "use firstNotNullOf() instead of mapNotNull followed by first()") {
+    AutoCorrectRule(config, "use firstNotNullOf() instead of mapNotNull followed by first()") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -40,24 +41,34 @@ internal class UseFirstNotNullOf(config: Config = Config.empty) :
     )
 
     if (autoCorrect) {
-      removeCallToFirst(expression)
-      mayBeRemoveCallToAsSequence(receiverExpression)
+      val mapNotNullCall = receiverExpression.selectorExpression as? KtCallExpression ?: return
+      val mapNotNullCallText = mapNotNullCall.text
+      val newCallText = mapNotNullCallText.replaceFirst("mapNotNull", "firstNotNullOf")
 
-      receiverExpression.simplifyCollectionPatterns("firstNotNullOf")
+      val mapNotNullReceiver = receiverExpression.receiverExpression
+      val shouldRemoveAsSequence = mapNotNullReceiver is KtDotQualifiedExpression &&
+          mapNotNullReceiver.lastChild.text == "asSequence()"
+
+      if (shouldRemoveAsSequence) {
+        // Strip .asSequence() — use the receiver before asSequence() as base
+        val asSeqExpr = mapNotNullReceiver as KtDotQualifiedExpression
+        val baseReceiverText = asSeqExpr.receiverExpression.text
+        val asSeqCallText = asSeqExpr.selectorExpression?.text ?: return
+        // Get whitespace/dot between base receiver and asSequence call
+        val betweenBaseAndAsSeq = asSeqExpr.text.removePrefix(baseReceiverText).removeSuffix(asSeqCallText)
+        pending.add(expression.text to "$baseReceiverText$betweenBaseAndAsSeq$newCallText")
+      } else {
+        val baseReceiverText = mapNotNullReceiver.text
+        val betweenBaseAndMapNotNull =
+          receiverExpression.text.removePrefix(baseReceiverText).removeSuffix(mapNotNullCallText)
+        pending.add(expression.text to "$baseReceiverText$betweenBaseAndMapNotNull$newCallText")
+      }
     }
   }
 }
 
-private fun removeCallToFirst(expression: KtDotQualifiedExpression) {
-  expression.lastChild.delete() // Delete "first()"
-  expression.lastChild.delete() // Delete "."
-}
-
-private fun mayBeRemoveCallToAsSequence(expression: KtDotQualifiedExpression) {
-  // Check whether the child immediately preceding the receiver expression is "asSequence()"
-  val receiverExpression = expression.receiverExpression
-  if (receiverExpression.lastChild.text != "asSequence()") return
-
-  receiverExpression.lastChild.delete() // Delete "asSequence()"
-  receiverExpression.lastChild.delete() // Delete "."
-}
+private fun buildArgumentsText(call: KtCallExpression): String = if (call.lambdaArguments.isNotEmpty()) {
+    " ${call.lambdaArguments.joinToString { it.text }}"
+  } else {
+    "(${call.valueArguments.joinToString { it.text }})"
+  }

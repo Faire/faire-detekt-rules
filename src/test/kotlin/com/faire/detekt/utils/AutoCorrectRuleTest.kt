@@ -2,6 +2,7 @@ package com.faire.detekt.utils
 
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
+import dev.detekt.api.modifiedText
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import dev.detekt.test.utils.compileContentForTest
@@ -29,9 +30,13 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
         .`as`("Expected issues to be: '$issueDescription'")
         .extracting<String> { it.message }
         .allMatch { it == issueDescription }
-    assertThat(code.text).isEqualTo(expectedPostFormattedCode)
 
-    val postFormattedCode = compileContentForTest(code.text, fileName)
+    assertThat(code.modifiedText).isNotNull()
+    val modifiedText = code.modifiedText!!
+
+    assertThat(modifiedText).isEqualTo(expectedPostFormattedCode)
+
+    val postFormattedCode = compileContentForTest(modifiedText, fileName)
     assertThat(autoCorrectRule.lint(postFormattedCode)).isEmpty()
   }
 
@@ -43,6 +48,7 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
     val code = compileContentForTest(codeToLint, fileName)
     val findings = autoCorrectRule.lint(code)
     assertThat(code.text).isEqualTo(codeToLint)
+    assertThat(code.modifiedText).isNull()
     assertThat(findings).isEmpty()
   }
 
