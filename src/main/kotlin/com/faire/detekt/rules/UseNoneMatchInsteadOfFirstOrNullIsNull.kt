@@ -1,14 +1,12 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -28,11 +26,12 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * that the result was not null.
  */
 internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty) :
-    Rule(
+    AutoCorrectRule(
         config,
         "Use assertThat(collection).noneMatch { predicate } instead of " +
             "assertThat(collection.firstOrNull { predicate }).isNull()",
     ) {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -63,20 +62,15 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
     )
 
     if (autoCorrect) {
-      // Get the collection (receiver of firstOrNull)
       val collectionExpression = assertThatArgument.receiverExpression.text
 
-      // Get the predicate arguments from firstOrNull
       val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {
         " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
       } else {
         "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
       }
 
-      val newExpression = KtPsiFactory(expression.project).createExpression(
-          "assertThat($collectionExpression).noneMatch$predicateArgs",
-      )
-      expression.astReplace(newExpression)
+      pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")
     }
   }
 }

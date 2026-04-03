@@ -1,11 +1,9 @@
 package com.faire.detekt.rules
 
-import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
-import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
@@ -24,7 +22,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
  * ```
  */
 internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.empty) :
-    Rule(config, "Use filterNotNull() instead of mapNotNull { it }") {
+    AutoCorrectRule(config, "Use filterNotNull() instead of mapNotNull { it }") {
+
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
@@ -43,22 +42,8 @@ internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.e
       )
 
       if (autoCorrect) {
-        // Rename "mapNotNull" to "filterNotNull"
-        val calleeLeaf = callee.node.findChildByType(KtTokens.IDENTIFIER)
-        (calleeLeaf?.psi as? LeafPsiElement)?.rawReplaceWithText("filterNotNull")
-
-        // Remove lambda argument and any preceding whitespace
-        val expressionNode = expression.node
-        val lambdaArgNode = expression.lambdaArguments.first().node
-        val blankNode = lambdaArgNode.treePrev?.takeIf { it.text.isBlank() }
-        if (blankNode != null) {
-          expressionNode.removeChild(blankNode)
-        }
-        expressionNode.removeChild(lambdaArgNode)
-
-        // Add empty parentheses
-        expressionNode.addChild(LeafPsiElement(KtTokens.LPAR, "("), null)
-        expressionNode.addChild(LeafPsiElement(KtTokens.RPAR, ")"), null)
+        // mapNotNull { it } -> filterNotNull()
+        pending.add(expression.text to "filterNotNull()")
       }
     }
   }

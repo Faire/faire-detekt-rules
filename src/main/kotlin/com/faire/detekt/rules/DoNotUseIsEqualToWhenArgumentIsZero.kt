@@ -1,15 +1,13 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.faire.detekt.utils.isAssertThat
 import com.faire.detekt.utils.usesSizeProperty
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 private val ZERO_TEXTS = setOf("0.0", "0", "0L", "0.0f", "0f", "0.0F", "0x0", "0b0")
@@ -29,7 +27,8 @@ private val ZERO_TEXTS = setOf("0.0", "0", "0L", "0.0f", "0f", "0.0F", "0x0", "0
  * ```
  */
 internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty) :
-    Rule(config, "Do not use isEqualTo(0), use isZero() instead.") {
+    AutoCorrectRule(config, "Do not use isEqualTo(0), use isZero() instead.") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -54,8 +53,7 @@ internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty
       )
 
       if (autoCorrect) {
-        val isZeroExpression = KtPsiFactory(isEqualToExpression).createExpression("isZero()")
-        isEqualToExpression.astReplace(isZeroExpression)
+        pending.add(isEqualToExpression.text to "isZero()")
       }
     }
   }

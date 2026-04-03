@@ -1,10 +1,10 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.utils.simplifyCollectionPatterns
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
 private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
@@ -26,7 +26,8 @@ private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
  *  for larger collections.
  */
 internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) :
-    Rule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
+    AutoCorrectRule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -44,13 +45,20 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     )
 
     if (autoCorrect) {
-      removeCallToFilterNotNull(expression)
-      receiverExpression.simplifyCollectionPatterns("mapNotNull")
+      val receiverDotExpr = receiverExpression as? KtDotQualifiedExpression ?: return
+      val mapCall = receiverDotExpr.selectorExpression as? KtCallExpression ?: return
+      val mapCallText = mapCall.text
+      val newCallText = mapCallText.replaceFirst("map", "mapNotNull")
+      val baseReceiverText = receiverDotExpr.receiverExpression.text
+      val betweenBaseAndMap = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(mapCallText)
+
+      pending.add(expression.text to "$baseReceiverText$betweenBaseAndMap$newCallText")
     }
   }
-
-  private fun removeCallToFilterNotNull(expression: KtDotQualifiedExpression) {
-    expression.lastChild.delete()
-    expression.lastChild.delete()
-  }
 }
+
+private fun buildArgumentsText(call: KtCallExpression): String = if (call.lambdaArguments.isNotEmpty()) {
+    " ${call.lambdaArguments.joinToString { it.text }}"
+  } else {
+    "(${call.valueArguments.joinToString { it.text }})"
+  }

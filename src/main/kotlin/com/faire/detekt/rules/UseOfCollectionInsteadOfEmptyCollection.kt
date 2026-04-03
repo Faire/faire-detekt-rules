@@ -1,40 +1,43 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
-import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
+
+private val EMPTY_COLLECTIONS = setOf("emptyList", "emptySet", "emptyMap")
 
 /**
  * Instead of using `emptyMap()`, `emptyList()` or `emptySet()` we should use `mapOf()`, `listOf()`, or `setOf()`.
  *
  * This code convention exists for the purpose of consistency.
  */
-internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.empty) : Rule(config, ISSUE) {
+internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.empty) :
+    AutoCorrectRule(config, ISSUE) {
+
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
-    val callee = expression.getCalleeExpressionIfAny() ?: return
+    val calleeText = expression.calleeExpression?.text ?: return
+    if (calleeText !in EMPTY_COLLECTIONS) return
 
-    if (callee.text in setOf("emptyList", "emptySet", "emptyMap")) {
-      report(
-          Finding(
-              entity = Entity.from(expression),
-              message = description,
-          ),
-      )
+    report(
+        Finding(
+            entity = Entity.from(expression),
+            message = description,
+        ),
+    )
 
-      if (autoCorrect) {
-        when (callee.text) {
-          "emptyList" -> callee.astReplace(KtPsiFactory(callee).createExpression("listOf"))
-          "emptySet" -> callee.astReplace(KtPsiFactory(callee).createExpression("setOf"))
-          "emptyMap" -> callee.astReplace(KtPsiFactory(callee).createExpression("mapOf"))
-        }
+    if (autoCorrect) {
+      val replacement = when (calleeText) {
+        "emptyList" -> "listOf"
+        "emptySet" -> "setOf"
+        "emptyMap" -> "mapOf"
+        else -> return
       }
+      val typeArgs = expression.typeArgumentList?.text.orEmpty()
+      pending.add(expression.text to "$replacement$typeArgs()")
     }
   }
 

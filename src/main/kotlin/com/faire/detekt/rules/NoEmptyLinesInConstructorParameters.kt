@@ -1,14 +1,16 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtParameterList
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+
+private val BLANK_LINE_REGEX = Regex("""\n([ \t]*\n)+""")
 
 /**
  * Detects and removes empty lines within constructor parameter lists.
@@ -53,7 +55,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
  * ```
  */
 internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty) :
-    Rule(config, description = "Constructor parameter lists should not contain empty lines") {
+    AutoCorrectRule(config, description = "Constructor parameter lists should not contain empty lines") {
+
   override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
     super.visitPrimaryConstructor(constructor)
     checkConstructorParameters(constructor.valueParameterList)
@@ -84,17 +87,11 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
         Finding(entity = Entity.from(parameterList), message = description),
     )
 
-    // Auto-correct by removing blank lines
     if (autoCorrect) {
-        for (whitespaceNode in nodesWithBlankLines) {
-          // Replace multiple consecutive newlines with a single newline
-          // Preserve the indentation from the last line
-          val lines = whitespaceNode.text.split("\n")
-          val lastLine = lines.lastOrNull() ?: ""
-          val correctedWhitespace = "\n$lastLine"
-
-          whitespaceNode.rawReplaceWithText(correctedWhitespace)
-        }
-      }
+      val originalText = parameterList.text
+      // Collapse blank lines: replace sequences of newlines (with optional whitespace) with a single newline
+      val fixedText = BLANK_LINE_REGEX.replace(originalText, "\n")
+      pending.add(originalText to fixedText)
+    }
   }
 }

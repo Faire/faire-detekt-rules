@@ -1,14 +1,12 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.faire.detekt.utils.isAssertThat
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 import org.jetbrains.kotlin.resolve.calls.util.getValueArgumentsInParentheses
 
@@ -34,7 +32,8 @@ import org.jetbrains.kotlin.resolve.calls.util.getValueArgumentsInParentheses
  * ```
  */
 internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty) :
-    Rule(config, "Do not call hasSize(0) on an empty collection, call isEmpty().") {
+    AutoCorrectRule(config, "Do not call hasSize(0) on an empty collection, call isEmpty().") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -55,8 +54,7 @@ internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty
       )
 
       if (autoCorrect) {
-        val isEmptyExpression = KtPsiFactory(hasSizeExpression).createExpression("isEmpty()")
-        hasSizeExpression.astReplace(isEmptyExpression)
+        pending.add(hasSizeExpression.text to "isEmpty()")
       }
     }
   }

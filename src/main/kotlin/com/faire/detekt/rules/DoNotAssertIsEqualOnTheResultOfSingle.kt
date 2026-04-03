@@ -1,15 +1,13 @@
 package com.faire.detekt.rules
 
+import com.faire.detekt.utils.AutoCorrectRule
 import com.faire.detekt.utils.isAssertThat
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -27,7 +25,8 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * ```
  */
 internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) :
-    Rule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
+    AutoCorrectRule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -50,13 +49,11 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
     )
 
     if (autoCorrect) {
-      argumentForAssertThatExpression.lastChild.delete() // Delete "single()"
-      argumentForAssertThatExpression.lastChild.delete() // Delete "."
+      // assertThat(x.single()).isEqualTo(y) -> assertThat(x).containsOnly(y)
+      val collectionExpr = (argumentForAssertThatExpression as KtDotQualifiedExpression).receiverExpression.text
+      val isEqualArgs = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
 
-      val argumentsForIsEqualExpression = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
-      isEqualExpression.astReplace(
-          KtPsiFactory(isEqualExpression).createExpression("containsOnly$argumentsForIsEqualExpression"),
-      )
+      pending.add(expression.text to "assertThat($collectionExpr).containsOnly$isEqualArgs")
     }
   }
 

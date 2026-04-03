@@ -1,10 +1,10 @@
 package com.faire.detekt.rules
 
-import com.faire.detekt.utils.simplifyCollectionPatterns
+import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import dev.detekt.api.Rule
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentList
@@ -25,7 +25,8 @@ private val FILTER_REGEX = ".*\\.*filter\\s*(\\{|\\().+".toRegex()
  * This augments the `UnnecessaryFilter` detekt rule which does not cover `.single` as of 1.21.0.
  */
 internal class DoNotUseSingleOnFilter(config: Config = Config.empty) :
-    Rule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
+    AutoCorrectRule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
+
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
@@ -48,13 +49,21 @@ internal class DoNotUseSingleOnFilter(config: Config = Config.empty) :
     )
 
     if (autoCorrect) {
-      removeCallToSingle(expression)
-      receiverExpression.simplifyCollectionPatterns("single")
+      val receiverDotExpr = receiverExpression as? KtDotQualifiedExpression ?: return
+      val filterCall = receiverDotExpr.selectorExpression as? KtCallExpression ?: return
+      val filterCallText = filterCall.text
+      val newCallText = filterCallText.replaceFirst("filter", "single")
+      val baseReceiverText = receiverDotExpr.receiverExpression.text
+      // Extract whitespace/dot between base receiver and filter call from the expression text
+      val betweenBaseAndFilter = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(filterCallText)
+
+      pending.add(expression.text to "$baseReceiverText$betweenBaseAndFilter$newCallText")
     }
   }
-
-  private fun removeCallToSingle(expression: KtDotQualifiedExpression) {
-    expression.lastChild.delete()
-    expression.lastChild.delete()
-  }
 }
+
+private fun buildArgumentsText(call: KtCallExpression): String = if (call.lambdaArguments.isNotEmpty()) {
+    " ${call.lambdaArguments.joinToString { it.text }}"
+  } else {
+    "(${call.valueArguments.joinToString { it.text }})"
+  }
