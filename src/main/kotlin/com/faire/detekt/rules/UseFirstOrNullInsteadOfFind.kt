@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 private val BANNED_CLASS_IDS = listOf(
@@ -39,20 +41,28 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
+    inspectQualifiedExpression(expression)
+  }
 
-    val selectorExpression = expression.selectorExpression ?: return
+  override fun visitSafeQualifiedExpression(expression: KtSafeQualifiedExpression) {
+    super.visitSafeQualifiedExpression(expression)
+    inspectQualifiedExpression(expression)
+  }
+
+  private fun inspectQualifiedExpression(qualifiedExpression: KtQualifiedExpression) {
+    val selectorExpression = qualifiedExpression.selectorExpression ?: return
     if (selectorExpression.referenceExpression()?.text != "find") return
 
     val findExpression = selectorExpression as? KtCallExpression ?: return
-    val receiverExpression = expression.receiverExpression
+    val receiverExpression = qualifiedExpression.receiverExpression
 
-    analyze(expression) {
+    analyze(qualifiedExpression) {
       val receiverType = receiverExpression.expressionType ?: return@analyze
       if (BANNED_CLASS_IDS.none { receiverType.isSubtypeOf(it) }) return@analyze
 
       report(
           Finding(
-              entity = Entity.from(expression),
+              entity = Entity.from(qualifiedExpression),
               message = description,
           ),
       )
