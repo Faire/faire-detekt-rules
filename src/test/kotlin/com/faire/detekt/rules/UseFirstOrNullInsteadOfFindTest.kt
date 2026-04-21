@@ -51,6 +51,23 @@ internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmen
   }
 
   @Test
+  fun `find{ } is flagged on nullable collection chain`() {
+    assertThat(
+        rule.lintWithContext(
+            env,
+            """
+              data class Option(val id: Int)
+              data class PaymentOptions(val items: List<Option>)
+
+              fun foo(paymentOptions: PaymentOptions?, selectedOptionIds: Set<Int>) {
+                val selectedPaymentOption = paymentOptions?.items?.find { opt -> opt.id in selectedOptionIds }
+              }
+            """.trimIndent(),
+        ),
+    ).hasSize(1)
+  }
+
+  @Test
   fun `find() on unrelated type is not flagged`() {
     assertThat(
         rule.lintWithContext(
