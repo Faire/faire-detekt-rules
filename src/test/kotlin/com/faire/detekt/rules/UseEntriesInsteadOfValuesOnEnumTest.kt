@@ -1,14 +1,17 @@
 package com.faire.detekt.rules
 
 import dev.detekt.api.Finding
-import dev.detekt.test.lint
+import dev.detekt.test.junit.KotlinCoreEnvironmentTest
+import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private const val ISSUE_DESCRIPTION = "Do not call .values() on an Enum. Use .entries instead"
 
-internal class UseEntriesInsteadOfValuesOnEnumTest {
+@KotlinCoreEnvironmentTest
+internal class UseEntriesInsteadOfValuesOnEnumTest(private val env: KotlinEnvironmentContainer) {
   private lateinit var rule: UseEntriesInsteadOfValuesOnEnum
 
   @BeforeEach
@@ -49,6 +52,38 @@ internal class UseEntriesInsteadOfValuesOnEnumTest {
   }
 
   @Test
+  fun `calling values() on a non-enum type does not report`() {
+    val findings = lint(
+        """
+          class NotAnEnum {
+            fun values(): List<String> = listOf("foo")
+
+            companion object {
+              fun values(): List<String> = listOf("bar")
+            }
+          }
+
+          object NotAnEnumObject {
+            fun values(): List<String> = listOf("baz")
+          }
+
+          interface NotAnEnumInterface {
+            fun values(): List<String>
+          }
+
+          fun tester(anInterface: NotAnEnumInterface): List<String> {
+            return NotAnEnum().values() +
+                NotAnEnum.values() +
+                NotAnEnumObject.values() +
+                anInterface.values()
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `calling values() on Enum class does report`() {
     val findings = lint(
         """
@@ -65,5 +100,5 @@ internal class UseEntriesInsteadOfValuesOnEnumTest {
     assertThat(findings.map { it.message }).containsExactlyInAnyOrder(ISSUE_DESCRIPTION)
   }
 
-  private fun lint(content: String): List<Finding> = rule.lint(content)
+  private fun lint(content: String): List<Finding> = rule.lintWithContext(env, content)
 }
