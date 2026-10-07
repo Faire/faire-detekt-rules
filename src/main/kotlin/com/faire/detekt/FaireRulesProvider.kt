@@ -5,6 +5,7 @@ import com.faire.detekt.rules.DoNotAccessVisibleForTesting
 import com.faire.detekt.rules.DoNotAssertIsEqualOnTheResultOfSingle
 import com.faire.detekt.rules.DoNotNameCompanionObject
 import com.faire.detekt.rules.DoNotSplitByRegex
+import com.faire.detekt.rules.DoNotStaticallyImportObjectFunctions
 import com.faire.detekt.rules.DoNotUseDirectReceiverReferenceInsideWith
 import com.faire.detekt.rules.DoNotUseHasSizeForEmptyListInAssert
 import com.faire.detekt.rules.DoNotUseIsEqualToWhenArgumentIsOne
@@ -48,6 +49,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           { DoNotAssertIsEqualOnTheResultOfSingle(it) },
           { DoNotNameCompanionObject(it) },
           { DoNotSplitByRegex(it) },
+          { DoNotStaticallyImportObjectFunctions(it) },
           { DoNotUseDirectReceiverReferenceInsideWith(it) },
           { DoNotUsePropertyAccessInAssert(it) },
           { DoNotUseHasSizeForEmptyListInAssert(it) },
