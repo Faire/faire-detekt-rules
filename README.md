@@ -32,7 +32,7 @@ FaireRuleSet:
     active: true
   DoNotStaticallyImportObjectFunctions:
     active: true
-    allowedTypes: ["Assertions"]
+    allowedTypes: ["org.assertj.core.api.Assertions"]
   DoNotUseDirectReceiverReferenceInsideWith:
     active: true
   DoNotUseHasSizeForEmptyListInAssert:
@@ -103,8 +103,8 @@ that do not have an alternative, configure the list using `withoutAlternatives`.
 Flags static imports of functions declared on `object` types, companion objects, and Java static methods, so call
 sites reference them through the type name (e.g. `MySpecificObject.theStaticFunction()`). By default no types are
 allowed. Types that should always be statically imported, such as AssertJ's `Assertions`, can be listed in
-`allowedTypes` by simple or fully qualified name. An entry also covers objects nested in the type, such as its
-companion object. This rule requires type resolution.
+`allowedTypes` by fully qualified name (e.g. `org.assertj.core.api.Assertions`). An entry also covers objects nested
+in the type, such as its companion object. This rule requires type resolution.
 
 **DoNotAccessVisibleForTesting:**
 It is strong recommended to configure this rule with `excludes: ["**/*Test.kt"]` (following the test file naming

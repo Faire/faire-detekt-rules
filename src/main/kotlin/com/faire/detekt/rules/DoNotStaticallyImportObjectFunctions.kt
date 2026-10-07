@@ -27,8 +27,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getQualifiedElementSelector
  * and without the type name next to the call, the context of where the function comes from is missing from them.
  *
  * Some types are conventionally always statically imported (e.g. AssertJ's `Assertions`). These are configured via
- * `allowedTypes`, which accepts either simple names or fully qualified names. An entry also covers objects nested in
- * the type, such as its companion object.
+ * `allowedTypes` by fully qualified name, e.g. `org.assertj.core.api.Assertions`. An entry also covers objects nested
+ * in the type, such as its companion object.
  *
  * Imports are first filtered by name, relying on packages starting with a lowercase letter and types with an
  * uppercase one, so that only imports that can be a function on a type reach type resolution.
@@ -40,7 +40,7 @@ internal class DoNotStaticallyImportObjectFunctions(config: Config = Config.empt
     ),
     RequiresAnalysisApi {
 
-  private val allowedTypes: List<String> by config(defaultValue = listOf<String>())
+  private val allowedTypes: List<FqName> by config(defaultValue = listOf<String>()) { it.map(::FqName) }
 
   override fun visitImportDirective(importDirective: KtImportDirective) {
     super.visitImportDirective(importDirective)
@@ -81,14 +81,5 @@ internal class DoNotStaticallyImportObjectFunctions(config: Config = Config.empt
 
   private fun Name.couldBeFunction(): Boolean = asString().first().isLowerCase()
 
-  private fun FqName.isAllowed(): Boolean {
-    val segments = pathSegments().map { it.asString() }
-    return segments.indices
-        .filter { segments[it].first().isUpperCase() }
-        .any { index ->
-          val simpleName = segments[index]
-          val qualifiedName = segments.take(index + 1).joinToString(".")
-          allowedTypes.any { it == simpleName || it == qualifiedName }
-        }
-  }
+  private fun FqName.isAllowed(): Boolean = allowedTypes.any { startsWith(it) }
 }

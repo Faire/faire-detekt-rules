@@ -175,7 +175,7 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
   @Test
   fun `functions of allowed types and their nested objects are not reported`() {
     val configuredRule = DoNotStaticallyImportObjectFunctions(
-        TestConfig("allowedTypes" to listOf("Assertions", "ApiException")),
+        TestConfig("allowedTypes" to listOf("com.faire.lib.Assertions", "com.faire.lib.ApiException")),
     )
 
     val findings = configuredRule.lintWithContext(
@@ -194,9 +194,9 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
   }
 
   @Test
-  fun `allowed types can be configured by simple or fully qualified name`() {
+  fun `allowed types only match by fully qualified name`() {
     val configuredRule = DoNotStaticallyImportObjectFunctions(
-        TestConfig("allowedTypes" to listOf("com.faire.lib.MySpecificObject", "WithCompanion")),
+        TestConfig("allowedTypes" to listOf("Assertions", "com.faire.lib.MySpecific", "com.faire.lib.WithCompanion")),
     )
 
     val findings = configuredRule.lintWithContext(
@@ -211,8 +211,10 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
         DEPENDENCIES,
     )
 
-    assertThat(findings).singleElement().satisfies({
-      assertThat(it.message).contains("Assertions.assertThat()")
-    })
+    assertThat(findings.map { it.message }).containsExactlyInAnyOrder(
+        "Do not statically import functions of Assertions, call them as Assertions.assertThat() instead.",
+        "Do not statically import functions of MySpecificObject, " +
+            "call them as MySpecificObject.theStaticFunction() instead.",
+    )
   }
 }
