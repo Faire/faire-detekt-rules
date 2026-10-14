@@ -112,6 +112,19 @@ internal class UseFirstNotNullOfTest :
   }
 
   @Test
+  fun `mapNotNull {} followed by firstOrNull() is not flagged`() {
+    assertThat(
+        rule.lint(
+            """
+               fun `test usage`() {
+                   products.mapNotNull { it.foo() }.firstOrNull()
+               }
+            """.trimIndent(),
+        ),
+    ).isEmpty()
+  }
+
+  @Test
   fun `first() by itself is not flagged`() {
     assertThat(
         rule.lint(
