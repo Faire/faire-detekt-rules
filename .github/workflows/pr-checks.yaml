@@ -1,11 +1,16 @@
 name: Build and test
-on: [ pull_request, push ]
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
 jobs:
   JVM-Run-Gradle-Check:
     name: Build and test
     runs-on: ubuntu-latest
-    # Run if github push is main branch or pull request
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,8 +25,6 @@ jobs:
       # Also validates the Gradle wrapper.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-        with:
-            cache-read-only: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' }}
 
       - name: Run checks
         run: |
