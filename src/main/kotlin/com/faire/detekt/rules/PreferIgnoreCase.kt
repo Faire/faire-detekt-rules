@@ -55,7 +55,7 @@ internal class PreferIgnoreCase(config: Config = Config.empty) :
         // Strip .lowercase()/.toLowerCase() from receiver to get the base string expression
         val baseReceiver = receiverExpression.firstChild.text
 
-        pending.add(expression.text to "$baseReceiver.$functionName$newArguments")
+        replace(expression, "$baseReceiver.$functionName$newArguments")
       }
     }
   }

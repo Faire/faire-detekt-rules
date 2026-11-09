@@ -87,6 +87,6 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
       }
     }
 
-    pending.add(findExpression.text to replacementText)
+    replace(findExpression, replacementText)
   }
 }
