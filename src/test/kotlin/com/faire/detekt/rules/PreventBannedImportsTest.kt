@@ -45,6 +45,32 @@ internal class PreventBannedImportsTest :
   }
 
   @Test
+  fun `aliased import keeps its alias when replaced`() {
+    assertLintAndFormat(
+        """
+        import com.google.inject.Singleton as GuiceSingleton
+        """.trimIndent(),
+        """
+        import javax.inject.Singleton as GuiceSingleton
+        """.trimIndent(),
+        issueDescription = "Replace com.google.inject.Singleton import with javax.inject.Singleton",
+    )
+  }
+
+  @Test
+  fun `star import stays a star import when replaced`() {
+    assertLintAndFormat(
+        """
+        import com.google.inject.Singleton.*
+        """.trimIndent(),
+        """
+        import javax.inject.Singleton.*
+        """.trimIndent(),
+        issueDescription = "Replace com.google.inject.Singleton import with javax.inject.Singleton",
+    )
+  }
+
+  @Test
   fun `can report imports without replacements configured`() {
     val findings = rule.lint(
         """
