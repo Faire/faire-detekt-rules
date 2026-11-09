@@ -50,7 +50,8 @@ internal open class PreventBannedImports(config: Config = Config.empty) :
   }
 
   override fun visitImportDirective(importDirective: KtImportDirective) {
-    val importReference = importDirective.importedReference?.text ?: return
+    val importedReference = importDirective.importedReference ?: return
+    val importReference = importedReference.text
     for ((invalidImport, validImport) in withAlternatives) {
       if (importReference.startsWith(invalidImport)) {
         val didReportIssue = maybeReportIssue(
@@ -61,8 +62,7 @@ internal open class PreventBannedImports(config: Config = Config.empty) :
         )
         if (!didReportIssue) continue
         if (autoCorrect) {
-          val newImportPath = validImport + importReference.removePrefix(invalidImport)
-          replace(importDirective, "import $newImportPath")
+          replace(importedReference, validImport + importReference.removePrefix(invalidImport))
         }
       }
     }
