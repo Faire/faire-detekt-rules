@@ -56,17 +56,18 @@ internal class UseFirstOrNullInsteadOfFind(config: Config = Config.empty) :
     val findExpression = selectorExpression as? KtCallExpression ?: return
     val receiverExpression = qualifiedExpression.receiverExpression
 
-    analyze(qualifiedExpression) {
-      val receiverType = receiverExpression.expressionType ?: return@analyze
-      if (BANNED_CLASS_IDS.none { receiverType.isSubtypeOf(it) }) return@analyze
-
-      report(
-          Finding(
-              entity = Entity.from(qualifiedExpression),
-              message = description,
-          ),
-      )
+    val isFindOnBannedType = analyze(qualifiedExpression) {
+      val receiverType = receiverExpression.expressionType ?: return@analyze false
+      BANNED_CLASS_IDS.any { receiverType.isSubtypeOf(it) }
     }
+    if (!isFindOnBannedType) return
+
+    report(
+        Finding(
+            entity = Entity.from(qualifiedExpression),
+            message = description,
+        ),
+    )
 
     if (!autoCorrect) return
 
