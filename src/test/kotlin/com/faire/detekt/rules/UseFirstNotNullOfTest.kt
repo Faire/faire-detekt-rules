@@ -75,6 +75,27 @@ internal class UseFirstNotNullOfTest :
   }
 
   @Test
+  fun `mapNotNull {} with a multi-line lambda followed by first() is caught and corrected`() {
+    assertLintAndFormat(
+        """
+           fun `test usage`() {
+               products.mapNotNull {
+                   it.foo()
+               }.first()
+           }
+        """.trimIndent(),
+        """
+           fun `test usage`() {
+               products.firstNotNullOf {
+                   it.foo()
+               }
+           }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
   fun `first with predicate function is not caught`() {
     assertThat(
         rule.lint(
