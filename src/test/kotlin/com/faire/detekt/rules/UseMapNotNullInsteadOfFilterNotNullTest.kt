@@ -5,7 +5,7 @@ import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-private const val ISSUE_DESCRIPTION = "use mapNotNull() instead of map followed by filerNotNull()"
+private const val ISSUE_DESCRIPTION = "use mapNotNull() instead of map followed by filterNotNull()"
 
 internal class UseMapNotNullInsteadOfFilterNotNullTest :
     AutoCorrectRuleTest<UseMapNotNullInsteadOfFilterNotNull>(

@@ -26,7 +26,7 @@ private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
  *  for larger collections.
  */
 internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) :
-    AutoCorrectRule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
+    AutoCorrectRule(config, "use mapNotNull() instead of map followed by filterNotNull()") {
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
