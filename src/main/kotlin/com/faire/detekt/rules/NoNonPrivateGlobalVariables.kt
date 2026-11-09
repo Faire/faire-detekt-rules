@@ -40,7 +40,7 @@ internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) :
           property.hasModifier(KtTokens.PUBLIC_KEYWORD) -> propertyText.replaceFirst("public", "private")
           else -> "private $propertyText"
         }
-        pending.add(propertyText to replacement)
+        replace(property, replacement)
       }
     }
   }

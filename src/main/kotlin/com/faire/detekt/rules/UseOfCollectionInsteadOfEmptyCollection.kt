@@ -37,7 +37,7 @@ internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.e
         else -> return
       }
       val typeArgs = expression.typeArgumentList?.text.orEmpty()
-      pending.add(expression.text to "$replacement$typeArgs()")
+      replace(expression, "$replacement$typeArgs()")
     }
   }
 

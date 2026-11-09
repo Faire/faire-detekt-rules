@@ -39,6 +39,25 @@ internal class DoNotUsePropertyAccessInAssertTest :
   }
 
   @Test
+  fun `only the property access is corrected when the same name is called earlier in the file`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            assertThat(first).isTrue()
+            assertThat(second).isTrue
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(first).isTrue()
+            assertThat(second).isTrue()
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
   fun `allow lambda parameter`() {
     val findings = rule.lint(
         """

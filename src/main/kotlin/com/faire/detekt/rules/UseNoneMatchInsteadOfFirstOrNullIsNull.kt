@@ -70,7 +70,7 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
       }
 
-      pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")
+      replace(expression, "assertThat($collectionExpression).noneMatch$predicateArgs")
     }
   }
 }

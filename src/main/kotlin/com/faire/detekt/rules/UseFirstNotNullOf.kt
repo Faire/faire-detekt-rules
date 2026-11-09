@@ -56,12 +56,12 @@ internal class UseFirstNotNullOf(config: Config = Config.empty) :
         val asSeqCallText = asSeqExpr.selectorExpression?.text ?: return
         // Get whitespace/dot between base receiver and asSequence call
         val betweenBaseAndAsSeq = asSeqExpr.text.removePrefix(baseReceiverText).removeSuffix(asSeqCallText)
-        pending.add(expression.text to "$baseReceiverText$betweenBaseAndAsSeq$newCallText")
+        replace(expression, "$baseReceiverText$betweenBaseAndAsSeq$newCallText")
       } else {
         val baseReceiverText = mapNotNullReceiver.text
         val betweenBaseAndMapNotNull =
           receiverExpression.text.removePrefix(baseReceiverText).removeSuffix(mapNotNullCallText)
-        pending.add(expression.text to "$baseReceiverText$betweenBaseAndMapNotNull$newCallText")
+        replace(expression, "$baseReceiverText$betweenBaseAndMapNotNull$newCallText")
       }
     }
   }
