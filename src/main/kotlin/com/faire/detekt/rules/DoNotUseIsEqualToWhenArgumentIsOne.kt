@@ -53,7 +53,7 @@ internal class DoNotUseIsEqualToWhenArgumentIsOne(config: Config = Config.empty)
       )
 
       if (autoCorrect) {
-        pending.add(isEqualToExpression.text to "isOne()")
+        replace(isEqualToExpression, "isOne()")
       }
     }
   }

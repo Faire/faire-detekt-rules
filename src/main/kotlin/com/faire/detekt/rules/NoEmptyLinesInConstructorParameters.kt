@@ -91,7 +91,7 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
       val originalText = parameterList.text
       // Collapse blank lines: replace sequences of newlines (with optional whitespace) with a single newline
       val fixedText = BLANK_LINE_REGEX.replace(originalText, "\n")
-      pending.add(originalText to fixedText)
+      replace(parameterList, fixedText)
     }
   }
 }

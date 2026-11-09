@@ -36,7 +36,7 @@ internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) :
       report(Finding(entity = Entity.from(property), message = RULE_DESCRIPTION))
 
       if (autoCorrect) {
-        pending.add(property.text to property.textWithPrivateVisibility())
+        replace(property, property.textWithPrivateVisibility())
       }
     }
   }

@@ -62,7 +62,7 @@ internal open class PreventBannedImports(config: Config = Config.empty) :
         if (!didReportIssue) continue
         if (autoCorrect) {
           val newImportPath = validImport + importReference.removePrefix(invalidImport)
-          pending.add(importDirective.text to "import $newImportPath")
+          replace(importDirective, "import $newImportPath")
         }
       }
     }

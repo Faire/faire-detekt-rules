@@ -43,7 +43,7 @@ internal abstract class MapNotNullFollowedByFirstRule(
       val firstReplacedCall = asSequenceCall ?: mapNotNullCall
       val keptLength = firstReplacedCall.textRange.startOffset - expression.textRange.startOffset
       val newCallText = mapNotNullCall.text.replaceFirst("mapNotNull", replacementFunctionName)
-      pending.add(expression.text to expression.text.take(keptLength) + newCallText)
+      replace(expression, expression.text.take(keptLength) + newCallText)
     }
   }
 }

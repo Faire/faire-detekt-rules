@@ -43,7 +43,7 @@ internal class DoNotUsePropertyAccessInAssert(config: Config = Config.empty) :
       )
 
       if (autoCorrect) {
-        pending.add(selectorExpression.text to "${selectorExpression.text}()")
+        replace(selectorExpression, "${selectorExpression.text}()")
       }
     }
   }

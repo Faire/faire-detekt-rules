@@ -54,7 +54,7 @@ internal class DoNotUseHasSizeForEmptyListInAssert(config: Config = Config.empty
       )
 
       if (autoCorrect) {
-        pending.add(hasSizeExpression.text to "isEmpty()")
+        replace(hasSizeExpression, "isEmpty()")
       }
     }
   }

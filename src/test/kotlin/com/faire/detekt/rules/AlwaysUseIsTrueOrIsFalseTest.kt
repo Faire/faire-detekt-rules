@@ -76,6 +76,25 @@ internal class AlwaysUseIsTrueOrIsFalseTest :
   }
 
   @Test
+  fun `only the flagged isEqualTo(true) is corrected`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            expect(someValue).isEqualTo(true)
+            assertThat(someValue).isEqualTo(true)
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            expect(someValue).isEqualTo(true)
+            assertThat(someValue).isTrue()
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
   fun `using isEqualTo(false) is corrected`() {
     assertLintAndFormat(
         """

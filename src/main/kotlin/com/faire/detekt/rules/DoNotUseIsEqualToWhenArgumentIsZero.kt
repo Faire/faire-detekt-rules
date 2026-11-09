@@ -53,7 +53,7 @@ internal class DoNotUseIsEqualToWhenArgumentIsZero(config: Config = Config.empty
       )
 
       if (autoCorrect) {
-        pending.add(isEqualToExpression.text to "isZero()")
+        replace(isEqualToExpression, "isZero()")
       }
     }
   }
