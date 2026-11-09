@@ -54,13 +54,13 @@ internal open class PreventBannedImports(config: Config = Config.empty) :
     val importReference = importedReference.text
     for ((invalidImport, validImport) in withAlternatives) {
       if (importReference.startsWith(invalidImport)) {
-        val didReportIssue = maybeReportIssue(
+        val isIssueReported = maybeReportIssue(
             invalidImport = invalidImport,
             importDirective = importDirective,
             importReference = importReference,
             message = "Replace $invalidImport import with $validImport",
         )
-        if (!didReportIssue) continue
+        if (!isIssueReported) continue
         if (autoCorrect) {
           replace(importedReference, validImport + importReference.removePrefix(invalidImport))
         }

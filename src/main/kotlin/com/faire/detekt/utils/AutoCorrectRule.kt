@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.psi.KtFile
  * afterwards, so a rule may receive a file whose text was already modified by other rules. PSI offsets are then no
  * longer reliable, which is why replacements are located by the occurrence index of the element's text instead.
  */
+@Suppress("AbstractClassCanBeConcreteClass")
 internal abstract class AutoCorrectRule(config: Config, description: String) : Rule(config, description) {
 
   private val replacements = mutableListOf<Replacement>()
