@@ -83,6 +83,11 @@ tasks.test {
   useJUnitPlatform()
 }
 
+// `detekt` runs without type resolution, which skips the rules that need it.
+tasks.check {
+  dependsOn(tasks.detektMain, tasks.detektTest)
+}
+
 kotlin {
   jvmToolchain(8)
 }

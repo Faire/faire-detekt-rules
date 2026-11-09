@@ -9,6 +9,7 @@ import dev.detekt.test.utils.compileContentForTest
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 
+@Suppress("AbstractClassCanBeConcreteClass")
 internal abstract class AutoCorrectRuleTest<T : Rule>(
     factory: (config: Config) -> T,
     additionalConfig: List<Pair<String, Any>> = listOf(),

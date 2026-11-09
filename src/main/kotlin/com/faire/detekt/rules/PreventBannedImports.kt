@@ -53,13 +53,13 @@ internal open class PreventBannedImports(config: Config = Config.empty) :
     val importReference = importDirective.importedReference?.text ?: return
     for ((invalidImport, validImport) in withAlternatives) {
       if (importReference.startsWith(invalidImport)) {
-        val didReportIssue = maybeReportIssue(
+        val isIssueReported = maybeReportIssue(
             invalidImport = invalidImport,
             importDirective = importDirective,
             importReference = importReference,
             message = "Replace $invalidImport import with $validImport",
         )
-        if (!didReportIssue) continue
+        if (!isIssueReported) continue
         if (autoCorrect) {
           val newImportPath = validImport + importReference.removePrefix(invalidImport)
           pending.add(importDirective.text to "import $newImportPath")
