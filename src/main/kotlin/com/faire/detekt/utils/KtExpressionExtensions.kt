@@ -1,21 +1,25 @@
 package com.faire.detekt.utils
 
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtPsiFactory
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
+import org.jetbrains.kotlin.psi.KtReturnExpression
+import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 internal fun KtExpression.isAssertThat(): Boolean = referenceExpression()?.text == "assertThat"
 
-internal fun KtExpression.simplifyCollectionPatterns(replacedWith: String) {
-  val filterExpression = this.lastChild
+/**
+ * Returns the selector call when it calls [functionName] with exactly one argument, either in parentheses or as a
+ * trailing lambda, e.g. `items.filter { it.isValid }` or `items.filter(::isValid)`.
+ */
+internal fun KtDotQualifiedExpression.singleArgumentCallOrNull(functionName: String): KtCallExpression? =
+    (selectorExpression as? KtCallExpression)
+        ?.takeIf { it.calleeExpression?.text == functionName && it.valueArguments.size == 1 }
 
-  val arguments = if ((filterExpression as KtCallExpression).lambdaArguments.isNotEmpty()) {
-    " ${filterExpression.lambdaArguments.joinToString { it.text }}"
-  } else {
-    "(${filterExpression.valueArguments.joinToString { it.text }})"
-  }
-
-  filterExpression.astReplace(KtPsiFactory(filterExpression).createExpression("$replacedWith$arguments"))
-}
+/**
+ * Whether this call contains a return to [label]. A lambda's implicit label is the name of the function it is passed
+ * to, so renaming the call breaks such a return, or rebinds it to an outer lambda with the same label.
+ */
+internal fun KtCallExpression.hasReturnLabelled(label: String): Boolean =
+    anyDescendantOfType<KtReturnExpression> { it.getLabelName() == label }

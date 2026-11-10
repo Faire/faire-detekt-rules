@@ -63,6 +63,55 @@ internal class DoNotUseSingleOnFilterTest :
   }
 
   @Test
+  fun `filter {} with a multi-line lambda followed by single() is caught and corrected`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            products.filter {
+              it.preorderable!!
+            }.single()
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            products.single {
+              it.preorderable!!
+            }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `filter {} with return@filter followed by single() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+          fun `test usage`() {
+            products.filter {
+              if (it.name == null) return@filter false
+              it.preorderable!!
+            }.single()
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `single() on a call that receives a filtered collection is not caught`() {
+    val findings = rule.lint(
+        """
+          fun `test usage`() {
+            wrap(products.filter { it.preorderable!! }).single()
+            foo.wrap(products.filter { it.preorderable!! }).single()
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `filter {} and single() non-consecutive call pair is not caught`() {
     val findings = rule.lint(
         """
@@ -105,6 +154,19 @@ internal class DoNotUseSingleOnFilterTest :
         """.trimIndent(),
         issueDescription = ISSUE_DESCRIPTION,
     )
+  }
+
+  @Test
+  fun `filter with two arguments followed by single() is not caught`() {
+    val findings = rule.lint(
+        """
+          fun `test usage`() {
+            products.filter(a, b).single()
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
   }
 
   @Test
