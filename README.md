@@ -4,11 +4,11 @@ An opinionated ruleset for Detekt, which aims to reduce bugs, improve readabilit
 ## Usage
 In the `dependencies` block of your `build.gradle` file, add the following:
 ```groovy
-detektPlugins("com.faire:faire-detekt-rules:0.5.3")
+detektPlugins("com.faire:faire-detekt-rules:0.5.9")
 ```
 or if you're using a `libs.version.toml` file, add this there:
 ```
-faire-detekt-rules = { module = "com.faire:faire-detekt-rules", version = "0.5.3" }
+faire-detekt-rules = { module = "com.faire:faire-detekt-rules", version = "0.5.9" }
 ```
 and this in your `build.gradle` file:
 ```groovy
@@ -16,6 +16,9 @@ detektPlugins(rootProject.libs.faire.detekt.rules)
 ```
 
 You can find the latest version [here](https://central.sonatype.com/artifact/com.faire/faire-detekt-rules).
+
+Version 0.5.5 and later are built against detekt 2.0.0-alpha.2 (the `dev.detekt` packages). For detekt 1.23
+(`io.gitlab.arturbosch.detekt`), use version 0.5.4.
 
 ## Configuration
 The below block is a starting point for the configuration to add to `detekt.yml`, and can be modified as needed:
@@ -28,6 +31,11 @@ FaireRuleSet:
   DoNotAccessVisibleForTesting:
     active: true
     excludes: ["**/*Test.kt"]
+  DoNotAssertIsEqualOnTheResultOfSingle:
+    active: true
+    autoCorrect: true
+  DoNotNameCompanionObject:
+    active: true
   DoNotSplitByRegex:
     active: true
   DoNotStaticallyImportObjectFunctions:
@@ -44,6 +52,12 @@ FaireRuleSet:
   DoNotUseIsEqualToWhenArgumentIsZero:
     active: true
     autoCorrect: true
+  # Opposite of DoNotUseIsEqualToWhenArgumentIsOne, activate only one of them.
+  DoNotUseIsOneAssertions:
+    active: false
+  # Opposite of DoNotUseIsEqualToWhenArgumentIsZero, activate only one of them.
+  DoNotUseIsZeroAssertions:
+    active: false
   DoNotUsePropertyAccessInAssert:
     active: true
     autoCorrect: true
@@ -52,11 +66,19 @@ FaireRuleSet:
     autoCorrect: true
   DoNotUseSizePropertyInAssert:
     active: true
+  FilterNotNullOverMapNotNullForFiltering:
+    active: true
+    autoCorrect: true
   GetOrDefaultShouldBeReplacedWithGetOrElse:
     active: true
   NoDuplicateKeysInMapOf:
     active: true
+  NoEmptyLinesInConstructorParameters:
+    active: true
+    autoCorrect: true
   NoExtensionFunctionOnNullableReceiver:
+    active: true
+  NoFunctionReferenceToJavaClass:
     active: true
   NoNonPrivateGlobalVariables:
     active: true
@@ -75,6 +97,9 @@ FaireRuleSet:
   UseEntriesInsteadOfValuesOnEnum:
     active: true
     autoCorrect: false
+  UseFirstNotNullOf:
+    active: true
+    autoCorrect: true
   UseFirstOrNullInsteadOfFind:
     active: true
     autoCorrect: true
@@ -90,6 +115,8 @@ FaireRuleSet:
   UseSetInsteadOfListToSet:
     active: true
     autoCorrect: true
+  WithReceiverShouldHaveMultipleActions:
+    active: true
 ```
 
 ### Per-rule Configuration
@@ -111,11 +138,16 @@ It is strong recommended to configure this rule with `excludes: ["**/*Test.kt"]`
 convention of the project) to allow test code access to the annotated members.
 
 ## Type Resolution
-A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled to function properly. If type resolution is not enabled, the rules will silently continue.
+These rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/):
+`DoNotAccessVisibleForTesting`, `DoNotSplitByRegex`, `DoNotStaticallyImportObjectFunctions`,
+`DoNotUseSizePropertyInAssert`, `UseEntriesInsteadOfValuesOnEnum` and `UseFirstOrNullInsteadOfFind`. Detekt skips them
+when it runs without type resolution, for example in the Gradle `detekt` task. Use `detektMain` and `detektTest` to
+run them.
 
 # Releasing
 
 To release a new version: 
 
-1. Create a PR that bumps the `version` in [`build.gradle.kts`](./build.gradle.kts).
+1. Create a PR that bumps the `version` in [`build.gradle.kts`](./build.gradle.kts) and in the [Usage](#usage) section
+   of this README.
 2. Once this PR merges with the new version and completes CI, create a new version through Github releases

@@ -6,9 +6,9 @@ import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
+import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 
 /**
  * This rule checks for duplicate keys in mapOf and mutableMapOf calls.
@@ -69,8 +69,8 @@ internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(conf
   }
 
   private fun extractKeyFromExpression(expression: KtExpression?): String? {
-    // Skip function calls as they could generate unique values (e.g. random id generator)
-    return if (expression == null || expression is KtCallExpression || expression is KtDotQualifiedExpression) {
+    // Skip keys that call functions as they could generate unique values (e.g. random id generator)
+    return if (expression == null || expression.anyDescendantOfType<KtCallExpression>()) {
       null
     } else {
       expression.text

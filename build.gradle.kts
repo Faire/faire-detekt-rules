@@ -26,8 +26,6 @@ if (!providers.environmentVariable("RELEASE").isPresent) {
   version = "$version-$gitSha-SNAPSHOT"
 }
 
-val detektVersion = libs.versions.detekt.get()
-
 repositories {
   mavenCentral()
 }
@@ -65,6 +63,12 @@ dependencyAnalysis {
       onDuplicateClassWarnings {
         severity("ignore")
       }
+      // The bundled kotlin-stdlib also confuses usage analysis. Depending on which stdlib functions
+      // the tests call, the plugin either counts the JAR as used or reports it as binary-incompatible
+      // and asks for its removal, so its advice for this dependency is noise.
+      onAny {
+        exclude(libs.detekt.kotlin.analysis.api)
+      }
     }
   }
 }
@@ -76,11 +80,16 @@ detekt {
   buildUponDefaultConfig = true
   config.from(rootProject.file("detekt.yaml"))
 
-  allRules = false // activate all available (even unstable) rules.
+  allRules = false // true would activate all available rules, including unstable ones.
 }
 
 tasks.test {
   useJUnitPlatform()
+}
+
+// `detekt` runs without type resolution, which skips the rules that need it.
+tasks.check {
+  dependsOn(tasks.detektMain, tasks.detektTest)
 }
 
 kotlin {

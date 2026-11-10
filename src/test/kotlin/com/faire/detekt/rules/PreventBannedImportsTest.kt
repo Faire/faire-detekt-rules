@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 
 internal class PreventBannedImportsTest :
     AutoCorrectRuleTest<PreventBannedImports>(
-    {
+    { config ->
       PreventBannedImports(
           TestConfig(
-              "autoCorrect" to it.valueOrNull<Boolean>("autoCorrect")!!,
+              "autoCorrect" to config.valueOrNull<Boolean>("autoCorrect")!!,
               "withAlternatives" to listOf(
                   "com.google.inject.Singleton=javax.inject.Singleton",
               ),
@@ -39,6 +39,32 @@ internal class PreventBannedImportsTest :
         """.trimIndent(),
         """
         import javax.inject.Singleton
+        """.trimIndent(),
+        issueDescription = "Replace com.google.inject.Singleton import with javax.inject.Singleton",
+    )
+  }
+
+  @Test
+  fun `aliased import keeps its alias when replaced`() {
+    assertLintAndFormat(
+        """
+        import com.google.inject.Singleton as GuiceSingleton
+        """.trimIndent(),
+        """
+        import javax.inject.Singleton as GuiceSingleton
+        """.trimIndent(),
+        issueDescription = "Replace com.google.inject.Singleton import with javax.inject.Singleton",
+    )
+  }
+
+  @Test
+  fun `star import stays a star import when replaced`() {
+    assertLintAndFormat(
+        """
+        import com.google.inject.Singleton.*
+        """.trimIndent(),
+        """
+        import javax.inject.Singleton.*
         """.trimIndent(),
         issueDescription = "Replace com.google.inject.Singleton import with javax.inject.Singleton",
     )

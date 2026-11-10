@@ -64,8 +64,8 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
         DEPENDENCIES,
     )
 
-    assertThat(findings).singleElement().satisfies({
-      assertThat(it.message).isEqualTo(
+    assertThat(findings).singleElement().satisfies({ finding ->
+      assertThat(finding.message).isEqualTo(
           "Do not statically import functions of MySpecificObject, " +
               "call them as MySpecificObject.theStaticFunction() instead.",
       )
@@ -99,8 +99,8 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
         DEPENDENCIES,
     )
 
-    assertThat(findings).singleElement().satisfies({
-      assertThat(it.message).isEqualTo(
+    assertThat(findings).singleElement().satisfies({ finding ->
+      assertThat(finding.message).isEqualTo(
           "Do not statically import functions of WithCompanion, call them as WithCompanion.create() instead.",
       )
     })

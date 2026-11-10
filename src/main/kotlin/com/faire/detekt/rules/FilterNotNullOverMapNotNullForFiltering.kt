@@ -43,7 +43,7 @@ internal class FilterNotNullOverMapNotNullForFiltering(config: Config = Config.e
 
       if (autoCorrect) {
         // mapNotNull { it } -> filterNotNull()
-        pending.add(expression.text to "filterNotNull()")
+        replace(expression, "filterNotNull()")
       }
     }
   }

@@ -1,29 +1,30 @@
 name: Build and test
-on: [ pull_request, push ]
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
 jobs:
   JVM-Run-Gradle-Check:
     name: Build and test
     runs-on: ubuntu-latest
-    # Run if github push is main branch or pull request
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version-file: '.java-version'
 
-      - name: Verify gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3
-
+      # Also validates the Gradle wrapper.
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-            cache-read-only: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' }}
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Run checks
         run: |

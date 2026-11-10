@@ -46,6 +46,41 @@ internal class UseMapNotNullInsteadOfFilterNotNullTest :
   }
 
   @Test
+  fun `map {} with a multi-line lambda followed by filterNotNull() is caught and corrected`() {
+    assertLintAndFormat(
+        """
+          fun foo() {
+            products.map {
+              it.toPlaceOrderItem(cases)
+            }.filterNotNull()
+          }
+        """.trimIndent(),
+        """
+          fun foo() {
+            products.mapNotNull {
+              it.toPlaceOrderItem(cases)
+            }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `filterNotNull() on a call that receives a mapped collection is not flagged`() {
+    assertThat(
+        rule.lint(
+            """
+              fun foo() {
+                wrap(products.map { it.toPlaceOrderItem(cases) }).filterNotNull()
+                products.remap { it.toPlaceOrderItem(cases) }.filterNotNull()
+              }
+            """.trimIndent(),
+        ),
+    ).isEmpty()
+  }
+
+  @Test
   fun `filterNotNull() on unrelated type is not flagged`() {
     assertThat(
         rule.lint(

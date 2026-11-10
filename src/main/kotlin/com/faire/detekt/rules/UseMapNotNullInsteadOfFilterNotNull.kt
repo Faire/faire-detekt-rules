@@ -1,13 +1,11 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.singleArgumentCallOrNull
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-
-private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
 
 /**
  * Instead of using .map {}.filterNotNull(), use mapNotNull {} to transform and filter
@@ -34,8 +32,8 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     val selectorExpression = expression.selectorExpression ?: return
     if (selectorExpression.text != "filterNotNull()") return
 
-    val receiverExpression = expression.receiverExpression
-    if (!receiverExpression.lastChild.text.matches(MAP_REGEX)) return
+    val receiverDotExpr = expression.receiverExpression as? KtDotQualifiedExpression ?: return
+    val mapCall = receiverDotExpr.singleArgumentCallOrNull("map") ?: return
 
     report(
         Finding(
@@ -45,20 +43,12 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     )
 
     if (autoCorrect) {
-      val receiverDotExpr = receiverExpression as? KtDotQualifiedExpression ?: return
-      val mapCall = receiverDotExpr.selectorExpression as? KtCallExpression ?: return
       val mapCallText = mapCall.text
       val newCallText = mapCallText.replaceFirst("map", "mapNotNull")
       val baseReceiverText = receiverDotExpr.receiverExpression.text
       val betweenBaseAndMap = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(mapCallText)
 
-      pending.add(expression.text to "$baseReceiverText$betweenBaseAndMap$newCallText")
+      replace(expression, "$baseReceiverText$betweenBaseAndMap$newCallText")
     }
   }
 }
-
-private fun buildArgumentsText(call: KtCallExpression): String = if (call.lambdaArguments.isNotEmpty()) {
-    " ${call.lambdaArguments.joinToString { it.text }}"
-  } else {
-    "(${call.valueArguments.joinToString { it.text }})"
-  }
