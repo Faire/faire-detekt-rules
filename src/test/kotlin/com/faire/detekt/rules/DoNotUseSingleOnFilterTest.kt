@@ -103,6 +103,7 @@ internal class DoNotUseSingleOnFilterTest :
         """
           fun `test usage`() {
             wrap(products.filter { it.preorderable!! }).single()
+            foo.wrap(products.filter { it.preorderable!! }).single()
           }
         """.trimIndent(),
     )
@@ -153,6 +154,19 @@ internal class DoNotUseSingleOnFilterTest :
         """.trimIndent(),
         issueDescription = ISSUE_DESCRIPTION,
     )
+  }
+
+  @Test
+  fun `filter with two arguments followed by single() is not caught`() {
+    val findings = rule.lint(
+        """
+          fun `test usage`() {
+            products.filter(a, b).single()
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
   }
 
   @Test

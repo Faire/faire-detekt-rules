@@ -147,6 +147,19 @@ internal class UseFirstNotNullOfTest :
   }
 
   @Test
+  fun `first() on a call that receives a mapped collection is not flagged`() {
+    assertThat(
+        rule.lint(
+            """
+               fun `test usage`() {
+                   foo.wrap(products.mapNotNull { it.foo() }).first()
+               }
+            """.trimIndent(),
+        ),
+    ).isEmpty()
+  }
+
+  @Test
   fun `first() by itself is not flagged`() {
     assertThat(
         rule.lint(

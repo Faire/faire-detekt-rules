@@ -98,6 +98,7 @@ internal class UseMapNotNullInsteadOfFilterNotNullTest :
             """
               fun foo() {
                 wrap(products.map { it.toPlaceOrderItem(cases) }).filterNotNull()
+                foo.wrap(products.map { it.toPlaceOrderItem(cases) }).filterNotNull()
                 products.remap { it.toPlaceOrderItem(cases) }.filterNotNull()
               }
             """.trimIndent(),
