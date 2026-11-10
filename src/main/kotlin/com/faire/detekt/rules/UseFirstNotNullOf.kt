@@ -1,6 +1,7 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
 import com.faire.detekt.utils.singleArgumentCallOrNull
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
@@ -38,7 +39,7 @@ internal class UseFirstNotNullOf(config: Config = Config.empty) :
         ),
     )
 
-    if (autoCorrect) {
+    if (autoCorrect && !mapNotNullCall.hasReturnLabelled("mapNotNull")) {
       val mapNotNullCallText = mapNotNullCall.text
       val newCallText = mapNotNullCallText.replaceFirst("mapNotNull", "firstNotNullOf")
 

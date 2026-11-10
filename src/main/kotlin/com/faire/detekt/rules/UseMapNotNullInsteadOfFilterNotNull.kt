@@ -1,6 +1,7 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
 import com.faire.detekt.utils.singleArgumentCallOrNull
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
@@ -42,7 +43,7 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
         ),
     )
 
-    if (autoCorrect) {
+    if (autoCorrect && !mapCall.hasReturnLabelled("map")) {
       val mapCallText = mapCall.text
       val newCallText = mapCallText.replaceFirst("map", "mapNotNull")
       val baseReceiverText = receiverDotExpr.receiverExpression.text

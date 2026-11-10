@@ -67,6 +67,31 @@ internal class UseMapNotNullInsteadOfFilterNotNullTest :
   }
 
   @Test
+  fun `map {} with return@map followed by filterNotNull() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+          fun foo() {
+            partnerships.map { partnership ->
+              val dbBrand = dbBrandMap[partnership.brandToken]
+              if (dbBrand?.basedIn == null) return@map null
+              BrandData(dbBrand)
+            }.filterNotNull()
+          }
+        """.trimIndent(),
+    )
+
+    assertLintedButNotFormatted(
+        """
+          fun foo() {
+            groups.map { group ->
+              group.items.map { if (it.skip) return@map null; it.value }.filterNotNull()
+            }
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `filterNotNull() on a call that receives a mapped collection is not flagged`() {
     assertThat(
         rule.lint(

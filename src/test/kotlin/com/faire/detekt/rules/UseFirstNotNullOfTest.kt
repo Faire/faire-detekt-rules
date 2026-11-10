@@ -96,6 +96,20 @@ internal class UseFirstNotNullOfTest :
   }
 
   @Test
+  fun `mapNotNull {} with return@mapNotNull followed by first() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+           fun `test usage`() {
+               products.mapNotNull {
+                   if (it.isHidden) return@mapNotNull null
+                   it.foo()
+               }.first()
+           }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `first with predicate function is not caught`() {
     assertThat(
         rule.lint(

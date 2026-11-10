@@ -84,6 +84,20 @@ internal class DoNotUseSingleOnFilterTest :
   }
 
   @Test
+  fun `filter {} with return@filter followed by single() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+          fun `test usage`() {
+            products.filter {
+              if (it.name == null) return@filter false
+              it.preorderable!!
+            }.single()
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `single() on a call that receives a filtered collection is not caught`() {
     val findings = rule.lint(
         """
