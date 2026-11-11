@@ -51,6 +51,23 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
   }
 
   @Test
+  fun `firstOrNull with a named predicate argument is corrected without the name`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            assertThat(items.firstOrNull(predicate = { it.isDeleted })).isNull()
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(items).noneMatch({ it.isDeleted })
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
   fun `firstOrNull with return@firstOrNull is caught but not corrected`() {
     assertLintedButNotFormatted(
         """

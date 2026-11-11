@@ -68,7 +68,8 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
       val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {
         " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
       } else {
-        "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
+        // noneMatch is a Java method, so a named argument such as `predicate = ...` would not compile
+        "(${firstOrNullCall.valueArguments.joinToString { it.getArgumentExpression()?.text.orEmpty() }})"
       }
 
       pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")
