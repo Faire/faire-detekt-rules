@@ -5,6 +5,7 @@ import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelector
 
 private val EMPTY_COLLECTIONS = setOf("emptyList", "emptySet", "emptyMap")
 
@@ -12,6 +13,8 @@ private val EMPTY_COLLECTIONS = setOf("emptyList", "emptySet", "emptyMap")
  * Instead of using `emptyMap()`, `emptyList()` or `emptySet()` we should use `mapOf()`, `listOf()`, or `setOf()`.
  *
  * This code convention exists for the purpose of consistency.
+ *
+ * Calls with a receiver, such as `Collections.emptyList()`, belong to other APIs and are not reported.
  */
 internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.empty) :
     AutoCorrectRule(config, ISSUE) {
@@ -21,6 +24,7 @@ internal class UseOfCollectionInsteadOfEmptyCollection(config: Config = Config.e
 
     val calleeText = expression.calleeExpression?.text ?: return
     if (calleeText !in EMPTY_COLLECTIONS) return
+    if (expression.getQualifiedExpressionForSelector() != null) return
 
     report(
         Finding(
