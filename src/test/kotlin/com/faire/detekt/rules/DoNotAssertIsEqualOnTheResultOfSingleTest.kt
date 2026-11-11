@@ -4,7 +4,7 @@ import com.faire.detekt.utils.AutoCorrectRuleTest
 import org.junit.jupiter.api.Test
 
 private const val RULE_DESCRIPTION =
-    "containsOnly should be used instead of asserting isEqual on the result of single()"
+    "containsExactly should be used instead of asserting isEqualTo on the result of single()"
 
 internal class DoNotAssertIsEqualOnTheResultOfSingleTest :
     AutoCorrectRuleTest<DoNotAssertIsEqualOnTheResultOfSingle>(
@@ -54,7 +54,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingleTest :
             """.trimIndent(),
         """
             fun foo() {
-                assertThat(bar.baz.qux).containsOnly(someValue)
+                assertThat(bar.baz.qux).containsExactly(someValue)
             }
             """.trimIndent(),
         issueDescription = RULE_DESCRIPTION,
