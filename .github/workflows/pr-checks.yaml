@@ -7,7 +7,7 @@ jobs:
     # Run if github push is main branch or pull request
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
