@@ -125,4 +125,50 @@ internal class NoNonPrivateGlobalVariablesTest :
         issueDescription = NoNonPrivateGlobalVariables.RULE_DESCRIPTION,
     )
   }
+
+  @Test
+  fun `should only replace the visibility modifier, not documentation that mentions it`() {
+    assertLintAndFormat(
+        """
+          package com.faire.detekt.rules
+
+          /** Cache size used internally by the loader. */
+          internal val cacheSize = 10
+
+          // Base URL of the public API.
+          public val baseUrl = "https://example.com"
+        """.trimIndent(),
+        """
+          package com.faire.detekt.rules
+
+          /** Cache size used internally by the loader. */
+          private val cacheSize = 10
+
+          // Base URL of the public API.
+          private val baseUrl = "https://example.com"
+        """.trimIndent(),
+        issueDescription = NoNonPrivateGlobalVariables.RULE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `should add private after the KDoc and annotations`() {
+    assertLintAndFormat(
+        """
+          package com.faire.detekt.rules
+
+          /** Default request timeout in seconds. */
+          @Suppress("MagicNumber")
+          const val TIMEOUT_SECONDS = 30
+        """.trimIndent(),
+        """
+          package com.faire.detekt.rules
+
+          /** Default request timeout in seconds. */
+          @Suppress("MagicNumber")
+          private const val TIMEOUT_SECONDS = 30
+        """.trimIndent(),
+        issueDescription = NoNonPrivateGlobalVariables.RULE_DESCRIPTION,
+    )
+  }
 }
