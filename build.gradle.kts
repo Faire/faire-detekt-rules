@@ -87,6 +87,8 @@ detekt {
 
 tasks.test {
   useJUnitPlatform()
+  // FaireRulesProviderTest checks the README against the rule set.
+  inputs.file("README.md").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 kotlin {
