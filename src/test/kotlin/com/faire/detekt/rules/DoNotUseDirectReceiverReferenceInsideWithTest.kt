@@ -228,4 +228,41 @@ internal class DoNotUseDirectReceiverReferenceInsideWithTest {
     )
     assertThat(findings).isEmpty()
   }
+
+  @Test
+  fun `a with call without a receiver argument has no errors`() {
+    val findings = rule.lint(
+        """
+        fun testFunc() {
+          with { println("no receiver") }
+          with() { println("no receiver") }
+        }
+      """.trimIndent(),
+    )
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `members, functions and types named like the receiver have no errors`() {
+    val findings = rule.lint(
+        """
+        fun testFunc(session: Session?, loader: Loader) {
+          with(user) {
+            println(session?.user)
+          }
+          with(config) {
+            loader.config()
+            listOf(loader).map(Loader::config)
+          }
+          with(Config) {
+            val copy: Config = default
+          }
+          session?.with(user) {
+            println(user)
+          }
+        }
+      """.trimIndent(),
+    )
+    assertThat(findings).isEmpty()
+  }
 }
