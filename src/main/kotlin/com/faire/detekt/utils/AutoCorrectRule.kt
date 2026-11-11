@@ -1,24 +1,32 @@
 package com.faire.detekt.utils
 
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.TextRange
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import dev.detekt.api.modifiedText
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.UserDataProperty
 
 /**
- * Base class for rules that auto-correct by rewriting the text of PSI elements.
+ * Base class for rules that auto-correct by replacing the text of PSI elements.
  *
- * detekt runs every auto-correcting rule against the same [KtFile] and only writes [KtFile.modifiedText] to disk
- * afterwards, so a rule may receive a file whose text was already modified by other rules. PSI offsets are then no
- * longer reliable, which is why replacements are located by the occurrence index of the element's text instead.
+ * detekt runs every auto-correcting rule against the same [KtFile] and writes [KtFile.modifiedText] to disk only after
+ * all of them have run, so the PSI never shows what earlier rules replaced. The rules therefore share an edit log
+ * through the file: each one logs its replacements at their PSI offsets, then rebuilds [KtFile.modifiedText] from the
+ * whole log.
+ *
+ * A replacement is skipped when it overlaps one already in the log, or when another tool, such as ktlint, changed the
+ * file before the first replacement was logged and [TextMapping] cannot find the replaced text in that tool's output.
+ * Its finding is still reported, and the next run fixes it.
  */
 internal abstract class AutoCorrectRule(config: Config, description: String) : Rule(config, description) {
 
   private val replacements = mutableListOf<Replacement>()
 
   protected fun replace(element: KtElement, replacement: String) {
-    replacements += Replacement(element.textRange.startOffset, element.text, replacement)
+    replacements += Replacement(element.textRange, replacement)
   }
 
   override fun preVisit(root: KtFile) {
@@ -28,44 +36,52 @@ internal abstract class AutoCorrectRule(config: Config, description: String) : R
   override fun postVisit(root: KtFile) {
     if (replacements.isEmpty()) return
 
-    val originalText = root.text
-    var text = root.modifiedText ?: originalText
-    var replacedFromOffset = originalText.length
-    // Replacing from the end of the file keeps the occurrence indexes of the remaining replacements valid.
-    for (replacement in replacements.sortedByDescending { it.startOffset }) {
-      // Skip replacements that overlap an applied one; a later run fixes them once the text is re-parsed.
-      if (replacement.endOffset > replacedFromOffset) continue
+    val editLog = root.editLog?.takeIf { it.isCurrentFor(root) } ?: EditLog(root).also { root.editLog = it }
+    if (editLog.add(replacements)) root.modifiedText = editLog.text
+  }
+}
 
-      val occurrence = originalText.countOccurrences(replacement.original, before = replacement.startOffset)
-      val index = text.indexOfOccurrence(replacement.original, occurrence)
-      if (index < 0) continue
+private var KtFile.editLog: EditLog? by UserDataProperty(Key("com.faire.detekt.utils.AutoCorrectRule.editLog"))
 
-      text = text.replaceRange(index, index + replacement.original.length, replacement.replacement)
-      replacedFromOffset = replacement.startOffset
+private class Replacement(val range: TextRange, val text: String)
+
+/** The replacements auto-correcting rules made to a file during one detekt run. */
+private class EditLog(root: KtFile) {
+  private val originalText = root.text
+  private val baseText = root.modifiedText ?: originalText
+  private val toBaseText = TextMapping(originalText, baseText)
+
+  /** Replacements at their offsets in [baseText], none of them overlapping. */
+  private val applied = mutableListOf<Replacement>()
+
+  var text: String = baseText
+    private set
+
+  /** Whether [root] still has the text this log gave it, which ends once detekt writes it or anything else edits it. */
+  fun isCurrentFor(root: KtFile): Boolean = (root.modifiedText ?: originalText) === text && root.text == originalText
+
+  /** Logs the [replacements] that fit, innermost first, and returns whether there were any. */
+  fun add(replacements: List<Replacement>): Boolean {
+    val appliedBefore = applied.size
+    val innermostFirst = compareByDescending<Replacement> { it.range.startOffset }.thenBy { it.range.endOffset }
+    for (replacement in replacements.sortedWith(innermostFirst)) {
+      val range = toBaseText.map(replacement.range)
+      if (range != null && applied.none { it.range.intersectsStrict(range) }) {
+        applied += Replacement(range, replacement.text)
+      }
     }
-    root.modifiedText = text
+    if (applied.size == appliedBefore) return false
+
+    text = rebuild()
+    return true
   }
 
-  private class Replacement(val startOffset: Int, val original: String, val replacement: String) {
-    val endOffset: Int get() = startOffset + original.length
+  private fun rebuild(): String = buildString(baseText.length) {
+    var copiedUpTo = 0
+    for (replacement in applied.sortedBy { it.range.startOffset }) {
+      append(baseText, copiedUpTo, replacement.range.startOffset).append(replacement.text)
+      copiedUpTo = replacement.range.endOffset
+    }
+    append(baseText, copiedUpTo, baseText.length)
   }
-}
-
-private fun String.countOccurrences(substring: String, before: Int): Int {
-  var count = 0
-  var index = indexOf(substring)
-  while (index in 0 until before) {
-    count++
-    index = indexOf(substring, index + 1)
-  }
-  return count
-}
-
-private fun String.indexOfOccurrence(substring: String, occurrence: Int): Int {
-  var index = indexOf(substring)
-  repeat(occurrence) {
-    if (index < 0) return -1
-    index = indexOf(substring, index + 1)
-  }
-  return index
 }
