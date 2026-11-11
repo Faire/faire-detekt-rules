@@ -179,7 +179,69 @@ internal class AutoCorrectRuleReplacementTest {
   }
 
   @Test
-  fun `skips a replacement on a line another tool changed`() {
+  fun `applies a replacement below imports another tool sorted and removed`() {
+    val ktFile = compileContentForTest(
+        """
+          import b.B
+          import a.A
+          import c.C
+
+          fun test() {
+            foo()
+          }
+        """.trimIndent(),
+    )
+    ktFile.modifiedText = """
+      import a.A
+      import b.B
+
+      fun test() {
+        foo()
+      }
+    """.trimIndent()
+
+    ReplaceCalls("foo", "bar()").lint(ktFile)
+
+    assertThat(ktFile.modifiedText).isEqualTo(
+        """
+          import a.A
+          import b.B
+
+          fun test() {
+            bar()
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `applies a replacement next to text another tool changed on the same line`() {
+    val ktFile = compileContentForTest(
+        """
+          val x = listOf(
+            foo()
+          )
+        """.trimIndent(),
+    )
+    ktFile.modifiedText = """
+      val x = listOf(
+        foo(),
+      )
+    """.trimIndent()
+
+    ReplaceCalls("foo", "bar()").lint(ktFile)
+
+    assertThat(ktFile.modifiedText).isEqualTo(
+        """
+          val x = listOf(
+            bar(),
+          )
+        """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `skips a replacement whose text another tool changed`() {
     val ktFile = compileContentForTest(
         """
           fun test() {
@@ -188,7 +250,12 @@ internal class AutoCorrectRuleReplacementTest {
           }
         """.trimIndent(),
     )
-    ktFile.modifiedText = ktFile.text.replace("foo( )", "foo()")
+    ktFile.modifiedText = """
+      fun test() {
+        foo()
+        foo()
+      }
+    """.trimIndent()
 
     ReplaceCalls("foo", "bar()").lint(ktFile)
 
