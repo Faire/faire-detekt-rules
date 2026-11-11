@@ -121,8 +121,14 @@ internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmen
     assertThat(
         autoCorrect(
             """
+              object TestQuery {
+                fun find(name: String): String? = name
+              }
+
               fun foo(input: String) {
                 val match = Regex("a").find(input)
+                val regexMatch = "x".toRegex().find("s")
+                val queryResult = TestQuery.find("test")
               }
             """.trimIndent(),
         ),
