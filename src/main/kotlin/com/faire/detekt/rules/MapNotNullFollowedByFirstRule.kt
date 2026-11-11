@@ -8,6 +8,7 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 
+@Suppress("AbstractClassCanBeConcreteClass")
 internal abstract class MapNotNullFollowedByFirstRule(
     config: Config,
     private val firstFunctionName: String,
