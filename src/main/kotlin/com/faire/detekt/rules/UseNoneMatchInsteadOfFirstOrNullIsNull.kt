@@ -8,6 +8,7 @@ import dev.detekt.api.Finding
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
+import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -69,7 +70,8 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
       } else {
         // noneMatch is a Java method, so a named argument such as `predicate = ...` would not compile
-        "(${firstOrNullCall.valueArguments.joinToString { it.getArgumentExpression()?.text.orEmpty() }})"
+        val predicate = firstOrNullCall.valueArguments.singleOrNull()?.getArgumentExpression() ?: return
+        if (predicate is KtLambdaExpression) " ${predicate.text}" else "(${predicate.text})"
       }
 
       pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")

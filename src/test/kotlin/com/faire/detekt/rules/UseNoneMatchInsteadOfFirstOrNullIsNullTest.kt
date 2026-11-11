@@ -60,7 +60,24 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
         """.trimIndent(),
         """
           fun `test usage`() {
-            assertThat(items).noneMatch({ it.isDeleted })
+            assertThat(items).noneMatch { it.isDeleted }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `firstOrNull with a lambda in parentheses is corrected to a trailing lambda`() {
+    assertLintAndFormat(
+        """
+          fun `test usage`() {
+            assertThat(items.firstOrNull({ it.isDeleted })).isNull()
+          }
+        """.trimIndent(),
+        """
+          fun `test usage`() {
+            assertThat(items).noneMatch { it.isDeleted }
           }
         """.trimIndent(),
         issueDescription = ISSUE_DESCRIPTION,
