@@ -71,7 +71,8 @@ dependencyAnalysis {
 
 detekt {
   parallel = true
-  autoCorrect = true
+  // CI reports the issues instead of fixing them in a checkout that is thrown away
+  autoCorrect = !providers.environmentVariable("CI").map(String::toBoolean).getOrElse(false)
 
   buildUponDefaultConfig = true
   config.from(rootProject.file("detekt.yaml"))
