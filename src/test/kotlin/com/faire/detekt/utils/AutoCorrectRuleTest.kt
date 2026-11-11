@@ -52,6 +52,16 @@ internal abstract class AutoCorrectRuleTest<T : Rule>(
     assertThat(findings).isEmpty()
   }
 
+  fun assertLintedButNotFormatted(
+      @Language("kotlin")
+      codeToLint: String,
+      fileName: String = "Test.kt",
+  ) {
+    val code = compileContentForTest(codeToLint, fileName)
+    assertThat(autoCorrectRule.lint(code)).isNotEmpty()
+    assertThat(code.modifiedText).isNull()
+  }
+
   // Lint the supplied code and ensure there are no detekted violations
   fun assertNoViolations(
       @Language("kotlin")

@@ -1,13 +1,12 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
+import com.faire.detekt.utils.singleArgumentCallOrNull
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-
-private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
 
 /**
  * Instead of using .map {}.filterNotNull(), use mapNotNull {} to transform and filter
@@ -26,7 +25,7 @@ private val MAP_REGEX = ".*\\.*map\\s*(\\{|\\().+".toRegex()
  *  for larger collections.
  */
 internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) :
-    AutoCorrectRule(config, "use mapNotNull() instead of map followed by filerNotNull()") {
+    AutoCorrectRule(config, "use mapNotNull() instead of map followed by filterNotNull()") {
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
@@ -34,8 +33,8 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     val selectorExpression = expression.selectorExpression ?: return
     if (selectorExpression.text != "filterNotNull()") return
 
-    val receiverExpression = expression.receiverExpression
-    if (!receiverExpression.lastChild.text.matches(MAP_REGEX)) return
+    val receiverDotExpr = expression.receiverExpression as? KtDotQualifiedExpression ?: return
+    val mapCall = receiverDotExpr.singleArgumentCallOrNull("map") ?: return
 
     report(
         Finding(
@@ -44,9 +43,7 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
         ),
     )
 
-    if (autoCorrect) {
-      val receiverDotExpr = receiverExpression as? KtDotQualifiedExpression ?: return
-      val mapCall = receiverDotExpr.selectorExpression as? KtCallExpression ?: return
+    if (autoCorrect && !mapCall.hasReturnLabelled("map")) {
       val mapCallText = mapCall.text
       val newCallText = mapCallText.replaceFirst("map", "mapNotNull")
       val baseReceiverText = receiverDotExpr.receiverExpression.text
@@ -56,9 +53,3 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
     }
   }
 }
-
-private fun buildArgumentsText(call: KtCallExpression): String = if (call.lambdaArguments.isNotEmpty()) {
-    " ${call.lambdaArguments.joinToString { it.text }}"
-  } else {
-    "(${call.valueArguments.joinToString { it.text }})"
-  }

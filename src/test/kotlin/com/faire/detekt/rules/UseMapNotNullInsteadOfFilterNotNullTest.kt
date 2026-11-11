@@ -5,7 +5,7 @@ import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-private const val ISSUE_DESCRIPTION = "use mapNotNull() instead of map followed by filerNotNull()"
+private const val ISSUE_DESCRIPTION = "use mapNotNull() instead of map followed by filterNotNull()"
 
 internal class UseMapNotNullInsteadOfFilterNotNullTest :
     AutoCorrectRuleTest<UseMapNotNullInsteadOfFilterNotNull>(
@@ -43,6 +43,67 @@ internal class UseMapNotNullInsteadOfFilterNotNullTest :
         """.trimIndent(),
         issueDescription = ISSUE_DESCRIPTION,
     )
+  }
+
+  @Test
+  fun `map {} with a multi-line lambda followed by filterNotNull() is caught and corrected`() {
+    assertLintAndFormat(
+        """
+          fun foo() {
+            products.map {
+              it.toPlaceOrderItem(cases)
+            }.filterNotNull()
+          }
+        """.trimIndent(),
+        """
+          fun foo() {
+            products.mapNotNull {
+              it.toPlaceOrderItem(cases)
+            }
+          }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `map {} with return@map followed by filterNotNull() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+          fun foo() {
+            partnerships.map { partnership ->
+              val dbBrand = dbBrandMap[partnership.brandToken]
+              if (dbBrand?.basedIn == null) return@map null
+              BrandData(dbBrand)
+            }.filterNotNull()
+          }
+        """.trimIndent(),
+    )
+
+    assertLintedButNotFormatted(
+        """
+          fun foo() {
+            groups.map { group ->
+              group.items.map { if (it.skip) return@map null; it.value }.filterNotNull()
+            }
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `filterNotNull() on a call that receives a mapped collection is not flagged`() {
+    assertThat(
+        rule.lint(
+            """
+              fun foo() {
+                wrap(products.map { it.toPlaceOrderItem(cases) }).filterNotNull()
+                foo.wrap(products.map { it.toPlaceOrderItem(cases) }).filterNotNull()
+                products.remap { it.toPlaceOrderItem(cases) }.filterNotNull()
+              }
+            """.trimIndent(),
+        ),
+    ).isEmpty()
   }
 
   @Test

@@ -1,13 +1,12 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
+import com.faire.detekt.utils.singleArgumentCallOrNull
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-
-private val MAP_NOT_NULL_REGEX = """.*\.*mapNotNull\s*[{(].+""".toRegex()
 
 internal abstract class MapNotNullFollowedByFirstRule(
     config: Config,
@@ -25,7 +24,7 @@ internal abstract class MapNotNullFollowedByFirstRule(
     if (selectorExpression.text != "$firstFunctionName()") return
 
     val receiverExpression = expression.receiverExpression as? KtDotQualifiedExpression ?: return
-    if (!receiverExpression.lastChild.text.matches(MAP_NOT_NULL_REGEX)) return
+    val mapNotNullCall = receiverExpression.singleArgumentCallOrNull("mapNotNull") ?: return
 
     report(
         Finding(
@@ -34,24 +33,27 @@ internal abstract class MapNotNullFollowedByFirstRule(
         ),
     )
 
-    if (autoCorrect) {
-      val mapNotNullCall = receiverExpression.selectorExpression as? KtCallExpression ?: return
+    if (autoCorrect && !mapNotNullCall.hasReturnLabelled("mapNotNull")) {
       val mapNotNullCallText = mapNotNullCall.text
       val newCallText = mapNotNullCallText.replaceFirst("mapNotNull", replacementFunctionName)
 
       val mapNotNullReceiver = receiverExpression.receiverExpression
-      val baseReceiverText = if (
-        mapNotNullReceiver is KtDotQualifiedExpression &&
-        mapNotNullReceiver.selectorExpression?.text == "asSequence()"
-      ) {
-        mapNotNullReceiver.receiverExpression.text
-      } else {
-        mapNotNullReceiver.text
-      }
+      val asSeqExpr = (mapNotNullReceiver as? KtDotQualifiedExpression)
+          ?.takeIf { it.selectorExpression?.text == "asSequence()" }
 
-      val betweenReceiverAndMapNotNull =
-        receiverExpression.text.removePrefix(mapNotNullReceiver.text).removeSuffix(mapNotNullCallText)
-      pending.add(expression.text to "$baseReceiverText$betweenReceiverAndMapNotNull$newCallText")
+      if (asSeqExpr != null) {
+        // Strip .asSequence() — use the receiver before asSequence() as base
+        val baseReceiverText = asSeqExpr.receiverExpression.text
+        val asSeqCallText = asSeqExpr.selectorExpression?.text ?: return
+        // Get whitespace/dot between base receiver and asSequence call
+        val betweenBaseAndAsSeq = asSeqExpr.text.removePrefix(baseReceiverText).removeSuffix(asSeqCallText)
+        pending.add(expression.text to "$baseReceiverText$betweenBaseAndAsSeq$newCallText")
+      } else {
+        val baseReceiverText = mapNotNullReceiver.text
+        val betweenBaseAndMapNotNull =
+          receiverExpression.text.removePrefix(baseReceiverText).removeSuffix(mapNotNullCallText)
+        pending.add(expression.text to "$baseReceiverText$betweenBaseAndMapNotNull$newCallText")
+      }
     }
   }
 }
