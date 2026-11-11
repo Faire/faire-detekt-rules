@@ -56,14 +56,22 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) :
 
   private fun KtExpression.isValueUsed(): Boolean = when (val parent = parent) {
     is KtQualifiedExpression -> this == parent.receiverExpression || parent.isValueUsed()
+
     is KtParenthesizedExpression, is KtLabeledExpression, is KtAnnotatedExpression, is KtTryExpression ->
       parent.isValueUsed()
+
     is KtBlockExpression -> this == parent.statements.lastOrNull() && parent.isValueUsed()
+
     is KtFunctionLiteral -> true
+
     is KtDeclarationWithBody -> this != parent.bodyBlockExpression
+
     is KtContainerNodeForControlStructureBody -> (parent.parent as? KtIfExpression)?.isValueUsed() ?: false
+
     is KtWhenEntry, is KtCatchClause -> (parent.parent as? KtExpression)?.isValueUsed() ?: true
+
     is KtFinallySection, is KtAnonymousInitializer -> false
+
     else -> true
   }
 }
