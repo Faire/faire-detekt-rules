@@ -75,6 +75,41 @@ internal class UseFirstNotNullOfOrNullTest :
   }
 
   @Test
+  fun `mapNotNull {} with a multi-line lambda followed by firstOrNull() is caught and corrected`() {
+    assertLintAndFormat(
+        """
+           fun `test usage`() {
+               products.mapNotNull {
+                   it.foo()
+               }.firstOrNull()
+           }
+        """.trimIndent(),
+        """
+           fun `test usage`() {
+               products.firstNotNullOfOrNull {
+                   it.foo()
+               }
+           }
+        """.trimIndent(),
+        issueDescription = ISSUE_DESCRIPTION,
+    )
+  }
+
+  @Test
+  fun `mapNotNull {} with return@mapNotNull followed by firstOrNull() is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+           fun `test usage`() {
+               products.mapNotNull {
+                   if (it.isHidden) return@mapNotNull null
+                   it.foo()
+               }.firstOrNull()
+           }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `firstOrNull with predicate function is not caught`() {
     assertThat(
         rule.lint(
@@ -105,6 +140,19 @@ internal class UseFirstNotNullOfOrNullTest :
             """
                fun `test usage`() {
                    products.map { it.foo() }.firstOrNull()
+               }
+            """.trimIndent(),
+        ),
+    ).isEmpty()
+  }
+
+  @Test
+  fun `firstOrNull() on a call that receives a mapped collection is not flagged`() {
+    assertThat(
+        rule.lint(
+            """
+               fun `test usage`() {
+                   foo.wrap(products.mapNotNull { it.foo() }).firstOrNull()
                }
             """.trimIndent(),
         ),
