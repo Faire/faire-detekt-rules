@@ -74,9 +74,13 @@ internal class PreferIgnoreCase(config: Config = Config.empty) :
     is KtStringTemplateExpression -> !hasInterpolation() && entries
         .joinToString("") { entry -> (entry as? KtEscapeStringTemplateEntry)?.unescapedValue ?: entry.text }
         .let { value -> value == value.lowercase() }
-    is KtConstantExpression -> node.elementType == KtNodeTypes.CHARACTER_CONSTANT &&
+
+    is KtConstantExpression ->
+        node.elementType == KtNodeTypes.CHARACTER_CONSTANT &&
         '\\' !in text && text == text.lowercase()
+
     is KtDotQualifiedExpression -> selectorExpression?.text in LOWERCASE_CALLS
+
     else -> false
   }
 }
