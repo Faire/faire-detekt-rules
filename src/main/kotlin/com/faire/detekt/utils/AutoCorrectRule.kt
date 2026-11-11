@@ -62,17 +62,18 @@ private class EditLog(root: KtFile) {
 
   /** Logs the [replacements] that fit, innermost first, and returns whether there were any. */
   fun add(replacements: List<Replacement>): Boolean {
+    val appliedBefore = applied.size
     val innermostFirst = compareByDescending<Replacement> { it.range.startOffset }.thenBy { it.range.endOffset }
-    var added = false
     for (replacement in replacements.sortedWith(innermostFirst)) {
       val range = toBaseText.map(replacement.range)
       if (range != null && applied.none { it.range.intersectsStrict(range) }) {
         applied += Replacement(range, replacement.text)
-        added = true
       }
     }
-    if (added) text = rebuild()
-    return added
+    if (applied.size == appliedBefore) return false
+
+    text = rebuild()
+    return true
   }
 
   private fun rebuild(): String = buildString(baseText.length) {
