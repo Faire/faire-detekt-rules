@@ -1,6 +1,7 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
@@ -61,7 +62,7 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         ),
     )
 
-    if (autoCorrect) {
+    if (autoCorrect && !firstOrNullCall.hasReturnLabelled("firstOrNull")) {
       val collectionExpression = assertThatArgument.receiverExpression.text
 
       val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {

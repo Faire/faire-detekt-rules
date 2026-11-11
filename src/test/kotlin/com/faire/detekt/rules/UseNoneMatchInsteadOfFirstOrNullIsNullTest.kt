@@ -51,6 +51,22 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNullTest :
   }
 
   @Test
+  fun `firstOrNull with return@firstOrNull is caught but not corrected`() {
+    assertLintedButNotFormatted(
+        """
+          fun `test usage`() {
+            assertThat(
+                items.firstOrNull { item ->
+                  if (item.isArchived) return@firstOrNull false
+                  item.type == DELETED
+                },
+            ).isNull()
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `chained calls before firstOrNull is caught and corrected`() {
     assertLintAndFormat(
         """
