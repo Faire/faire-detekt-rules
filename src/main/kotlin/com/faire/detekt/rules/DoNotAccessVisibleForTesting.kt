@@ -42,7 +42,7 @@ internal class DoNotAccessVisibleForTesting(config: Config = Config.empty) :
 
     analyze(expression) {
       val resolvedSymbol = expression.mainReference.resolveToSymbol() as? KaDeclarationSymbol ?: return@analyze
-      // Members inherited from a generic class resolve to a copy owned by the subclass, without the annotation
+      // Members inherited from a generic class resolve to a copy in the subclass's package
       val symbol = (resolvedSymbol as? KaCallableSymbol)?.fakeOverrideOriginal ?: resolvedSymbol
       val annotatedSymbols = listOfNotNull(symbol, (symbol as? KaConstructorSymbol)?.containingDeclaration)
       if (annotatedSymbols.none { it.hasVisibleForTestingAnnotation() }) return@analyze
