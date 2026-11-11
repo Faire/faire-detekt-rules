@@ -65,6 +65,12 @@ dependencyAnalysis {
       onDuplicateClassWarnings {
         severity("ignore")
       }
+      // The bundled kotlin-stdlib also confuses usage analysis. Depending on which stdlib functions
+      // the tests call, the plugin either counts the JAR as used or reports it as binary-incompatible
+      // and asks for its removal, so its advice for this dependency is noise.
+      onAny {
+        exclude(libs.detekt.kotlin.analysis.api)
+      }
     }
   }
 }
@@ -81,6 +87,8 @@ detekt {
 
 tasks.test {
   useJUnitPlatform()
+  // FaireRulesProviderTest checks the README against the rule set.
+  inputs.file("README.md").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 kotlin {
