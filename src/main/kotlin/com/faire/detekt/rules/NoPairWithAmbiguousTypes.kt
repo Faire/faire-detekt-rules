@@ -5,6 +5,7 @@ import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtTypeElement
@@ -17,11 +18,14 @@ import org.jetbrains.kotlin.psi.KtUserType
  *
  * Type arguments are compared by their full text, ignoring nullability, so `Pair<Order.Token, Brand.Token>` is
  * allowed.
+ *
+ * Overrides are not reported, because their types are set by the function they override.
  */
 internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) :
     Rule(config, "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)
+    if (function.hasModifier(KtTokens.OVERRIDE_KEYWORD)) return
 
     val offendingParameters = function.valueParameters.filter { it.typeReference?.isOffendingType() == true }
 

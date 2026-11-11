@@ -138,4 +138,23 @@ internal class NoPairWithAmbiguousTypesTest {
     assertThat(findings.single().message)
         .isEqualTo("The function run has parameter callbacks which should be a class instead")
   }
+
+  @Test
+  fun `overrides are not reported`() {
+    val findings = rule.lint(
+        """
+          interface Adder {
+            fun add(pair: Pair<Int, Int>): Int
+          }
+
+          class IntAdder : Adder {
+            override fun add(pair: Pair<Int, Int>): Int {
+              return pair.first + pair.second
+            }
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings.map { it.entity.ktElement.text }).containsExactly("fun add(pair: Pair<Int, Int>): Int")
+  }
 }
