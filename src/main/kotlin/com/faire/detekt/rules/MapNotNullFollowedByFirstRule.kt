@@ -34,26 +34,15 @@ internal abstract class MapNotNullFollowedByFirstRule(
     )
 
     if (autoCorrect && !mapNotNullCall.hasReturnLabelled("mapNotNull")) {
-      val mapNotNullCallText = mapNotNullCall.text
-      val newCallText = mapNotNullCallText.replaceFirst("mapNotNull", replacementFunctionName)
-
-      val mapNotNullReceiver = receiverExpression.receiverExpression
-      val asSeqExpr = (mapNotNullReceiver as? KtDotQualifiedExpression)
-          ?.takeIf { it.selectorExpression?.text == "asSequence()" }
-
-      if (asSeqExpr != null) {
-        // Strip .asSequence() — use the receiver before asSequence() as base
-        val baseReceiverText = asSeqExpr.receiverExpression.text
-        val asSeqCallText = asSeqExpr.selectorExpression?.text ?: return
-        // Get whitespace/dot between base receiver and asSequence call
-        val betweenBaseAndAsSeq = asSeqExpr.text.removePrefix(baseReceiverText).removeSuffix(asSeqCallText)
-        pending.add(expression.text to "$baseReceiverText$betweenBaseAndAsSeq$newCallText")
-      } else {
-        val baseReceiverText = mapNotNullReceiver.text
-        val betweenBaseAndMapNotNull =
-          receiverExpression.text.removePrefix(baseReceiverText).removeSuffix(mapNotNullCallText)
-        pending.add(expression.text to "$baseReceiverText$betweenBaseAndMapNotNull$newCallText")
-      }
+      // The replacement already stops at the first non-null result, so an asSequence() right before mapNotNull is
+      // redundant.
+      val asSequenceCall = (receiverExpression.receiverExpression as? KtDotQualifiedExpression)
+          ?.selectorExpression
+          ?.takeIf { it.text == "asSequence()" }
+      val firstReplacedCall = asSequenceCall ?: mapNotNullCall
+      val keptLength = firstReplacedCall.textRange.startOffset - expression.textRange.startOffset
+      val newCallText = mapNotNullCall.text.replaceFirst("mapNotNull", replacementFunctionName)
+      pending.add(expression.text to expression.text.take(keptLength) + newCallText)
     }
   }
 }
