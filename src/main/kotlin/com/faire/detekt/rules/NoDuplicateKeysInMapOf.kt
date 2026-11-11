@@ -27,7 +27,8 @@ import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
  * )
  * ```
  */
-internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) : Rule(config, "NoDuplicateKeysInMapOf") {
+internal class NoDuplicateKeysInMapOf(config: Config = Config.empty) :
+    Rule(config, "Do not repeat keys in mapOf() or mutableMapOf(), later entries overwrite earlier ones.") {
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
