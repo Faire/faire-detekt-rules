@@ -101,7 +101,7 @@ mavenPublishing {
       license {
         name = "The Apache License, Version 2.0"
         distribution = "repo"
-        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
       }
     }
 
@@ -123,7 +123,7 @@ mavenPublishing {
     }
 
     scm {
-      connection = "scm:git:git://github.com/Faire/faire-detekt-rules.git"
+      connection = "scm:git:https://github.com/Faire/faire-detekt-rules.git"
       url = "https://github.com/Faire/faire-detekt-rules"
     }
   }
