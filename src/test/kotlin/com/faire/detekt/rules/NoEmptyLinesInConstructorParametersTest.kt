@@ -273,6 +273,34 @@ internal class NoEmptyLinesInConstructorParametersTest :
   }
 
   @Test
+  fun `blank lines inside default values are kept by autocorrect`() {
+    assertLintAndFormat(
+        codeToLint = """
+            class Template(
+              val header: String,
+
+              val body: String = ${"\"\"\""}
+                  first paragraph
+
+                  second paragraph
+              ${"\"\"\""}.trimIndent(),
+            )
+            """.trimIndent(),
+        expectedPostFormattedCode = """
+            class Template(
+              val header: String,
+              val body: String = ${"\"\"\""}
+                  first paragraph
+
+                  second paragraph
+              ${"\"\"\""}.trimIndent(),
+            )
+            """.trimIndent(),
+        issueDescription = rule.description,
+    )
+  }
+
+  @Test
   fun `comment-only lines between parameters are allowed`() {
     assertNoViolations(
         """
