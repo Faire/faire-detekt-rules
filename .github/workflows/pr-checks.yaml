@@ -7,6 +7,12 @@ on:
 permissions:
   contents: read
 
+# A new push to a pull request cancels the run for its previous commit. Pushes to main have no pull request number,
+# so each gets its own group and runs to completion.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   JVM-Run-Gradle-Check:
     name: Build and test
