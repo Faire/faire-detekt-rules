@@ -1,26 +1,32 @@
 package com.faire.detekt.rules
 
-import com.intellij.psi.PsiElement
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.Rule
-import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtAnnotatedExpression
+import org.jetbrains.kotlin.psi.KtAnonymousInitializer
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtNamedFunction
-import org.jetbrains.kotlin.psi.KtParameter
-import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtReturnExpression
-import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
-import org.jetbrains.kotlin.psi.KtValueArgument
-import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
+import org.jetbrains.kotlin.psi.KtCatchClause
+import org.jetbrains.kotlin.psi.KtContainerNodeForControlStructureBody
+import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtFinallySection
+import org.jetbrains.kotlin.psi.KtFunctionLiteral
+import org.jetbrains.kotlin.psi.KtIfExpression
+import org.jetbrains.kotlin.psi.KtLabeledExpression
+import org.jetbrains.kotlin.psi.KtParenthesizedExpression
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.KtTryExpression
+import org.jetbrains.kotlin.psi.KtWhenEntry
 
 /**
  * This rule checks that the return value of a let is used - assigned, returned or captured in a collection.
  *
  * This is a convention we have chosen in order to keep our test assertions consistent.
+ *
+ * A let that ends a lambda counts as used, because its value is the lambda's result.
  *
  * Good:
  * if (user != null) {
@@ -36,37 +42,7 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) :
   override fun visitCallExpression(expression: KtCallExpression) {
     super.visitCallExpression(expression)
 
-    if (!expression.isLetExpr()) return
-
-    var currentParent = expression.parent
-    var currentChild: PsiElement = expression
-    while (currentParent != null) {
-      when {
-        currentParent is KtReturnExpression -> return
-
-        currentParent is KtProperty -> return
-
-        currentParent is KtBinaryExpression -> return
-
-        // that the let call is not last in a chain of dot qualified expressions
-        currentParent is KtDotQualifiedExpression && currentChild == currentParent.receiverExpression -> return
-
-        currentParent is KtSafeQualifiedExpression && currentChild == currentParent.receiverExpression -> return
-
-        currentParent is KtValueArgument -> return
-
-        currentParent is KtNamedFunction && isSingleLineFunction(currentParent) -> return
-
-        currentParent is KtDestructuringDeclaration -> return
-
-        currentParent is KtParameter && currentParent.elementType == KtStubElementTypes.VALUE_PARAMETER -> return
-
-        else -> {
-          currentChild = currentChild.parent
-          currentParent = currentParent.parent
-        }
-      }
-    }
+    if (!expression.isLetExpr() || expression.isValueUsed()) return
 
     report(
         Finding(
@@ -78,12 +54,24 @@ internal class ReturnValueOfLetMustBeUsed(config: Config = Config.empty) :
 
   private fun KtCallExpression.isLetExpr(): Boolean = calleeExpression?.textMatches("let") == true
 
-  private fun isSingleLineFunction(expression: KtNamedFunction): Boolean {
-    var child = expression.firstChild
-    while (child != null) {
-      if (child.textMatches("=")) return true
-      child = child.nextSibling
-    }
-    return false
+  private fun KtExpression.isValueUsed(): Boolean = when (val parent = parent) {
+    is KtQualifiedExpression -> this == parent.receiverExpression || parent.isValueUsed()
+
+    is KtParenthesizedExpression, is KtLabeledExpression, is KtAnnotatedExpression, is KtTryExpression ->
+      parent.isValueUsed()
+
+    is KtBlockExpression -> this == parent.statements.lastOrNull() && parent.isValueUsed()
+
+    is KtFunctionLiteral -> true
+
+    is KtDeclarationWithBody -> this != parent.bodyBlockExpression
+
+    is KtContainerNodeForControlStructureBody -> (parent.parent as? KtIfExpression)?.isValueUsed() ?: false
+
+    is KtWhenEntry, is KtCatchClause -> (parent.parent as? KtExpression)?.isValueUsed() ?: true
+
+    is KtFinallySection, is KtAnonymousInitializer -> false
+
+    else -> true
   }
 }
