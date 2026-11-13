@@ -171,4 +171,23 @@ internal class NoNonPrivateGlobalVariablesTest :
         issueDescription = NoNonPrivateGlobalVariables.RULE_DESCRIPTION,
     )
   }
+
+  @Test
+  fun `should add private after an annotation when there is no modifier keyword`() {
+    assertLintAndFormat(
+        """
+          package com.faire.detekt.rules
+
+          @Suppress("MagicNumber")
+          val timeoutSeconds = 30
+        """.trimIndent(),
+        """
+          package com.faire.detekt.rules
+
+          @Suppress("MagicNumber")
+          private val timeoutSeconds = 30
+        """.trimIndent(),
+        issueDescription = NoNonPrivateGlobalVariables.RULE_DESCRIPTION,
+    )
+  }
 }
