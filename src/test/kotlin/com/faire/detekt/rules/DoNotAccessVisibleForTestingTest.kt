@@ -71,4 +71,81 @@ internal class DoNotAccessVisibleForTestingTest(private val env: KotlinEnvironme
     )
     assertThat(findings).hasSize(2)
   }
+
+  @Test
+  fun `test accessing test-only classes and constructors`() {
+    val findings = rule.lintWithContext(
+        env,
+        """
+          package bar
+
+          import foo.FakeClock
+          import foo.Scheduler
+
+          fun bar() {
+            val clock: FakeClock = FakeClock()
+            Scheduler(clock)
+            Scheduler()
+          }
+        """,
+        """
+          package foo
+
+          annotation class VisibleForTesting
+
+          interface Clock
+
+          @VisibleForTesting
+          class FakeClock : Clock
+
+          class Scheduler @VisibleForTesting constructor(private val clock: Clock) {
+            constructor() : this(object : Clock {})
+          }
+        """,
+    )
+    assertThat(findings.map { it.entity.ktElement.text }).containsExactly("FakeClock", "FakeClock", "Scheduler")
+  }
+
+  @Test
+  fun `test accessing test-only members inherited from a generic class`() {
+    val dependencies = arrayOf(
+        """
+          package foo
+
+          annotation class VisibleForTesting
+
+          open class Base<T> {
+            @VisibleForTesting
+            fun testMember(value: T): T = value
+          }
+        """,
+        """
+          package bar
+
+          class Sub : foo.Base<String>()
+        """,
+    )
+
+    val findingsInOtherPackage = rule.lintWithContext(
+        env,
+        """
+          package bar
+
+          fun bar(): String = Sub().testMember("value")
+        """,
+        *dependencies,
+    )
+    val findingsInDeclaringPackage = rule.lintWithContext(
+        env,
+        """
+          package foo
+
+          fun foo(): String = bar.Sub().testMember("value")
+        """,
+        *dependencies,
+    )
+
+    assertThat(findingsInOtherPackage.map { it.entity.ktElement.text }).containsExactly("testMember")
+    assertThat(findingsInDeclaringPackage).isEmpty()
+  }
 }
