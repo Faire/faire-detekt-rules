@@ -1,12 +1,14 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
+import com.faire.detekt.utils.hasReturnLabelled
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
+import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
@@ -61,13 +63,15 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         ),
     )
 
-    if (autoCorrect) {
+    if (autoCorrect && !firstOrNullCall.hasReturnLabelled("firstOrNull")) {
       val collectionExpression = assertThatArgument.receiverExpression.text
 
       val predicateArgs = if (firstOrNullCall.lambdaArguments.isNotEmpty()) {
         " ${firstOrNullCall.lambdaArguments.joinToString { it.text }}"
       } else {
-        "(${firstOrNullCall.valueArguments.joinToString { it.text }})"
+        // noneMatch is a Java method, so a named argument such as `predicate = ...` would not compile
+        val predicate = firstOrNullCall.valueArguments.singleOrNull()?.getArgumentExpression() ?: return
+        if (predicate is KtLambdaExpression) " ${predicate.text}" else "(${predicate.text})"
       }
 
       pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")
