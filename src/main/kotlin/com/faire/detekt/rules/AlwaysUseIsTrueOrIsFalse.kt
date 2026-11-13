@@ -57,7 +57,7 @@ internal class AlwaysUseIsTrueOrIsFalse(config: Config = Config.empty) :
 
       if (autoCorrect) {
         val replacement = if (isEqualToExpression.isComparingToTrue()) "isTrue()" else "isFalse()"
-        pending.add(isEqualToExpression.text to replacement)
+        replace(isEqualToExpression, replacement)
       }
     }
   }

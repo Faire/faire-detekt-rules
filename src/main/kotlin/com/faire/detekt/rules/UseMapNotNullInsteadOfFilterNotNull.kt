@@ -49,7 +49,7 @@ internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty
       val baseReceiverText = receiverDotExpr.receiverExpression.text
       val betweenBaseAndMap = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(mapCallText)
 
-      pending.add(expression.text to "$baseReceiverText$betweenBaseAndMap$newCallText")
+      replace(expression, "$baseReceiverText$betweenBaseAndMap$newCallText")
     }
   }
 }

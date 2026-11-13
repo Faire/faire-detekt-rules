@@ -45,7 +45,7 @@ internal class UseSetInsteadOfListToSet(config: Config = Config.empty) :
       // Extract whitespace/dot between base receiver and list() from the expression text
       val betweenBaseAndList = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(listCallText)
 
-      pending.add(expression.text to "$baseReceiverText${betweenBaseAndList}set()")
+      replace(expression, "$baseReceiverText${betweenBaseAndList}set()")
     }
   }
 }

@@ -47,7 +47,7 @@ internal class DoNotUseSingleOnFilter(config: Config = Config.empty) :
       // Extract whitespace/dot between base receiver and filter call from the expression text
       val betweenBaseAndFilter = receiverDotExpr.text.removePrefix(baseReceiverText).removeSuffix(filterCallText)
 
-      pending.add(expression.text to "$baseReceiverText$betweenBaseAndFilter$newCallText")
+      replace(expression, "$baseReceiverText$betweenBaseAndFilter$newCallText")
     }
   }
 }
