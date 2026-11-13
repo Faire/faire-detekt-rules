@@ -4,10 +4,12 @@ import com.faire.detekt.utils.AutoCorrectRule
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
-import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.psiUtil.allChildren
 import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 
 /**
  * No top-level non-private global variables.
@@ -34,15 +36,23 @@ internal class NoNonPrivateGlobalVariables(config: Config = Config.empty) :
       report(Finding(entity = Entity.from(property), message = RULE_DESCRIPTION))
 
       if (autoCorrect) {
-        val propertyText = property.text
-        val replacement = when {
-          property.hasModifier(KtTokens.INTERNAL_KEYWORD) -> propertyText.replaceFirst("internal", "private")
-          property.hasModifier(KtTokens.PUBLIC_KEYWORD) -> propertyText.replaceFirst("public", "private")
-          else -> "private $propertyText"
-        }
-        pending.add(propertyText to replacement)
+        pending.add(property.text to property.textWithPrivateVisibility())
       }
     }
+  }
+
+  private fun KtProperty.textWithPrivateVisibility(): String {
+    val start = textRange.startOffset
+    val visibility = visibilityModifier()
+    if (visibility != null) {
+      val range = visibility.textRange.shiftLeft(start)
+      return text.replaceRange(range.startOffset, range.endOffset, "private")
+    }
+    // Insert after the KDoc and annotations so that the KDoc stays attached to the property.
+    val firstKeyword = modifierList?.allChildren?.firstOrNull { it.node.elementType is KtModifierKeywordToken }
+        ?: valOrVarKeyword
+    val insertAt = firstKeyword.textRange.startOffset - start
+    return text.replaceRange(insertAt, insertAt, "private ")
   }
 
   companion object {
