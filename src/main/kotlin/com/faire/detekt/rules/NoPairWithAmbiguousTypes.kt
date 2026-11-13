@@ -5,16 +5,27 @@ import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 
+/**
+ * Reports function parameters and return types that are a Pair of two identical types, such as `Pair<Int, Int>`, or a
+ * Pair with an `Any` type. A class with named properties makes clear which value is which.
+ *
+ * Type arguments are compared by their full text, ignoring nullability, so `Pair<Order.Token, Brand.Token>` is
+ * allowed.
+ *
+ * Overrides are not reported, because their types are set by the function they override.
+ */
 internal class NoPairWithAmbiguousTypes(config: Config = Config.empty) :
     Rule(config, "This rule prevents developers from using Pair<T, T> or Pair with an Any type parameter") {
   override fun visitNamedFunction(function: KtNamedFunction) {
     super.visitNamedFunction(function)
+    if (function.hasModifier(KtTokens.OVERRIDE_KEYWORD)) return
 
     val offendingParameters = function.valueParameters.filter { it.typeReference?.isOffendingType() == true }
 
@@ -45,17 +56,18 @@ private fun KtTypeReference.isOffendingType(): Boolean {
   }
 
   val genericTypes = this.typeElement?.getGenericTypes() ?: return false
-  val genericTypeNames = genericTypes.mapNotNull { generictype ->
-    val typeName = generictype.getTypeName()
-    val genericTypeNames = generictype.typeElement?.getGenericTypes()?.map { it.node.text }
-    if (typeName == null || genericTypeNames == null) {
-      null
-    } else {
-      "$typeName:$genericTypeNames".trimEnd('?')
-    }
+  if (genericTypes.any { it.getTypeName() == "Any" }) {
+    return true
   }
-  return (genericTypeNames.size == 2 && genericTypeNames[0].trimEnd('?') == genericTypeNames[1].trimEnd('?')) ||
-      genericTypeNames.any { it == "Any:[]" }
+
+  val typeTexts = genericTypes.mapNotNull { it.textWithoutNullability() }
+  return typeTexts.size == 2 && typeTexts[0] == typeTexts[1]
+}
+
+private fun KtTypeReference.textWithoutNullability(): String? {
+  val element = typeElement
+  val type = (element as? KtNullableType)?.innerType ?: element ?: return null
+  return type.text.filterNot(Char::isWhitespace)
 }
 
 private fun KtTypeElement.getGenericTypes(): List<KtTypeReference> = when (this) {
