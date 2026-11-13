@@ -1,9 +1,14 @@
 package com.faire.detekt.rules
 
+import dev.detekt.api.modifiedText
+import dev.detekt.test.TestConfig
 import dev.detekt.test.junit.KotlinCoreEnvironmentTest
 import dev.detekt.test.lintWithContext
+import dev.detekt.test.utils.KotlinAnalysisApiEngine
 import dev.detekt.test.utils.KotlinEnvironmentContainer
 import org.assertj.core.api.Assertions.assertThat
+import org.intellij.lang.annotations.Language
+import org.jetbrains.kotlin.config.languageVersionSettings
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -91,6 +96,46 @@ internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmen
   }
 
   @Test
+  fun `find{ } on collections is auto-corrected`() {
+    assertThat(
+        autoCorrect(
+            """
+              fun foo() {
+                val testList = listOf(0).find { it == 0 }
+                val testString = "test".find { it == 's' }
+              }
+            """.trimIndent(),
+        ),
+    ).isEqualTo(
+        """
+          fun foo() {
+            val testList = listOf(0).firstOrNull { it == 0 }
+            val testString = "test".firstOrNull { it == 's' }
+          }
+        """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `find() on unrelated type is not auto-corrected`() {
+    assertThat(
+        autoCorrect(
+            """
+              object TestQuery {
+                fun find(name: String): String? = name
+              }
+
+              fun foo(input: String) {
+                val match = Regex("a").find(input)
+                val regexMatch = "x".toRegex().find("s")
+                val queryResult = TestQuery.find("test")
+              }
+            """.trimIndent(),
+        ),
+    ).isNull()
+  }
+
+  @Test
   fun `firstOrNull() is not flagged`() {
     assertThat(
         rule.lintWithContext(
@@ -122,5 +167,12 @@ internal class UseFirstOrNullInsteadOfFindTest(private val env: KotlinEnvironmen
             """.trimIndent(),
         ),
     ).isEmpty()
+  }
+
+  private fun autoCorrect(@Language("kotlin") code: String): String? {
+    val ktFile = KotlinAnalysisApiEngine.compile(code)
+    UseFirstOrNullInsteadOfFind(TestConfig("autoCorrect" to true))
+        .visitFile(ktFile, env.configuration.languageVersionSettings)
+    return ktFile.modifiedText
   }
 }
