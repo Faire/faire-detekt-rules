@@ -11,21 +11,24 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 /**
- * Do not assert isEqual on the result of single(). Instead, use containsOnly.
+ * Do not assert isEqualTo on the result of single(). Instead, use containsExactly.
  *
  * Using .single() will throw an exception if the collection does not contain exactly one element.
  * The exception results in the assertion failure message being hidden, which makes debugging more difficult.
  *
+ * containsExactly keeps the guarantee that single() gives: it fails if the collection has more than one element,
+ * including duplicates. containsOnly would accept listOf("a", "a").
+ *
  * ```
  * // Good
- * assertThat(listof("a")).containsOnly("a")
+ * assertThat(listOf("a")).containsExactly("a")
  *
  * // Bad
- * assertThat(listof("a").single()).isEqualTo("a")
+ * assertThat(listOf("a").single()).isEqualTo("a")
  * ```
  */
 internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.empty) :
-    AutoCorrectRule(config, "use containsOnly() instead of asserting isEqual() on the result of single()") {
+    AutoCorrectRule(config, "use containsExactly() instead of asserting isEqualTo() on the result of single()") {
 
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
@@ -44,16 +47,16 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
     report(
         Finding(
             entity = Entity.from(expression),
-            message = "containsOnly should be used instead of asserting isEqual on the result of single()",
+            message = "containsExactly should be used instead of asserting isEqualTo on the result of single()",
         ),
     )
 
     if (autoCorrect) {
-      // assertThat(x.single()).isEqualTo(y) -> assertThat(x).containsOnly(y)
+      // assertThat(x.single()).isEqualTo(y) -> assertThat(x).containsExactly(y)
       val collectionExpr = (argumentForAssertThatExpression as KtDotQualifiedExpression).receiverExpression.text
       val isEqualArgs = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
 
-      pending.add(expression.text to "assertThat($collectionExpr).containsOnly$isEqualArgs")
+      pending.add(expression.text to "assertThat($collectionExpr).containsExactly$isEqualArgs")
     }
   }
 
