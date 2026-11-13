@@ -60,8 +60,7 @@ internal class DoNotStaticallyImportObjectFunctions(config: Config = Config.empt
       val ownerSymbol = ownerNameReference.mainReference.resolveToSymbol() as? KaClassSymbol ?: return@analyze null
       val scope = if (ownerSymbol.classKind.isObject) ownerSymbol.memberScope else ownerSymbol.staticMemberScope
       val callables = if (importedName == null) scope.callables { true } else scope.callables(importedName)
-      val importsFunction = callables.any { it is KaNamedFunctionSymbol && !it.isExtension }
-      if (!importsFunction) return@analyze null
+      if (callables.none { it is KaNamedFunctionSymbol && !it.isExtension }) return@analyze null
 
       val classId = ownerSymbol.classId ?: return@analyze null
       if (ownerSymbol.classKind == KaClassKind.COMPANION_OBJECT) classId.outerClassId else classId
