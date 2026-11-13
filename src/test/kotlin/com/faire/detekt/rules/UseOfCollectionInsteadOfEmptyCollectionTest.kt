@@ -141,4 +141,19 @@ internal class UseOfCollectionInsteadOfEmptyCollectionTest :
         issueDescription = ISSUE,
     )
   }
+
+  @Test
+  fun `calls with a receiver are not caught`() {
+    assertNoViolationsAndNotFormatted(
+        """
+          import java.util.Collections
+
+          fun test() {
+            val list = Collections.emptyList<String>()
+            val set = java.util.Collections.emptySet<String>()
+            val map = Collections.emptyMap<String, Int>()
+          }
+        """.trimIndent(),
+    )
+  }
 }
