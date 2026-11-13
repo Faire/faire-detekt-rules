@@ -101,6 +101,44 @@ internal class NoDuplicateKeysInMapOfTest {
   }
 
   @Test
+  fun `should report for duplicate keys when key is an enum entry`() {
+    val ktFile = compileContentForTest(
+        """
+          enum class Key { A, B }
+          val map = mapOf(
+              Key.A to "value1",
+              Key.B to "value2",
+              Key.A to "value3",
+          )
+        """.trimIndent(),
+    )
+
+    val findings = rule.lint(ktFile)
+    assertThat(findings)
+        .singleElement()
+        .extracting { it.message }
+        .isEqualTo("The key Key.A is duplicated in the map.")
+  }
+
+  @Test
+  fun `should not report for duplicate keys when key contains a function call`() {
+    val ktFile = compileContentForTest(
+        """
+          fun nextId() = UUID.randomUUID()
+          val map = mapOf(
+              UUID.randomUUID() to "value1",
+              UUID.randomUUID() to "value2",
+              "id-${'$'}{nextId()}" to "value3",
+              "id-${'$'}{nextId()}" to "value4",
+          )
+        """.trimIndent(),
+    )
+
+    val findings = rule.lint(ktFile)
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `should not report for constant, variable, and function with same name`() {
     val ktFile = compileContentForTest(
         """
