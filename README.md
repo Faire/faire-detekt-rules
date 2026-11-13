@@ -75,6 +75,12 @@ FaireRuleSet:
   UseEntriesInsteadOfValuesOnEnum:
     active: true
     autoCorrect: false
+  UseFirstNotNullOf:
+    active: true
+    autoCorrect: true
+  UseFirstNotNullOfOrNull:
+    active: true
+    autoCorrect: true
   UseFirstOrNullInsteadOfFind:
     active: true
     autoCorrect: true
