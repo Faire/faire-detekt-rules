@@ -54,6 +54,8 @@ FaireRuleSet:
     active: true
   GetOrDefaultShouldBeReplacedWithGetOrElse:
     active: true
+  NestedWithIsBanned:
+    active: false
   NoDuplicateKeysInMapOf:
     active: true
   NoExtensionFunctionOnNullableReceiver:
@@ -115,6 +117,11 @@ in the type, such as its companion object. This rule requires type resolution.
 **DoNotAccessVisibleForTesting:**
 It is strong recommended to configure this rule with `excludes: ["**/*Test.kt"]` (following the test file naming
 convention of the project) to allow test code access to the annotated members.
+
+**NestedWithIsBanned:**
+Flags a `with` call inside the lambda of another `with` call. Calls with a receiver, such as `scoper.with(...)`, are
+not flagged. Imports of `kotlin.with` under an alias are matched. This rule is inactive by default; set
+`active: true` to enable it.
 
 ## Type Resolution
 A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled to function properly. If type resolution is not enabled, the rules will silently continue.
