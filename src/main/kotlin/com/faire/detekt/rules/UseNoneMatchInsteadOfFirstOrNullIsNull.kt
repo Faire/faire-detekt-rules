@@ -26,6 +26,10 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
  * The `.noneMatch { }` assertion is more idiomatic and provides clearer error messages
  * when the assertion fails, showing which elements matched rather than just indicating
  * that the result was not null.
+ *
+ * Auto-correct skips predicates that use `return@firstOrNull`: once the call is renamed to
+ * `noneMatch`, that label no longer refers to the predicate. The rule still reports these
+ * calls. To fix one by hand, change the label to `return@noneMatch`.
  */
 internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.empty) :
     AutoCorrectRule(
