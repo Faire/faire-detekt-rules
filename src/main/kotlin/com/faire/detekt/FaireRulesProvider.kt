@@ -29,6 +29,7 @@ import com.faire.detekt.rules.PreventBannedImports
 import com.faire.detekt.rules.ReturnValueOfLetMustBeUsed
 import com.faire.detekt.rules.UseEntriesInsteadOfValuesOnEnum
 import com.faire.detekt.rules.UseFirstNotNullOf
+import com.faire.detekt.rules.UseFirstNotNullOfOrNull
 import com.faire.detekt.rules.UseFirstOrNullInsteadOfFind
 import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
 import com.faire.detekt.rules.UseNoneMatchInsteadOfFirstOrNullIsNull
@@ -73,6 +74,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           { ReturnValueOfLetMustBeUsed(it) },
           { UseEntriesInsteadOfValuesOnEnum(it) },
           { UseFirstNotNullOf(it) },
+          { UseFirstNotNullOfOrNull(it) },
           { UseFirstOrNullInsteadOfFind(it) },
           { UseMapNotNullInsteadOfFilterNotNull(it) },
           { UseNoneMatchInsteadOfFirstOrNullIsNull(it) },
