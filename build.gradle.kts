@@ -53,7 +53,7 @@ dependencies {
   detektPlugins(libs.detekt.rules.ktlint.wrapper)
   detektPlugins(libs.detekt.ruleauthors)
   detektPlugins(libs.detekt.compiler.wrapper)
-  detektPlugins(rootProject)
+  detektPlugins(project(":"))
 }
 
 dependencyAnalysis {
