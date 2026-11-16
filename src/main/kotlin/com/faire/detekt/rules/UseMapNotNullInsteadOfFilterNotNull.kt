@@ -23,6 +23,10 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
  *  using .map {}.filterNotNull() processes the collection twice: once for the
  *  transformation and once for filtering, which can be less efficient especially
  *  for larger collections.
+ *
+ * Auto-correct skips lambdas that use `return@map`: once the call is renamed to
+ * `mapNotNull`, that label no longer refers to the lambda. The rule still reports these
+ * calls. To fix one by hand, change the label to `return@mapNotNull`.
  */
 internal class UseMapNotNullInsteadOfFilterNotNull(config: Config = Config.empty) :
     AutoCorrectRule(config, "use mapNotNull() instead of map followed by filterNotNull()") {
