@@ -17,6 +17,7 @@ import com.faire.detekt.rules.DoNotUseSingleOnFilter
 import com.faire.detekt.rules.DoNotUseSizePropertyInAssert
 import com.faire.detekt.rules.FilterNotNullOverMapNotNullForFiltering
 import com.faire.detekt.rules.GetOrDefaultShouldBeReplacedWithGetOrElse
+import com.faire.detekt.rules.NestedWithIsBanned
 import com.faire.detekt.rules.NoDuplicateKeysInMapOf
 import com.faire.detekt.rules.NoEmptyLinesInConstructorParameters
 import com.faire.detekt.rules.NoExtensionFunctionOnNullableReceiver
@@ -62,6 +63,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           { DoNotUseSizePropertyInAssert(it) },
           { FilterNotNullOverMapNotNullForFiltering(it) },
           { GetOrDefaultShouldBeReplacedWithGetOrElse(it) },
+          { NestedWithIsBanned(it) },
           { NoDuplicateKeysInMapOf(it) },
           { NoEmptyLinesInConstructorParameters(it) },
           { NoExtensionFunctionOnNullableReceiver(it) },
