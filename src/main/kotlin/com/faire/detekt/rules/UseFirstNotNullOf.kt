@@ -13,6 +13,10 @@ import dev.detekt.api.Config
  *
  *  Readability: `firstNotNullOf {}` clearly expresses the intent to select the first element after the transformation.
  *               Using `.mapNotNull { ... }.first()` is more verbose.
+ *
+ * Auto-correct skips lambdas that use `return@mapNotNull`: once the call is renamed to `firstNotNullOf`, that label
+ * no longer refers to the lambda. The rule still reports these calls. To fix one by hand, change the label to
+ * `return@firstNotNullOf`.
  */
 internal class UseFirstNotNullOf(config: Config = Config.empty) :
     MapNotNullFollowedByFirstRule(

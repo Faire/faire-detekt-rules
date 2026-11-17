@@ -14,6 +14,10 @@ import dev.detekt.api.Config
  *
  *  Readability: `firstNotNullOfOrNull {}` clearly expresses the intent to select the first not-null element after the
  *               transformation. Using `.mapNotNull { ... }.firstOrNull()` is more verbose.
+ *
+ * Auto-correct skips lambdas that use `return@mapNotNull`: once the call is renamed to `firstNotNullOfOrNull`, that
+ * label no longer refers to the lambda. The rule still reports these calls. To fix one by hand, change the label to
+ * `return@firstNotNullOfOrNull`.
  */
 internal class UseFirstNotNullOfOrNull(config: Config = Config.empty) :
     MapNotNullFollowedByFirstRule(

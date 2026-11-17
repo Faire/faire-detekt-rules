@@ -20,6 +20,10 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
  * ```
  *
  * This augments the `UnnecessaryFilter` detekt rule which does not cover `.single` as of 1.21.0.
+ *
+ * Auto-correct skips predicates that use `return@filter`: once the call is renamed to `single`,
+ * that label no longer refers to the predicate. The rule still reports these calls. To fix one
+ * by hand, change the label to `return@single`.
  */
 internal class DoNotUseSingleOnFilter(config: Config = Config.empty) :
     AutoCorrectRule(config, "Do not use single() with filter { ... }, use single { ... } instead") {
