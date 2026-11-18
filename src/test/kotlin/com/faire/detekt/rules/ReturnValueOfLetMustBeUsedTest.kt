@@ -272,6 +272,64 @@ internal class ReturnValueOfLetMustBeUsedTest {
   }
 
   @Test
+  fun `let expression can be used as a when subject, condition, loop range or thrown exception`() {
+    val findings = rule.lint(
+        """
+        fun testFunc(user: User, names: List<String>) {
+          when (user.let { it.role }) {
+            Role.ADMIN -> println("admin")
+            else -> println("other")
+          }
+          if (user.let { it.isActive }) println("active")
+          for (name in names.let { it.sorted() }) println(name)
+          throw user.let { IllegalStateException(it.name) }
+        }
+      """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `let expression can be the value of an if, when or try that is used`() {
+    val findings = rule.lint(
+        """
+        fun testFunc(user: User?, fallback: String): String {
+          val name = if (user != null) {
+            user.let { it.name }
+          } else {
+            fallback
+          }
+          val role = when (user) {
+            null -> fallback
+            else -> user.let { it.role.name }
+          }
+          return try {
+            user!!.let { it.email }
+          } catch (e: NullPointerException) {
+            fallback.let { it.lowercase() }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `let expression as the last statement of a lambda produces no errors`() {
+    val findings = rule.lint(
+        """
+        fun testFunc(users: List<User?>): List<String?> {
+          return users.map { user -> user?.let { it.name } }
+        }
+      """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
   fun `let expression used as last call produces an error`() {
     val findings = rule.lint(
         """
@@ -346,5 +404,37 @@ internal class ReturnValueOfLetMustBeUsedTest {
 
     assertThat(findings.single()).isNotNull()
     assertThat(multiLineFindings.single()).isNotNull()
+  }
+
+  @Test
+  fun `let whose value is discarded inside a lambda or object produces an error`() {
+    val findings = rule.lint(
+        """
+        val handler = object : Handler {
+          override fun handle(name: String?) {
+            name?.let { println(it) }
+            println("handled")
+          }
+        }
+
+        fun testFunc(users: List<User?>): List<String> {
+          users.forEach { user ->
+            user?.let { println(it) }
+            println("done")
+          }
+          return buildList {
+            for (user in users) {
+              user?.let { add(it.name) }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    assertThat(findings.map { it.entity.ktElement.text }).containsExactly(
+        "let { println(it) }",
+        "let { println(it) }",
+        "let { add(it.name) }",
+    )
   }
 }
