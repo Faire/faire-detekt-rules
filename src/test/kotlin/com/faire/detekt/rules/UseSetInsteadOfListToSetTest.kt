@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Test
 private const val ISSUE_DESCRIPTION = "Use set() instead of list().toSet()"
 
 internal class UseSetInsteadOfListToSetTest :
-    AutoCorrectRuleTest<UseSetInsteadOfListToSet>({
-  UseSetInsteadOfListToSet(
-      it,
-  )
-}) {
+    AutoCorrectRuleTest<UseSetInsteadOfListToSet>(
+    { UseSetInsteadOfListToSet(it) },
+) {
 
   @Test
   fun `list() followed by toSet() is flagged`() {

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 
 internal class PreventBannedImportsTest :
     AutoCorrectRuleTest<PreventBannedImports>(
-    {
+    { config ->
       PreventBannedImports(
           TestConfig(
-              "autoCorrect" to it.valueOrNull<Boolean>("autoCorrect")!!,
+              "autoCorrect" to config.valueOrNull<Boolean>("autoCorrect")!!,
               "withAlternatives" to listOf(
                   "com.google.inject.Singleton=javax.inject.Singleton",
               ),

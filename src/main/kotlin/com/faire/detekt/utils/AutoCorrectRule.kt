@@ -5,6 +5,7 @@ import dev.detekt.api.Rule
 import dev.detekt.api.modifiedText
 import org.jetbrains.kotlin.psi.KtFile
 
+@Suppress("AbstractClassCanBeConcreteClass")
 internal abstract class AutoCorrectRule(config: Config, description: String) : Rule(config, description) {
 
   protected val pending = mutableListOf<Pair<String, String>>()

@@ -17,19 +17,19 @@ internal class DoNotUseDirectReceiverReferenceInsideWith(config: Config = empty)
   private val receiverList = mutableListOf<String>()
 
   override fun visitCallExpression(expression: KtCallExpression) {
-    var inWithBlock = false
+    var isInWithBlock = false
     var receiver = ""
     if (expression.isWithExpr() && expression.parent !is KtDotQualifiedExpression) {
       val argumentsList: KtValueArgumentList = expression.children.first { it is KtValueArgumentList }
           as KtValueArgumentList
       receiver = argumentsList.arguments.first().text
       receiverList.add(receiver)
-      inWithBlock = true
+      isInWithBlock = true
     }
 
     super.visitCallExpression(expression)
 
-    if (inWithBlock) {
+    if (isInWithBlock) {
       receiverList.remove(receiver)
     }
   }
