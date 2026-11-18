@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -18,6 +19,8 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedElementSelector
 
+private val ENUM_GENERATED_FUNCTIONS = setOf(StandardNames.ENUM_VALUES, StandardNames.ENUM_VALUE_OF)
+
 /**
  * Prevents statically importing functions declared on `object` types (including companion objects) and Java static
  * methods. Call sites should reference them through their type instead, e.g. `MySpecificObject.theStaticFunction()`
@@ -25,6 +28,9 @@ import org.jetbrains.kotlin.psi.psiUtil.getQualifiedElementSelector
  *
  * Statically importing these functions hurts readability in diffs: a reviewer usually only sees the changed lines,
  * and without the type name next to the call, the context of where the function comes from is missing from them.
+ *
+ * Star imports of enums are not reported for the `values()` and `valueOf()` functions that every enum has, only for
+ * functions the enum declares.
  *
  * Some types are conventionally always statically imported (e.g. AssertJ's `Assertions`). These are configured via
  * `allowedTypes` by fully qualified name, e.g. `org.assertj.core.api.Assertions`. An entry also covers objects nested
@@ -59,7 +65,11 @@ internal class DoNotStaticallyImportObjectFunctions(config: Config = Config.empt
     val importedOwner = analyze(importDirective) {
       val ownerSymbol = ownerNameReference.mainReference.resolveToSymbol() as? KaClassSymbol ?: return@analyze null
       val scope = if (ownerSymbol.classKind.isObject) ownerSymbol.memberScope else ownerSymbol.staticMemberScope
-      val callables = if (importedName == null) scope.callables { true } else scope.callables(importedName)
+      val callables = when {
+        importedName != null -> scope.callables(importedName)
+        ownerSymbol.classKind == KaClassKind.ENUM_CLASS -> scope.callables { it !in ENUM_GENERATED_FUNCTIONS }
+        else -> scope.callables { true }
+      }
       val importsFunction = callables.any { it is KaNamedFunctionSymbol && !it.isExtension }
       if (!importsFunction) return@analyze null
 

@@ -135,6 +135,42 @@ internal class DoNotStaticallyImportObjectFunctionsTest(private val env: KotlinE
   }
 
   @Test
+  fun `star importing an enum is not reported`() {
+    val findings = rule.lintWithContext(
+        env,
+        """
+        import com.faire.lib.SomeEnum.*
+        import java.time.temporal.ChronoUnit.*
+        import kotlin.DeprecationLevel.*
+
+        fun usage(): List<Any> = listOf(FIRST, CENTURIES, HIDDEN)
+        """.trimIndent(),
+        DEPENDENCIES,
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `enum functions are reported when imported by name or declared by the enum`() {
+    val findings = rule.lintWithContext(
+        env,
+        """
+        import com.faire.lib.SomeEnum.valueOf
+        import java.time.DayOfWeek.*
+
+        fun usage(): List<Any> = listOf(valueOf("FIRST"), of(1))
+        """.trimIndent(),
+        DEPENDENCIES,
+    )
+
+    assertThat(findings.map { it.message }).containsExactly(
+        "Do not statically import functions of SomeEnum, call them as SomeEnum.valueOf() instead.",
+        "Do not statically import functions of DayOfWeek, call them as DayOfWeek.function() instead.",
+    )
+  }
+
+  @Test
   fun `referencing an object function through its type is not reported`() {
     val findings = rule.lintWithContext(
         env,
