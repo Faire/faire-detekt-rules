@@ -7,8 +7,6 @@ updates:
       interval: daily
       time: "10:00"
       timezone: Canada/Eastern
-    reviewers:
-      - Faire/detektors
 
   - package-ecosystem: gradle
     open-pull-requests-limit: 5
@@ -17,5 +15,3 @@ updates:
       interval: daily
       time: "10:00"
       timezone: Canada/Eastern
-    reviewers:
-      - Faire/detektors
