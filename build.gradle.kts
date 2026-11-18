@@ -26,8 +26,6 @@ if (!providers.environmentVariable("RELEASE").isPresent) {
   version = "$version-$gitSha-SNAPSHOT"
 }
 
-val detektVersion = libs.versions.detekt.get()
-
 repositories {
   mavenCentral()
 }
@@ -76,7 +74,7 @@ detekt {
   buildUponDefaultConfig = true
   config.from(rootProject.file("detekt.yaml"))
 
-  allRules = false // activate all available (even unstable) rules.
+  allRules = false // true would activate all available rules, including unstable ones.
 }
 
 tasks.test {
