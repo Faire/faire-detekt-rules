@@ -4,9 +4,7 @@ import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.Rule
-import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 
 /**
  * In a with() block there must be multiple statements acting on the receiver.
@@ -32,15 +30,15 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
  */
 internal class WithReceiverShouldHaveMultipleActions(config: Config = Config.empty) :
     Rule(config, "With block receiver should have multiple actions") {
-  override fun visitBlockExpression(expression: KtBlockExpression) {
-    super.visitBlockExpression(expression)
-    val parentWithStatement = expression.getParentOfType<KtCallExpression>(true) ?: return
-    if (!parentWithStatement.isWithExpr()) return
+  override fun visitCallExpression(expression: KtCallExpression) {
+    super.visitCallExpression(expression)
+    if (!expression.isWithExpr()) return
 
-    if (expression.countChildren(null) <= 1) {
+    val lambdaBody = expression.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression ?: return
+    if (lambdaBody.statements.size <= 1) {
       report(
           Finding(
-              entity = Entity.from(parentWithStatement),
+              entity = Entity.from(expression),
               message = description,
           ),
       )

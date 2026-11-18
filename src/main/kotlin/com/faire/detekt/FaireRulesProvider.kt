@@ -36,6 +36,7 @@ import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
 import com.faire.detekt.rules.UseNoneMatchInsteadOfFirstOrNullIsNull
 import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection
 import com.faire.detekt.rules.UseSetInsteadOfListToSet
+import com.faire.detekt.rules.WithReceiverShouldHaveMultipleActions
 import dev.detekt.api.RuleSet
 import dev.detekt.api.RuleSetId
 import dev.detekt.api.RuleSetProvider
@@ -82,6 +83,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           { UseNoneMatchInsteadOfFirstOrNullIsNull(it) },
           { UseOfCollectionInsteadOfEmptyCollection(it) },
           { UseSetInsteadOfListToSet(it) },
+          { WithReceiverShouldHaveMultipleActions(it) },
       ),
   )
 }

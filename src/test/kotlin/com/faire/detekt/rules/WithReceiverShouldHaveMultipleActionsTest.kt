@@ -46,4 +46,37 @@ internal class WithReceiverShouldHaveMultipleActionsTest {
     )
     assertThat(findings).isEmpty()
   }
+
+  @Test
+  fun `with() having multiple statements including a single-statement lambda is not flagged`() {
+    val findings = rule.lint(
+        """
+            fun foo() {
+                val receiver = "foobar"
+                with(receiver) {
+                    val printLength = { println(length) }
+                    printLength()
+                }
+            }
+        """.trimIndent(),
+    )
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `with() having a single call to receiver and a comment is flagged`() {
+    val findings = rule.lint(
+        """
+            fun foo() {
+                val receiver = "foobar"
+                with(receiver) {
+                    // The receiver has 6 characters
+                    assertThat(length).isEqualTo(6)
+                }
+            }
+        """.trimIndent(),
+    )
+    assertThat(findings).hasSize(1)
+    assertThat(findings.first().message).isEqualTo(ISSUE_DESCRIPTION)
+  }
 }
