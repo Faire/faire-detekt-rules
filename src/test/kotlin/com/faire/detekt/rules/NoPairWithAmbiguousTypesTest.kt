@@ -111,4 +111,50 @@ internal class NoPairWithAmbiguousTypesTest {
 
     assertThat(findings).isEmpty()
   }
+
+  @Test
+  fun `valid Pair of different types with the same simple name`() {
+    val findings = rule.lint(
+        """
+          fun link(tokens: Pair<Order.Token, Brand.Token>): Int {
+            return 42
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings).isEmpty()
+  }
+
+  @Test
+  fun `invalid Pair of identical function types`() {
+    val findings = rule.lint(
+        """
+          fun run(callbacks: Pair<() -> Unit, () -> Unit>) {
+            callbacks.first()
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings.single().message)
+        .isEqualTo("The function run has parameter callbacks which should be a class instead")
+  }
+
+  @Test
+  fun `overrides are not reported`() {
+    val findings = rule.lint(
+        """
+          interface Adder {
+            fun add(pair: Pair<Int, Int>): Int
+          }
+
+          class IntAdder : Adder {
+            override fun add(pair: Pair<Int, Int>): Int {
+              return pair.first + pair.second
+            }
+          }
+        """.trimIndent(),
+    )
+
+    assertThat(findings.map { it.entity.ktElement.text }).containsExactly("fun add(pair: Pair<Int, Int>): Int")
+  }
 }
