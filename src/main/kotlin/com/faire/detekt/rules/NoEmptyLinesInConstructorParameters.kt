@@ -8,6 +8,7 @@ import dev.detekt.api.Finding
 import org.jetbrains.kotlin.psi.KtParameterList
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
+import org.jetbrains.kotlin.psi.psiUtil.allChildren
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 
 private val BLANK_LINE_REGEX = Regex("""\n([ \t]*\n)+""")
@@ -89,8 +90,10 @@ internal class NoEmptyLinesInConstructorParameters(config: Config = Config.empty
 
     if (autoCorrect) {
       val originalText = parameterList.text
-      // Collapse blank lines: replace sequences of newlines (with optional whitespace) with a single newline
-      val fixedText = BLANK_LINE_REGEX.replace(originalText, "\n")
+      // Collapse blank lines in the whitespace between parameters only, so multi-line strings keep their content
+      val fixedText = parameterList.allChildren.joinToString("") { child ->
+        if (child is PsiWhiteSpaceImpl) BLANK_LINE_REGEX.replace(child.text, "\n") else child.text
+      }
       pending.add(originalText to fixedText)
     }
   }
