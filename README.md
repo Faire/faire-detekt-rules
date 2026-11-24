@@ -33,6 +33,9 @@ FaireRuleSet:
   DoNotStaticallyImportObjectFunctions:
     active: true
     allowedTypes: ["org.assertj.core.api.Assertions"]
+  DoNotUseContainsExactlyForEmptyListInAssert:
+    active: true
+    autoCorrect: true
   DoNotUseDirectReceiverReferenceInsideWith:
     active: true
   DoNotUseHasSizeForEmptyListInAssert:
