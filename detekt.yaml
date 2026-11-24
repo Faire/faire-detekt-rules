@@ -148,6 +148,9 @@ FaireRuleSet:
   UseMapNotNullInsteadOfFilterNotNull:
     active: true
     autoCorrect: true
+  UseMatchAssertionsOnCollections:
+    active: true
+    autoCorrect: true
   UseNoneMatchInsteadOfFirstOrNullIsNull:
     active: true
     autoCorrect: true

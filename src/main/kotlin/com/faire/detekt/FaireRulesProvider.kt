@@ -33,6 +33,7 @@ import com.faire.detekt.rules.UseFirstNotNullOf
 import com.faire.detekt.rules.UseFirstNotNullOfOrNull
 import com.faire.detekt.rules.UseFirstOrNullInsteadOfFind
 import com.faire.detekt.rules.UseMapNotNullInsteadOfFilterNotNull
+import com.faire.detekt.rules.UseMatchAssertionsOnCollections
 import com.faire.detekt.rules.UseNoneMatchInsteadOfFirstOrNullIsNull
 import com.faire.detekt.rules.UseOfCollectionInsteadOfEmptyCollection
 import com.faire.detekt.rules.UseSetInsteadOfListToSet
@@ -79,6 +80,7 @@ internal class FaireRulesProvider : RuleSetProvider {
           { UseFirstNotNullOfOrNull(it) },
           { UseFirstOrNullInsteadOfFind(it) },
           { UseMapNotNullInsteadOfFilterNotNull(it) },
+          { UseMatchAssertionsOnCollections(it) },
           { UseNoneMatchInsteadOfFirstOrNullIsNull(it) },
           { UseOfCollectionInsteadOfEmptyCollection(it) },
           { UseSetInsteadOfListToSet(it) },
