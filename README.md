@@ -89,6 +89,9 @@ FaireRuleSet:
   UseMapNotNullInsteadOfFilterNotNull:
     active: true
     autoCorrect: true
+  UseMatchAssertionsOnCollections:
+    active: true
+    autoCorrect: true
   UseNoneMatchInsteadOfFirstOrNullIsNull:
     active: true
     autoCorrect: true
@@ -122,6 +125,12 @@ convention of the project) to allow test code access to the annotated members.
 Flags a `with` call inside the lambda of another `with` call. Calls with a receiver, such as `scoper.with(...)`, are
 not flagged. Imports of `kotlin.with` under an alias are matched. This rule is inactive by default; set
 `active: true` to enable it.
+
+**UseMatchAssertionsOnCollections:**
+Flags AssertJ assertions such as `assertThat(items.any { predicate }).isTrue()` or
+`assertThat(items.filter { predicate }).isEmpty()`, and auto-corrects them to `assertThat(items).anyMatch { predicate }`
+or `assertThat(items).noneMatch { predicate }`. Only `Iterable` receivers are flagged. Assertions with more assertions
+chained after them, and predicates that call suspend functions, are not flagged. This rule requires type resolution.
 
 ## Type Resolution
 A number of the rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) to be enabled to function properly. If type resolution is not enabled, the rules will silently continue.
