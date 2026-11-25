@@ -1,8 +1,9 @@
 package com.faire.detekt.rules
 
 import com.faire.detekt.utils.AutoCorrectRule
-import com.faire.detekt.utils.hasReturnLabelled
+import com.faire.detekt.utils.hasReturnOutsideOwnFunctions
 import com.faire.detekt.utils.isAssertThat
+import com.faire.detekt.utils.toJavaPredicateArgumentText
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
@@ -10,12 +11,16 @@ import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.successfulFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtLambdaExpression
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 
+private val ASSERTJ_PACKAGE = FqName("org.assertj.core.api")
 private val KOTLIN_COLLECTIONS_PACKAGE = FqName("kotlin.collections")
 private val ITERABLE_CLASS_ID = ClassId.topLevel(FqName("kotlin.collections.Iterable"))
 
@@ -57,14 +62,21 @@ private val MATCH_ASSERTIONS = mapOf(
  * The match assertions say what is being checked, and when they fail, AssertJ prints the collection and the element
  * that broke the assertion instead of "expected true but was false".
  *
- * The rule only reports receivers that are an [Iterable], because AssertJ has no match assertions for maps, strings,
- * sequences or primitive arrays. It does not report `assertThat(collection.all { predicate }).isFalse()` or
- * `assertThat(collection.filterNot { predicate }).isNotEmpty()`, because no match assertion means "not all elements
- * match".
+ * The rule only reports AssertJ's `assertThat` on receivers that are an [Iterable], because AssertJ has no match
+ * assertions for maps, strings, sequences or primitive arrays. It does not report:
+ * - `assertThat(collection.all { predicate }).isFalse()` or
+ *   `assertThat(collection.filterNot { predicate }).isNotEmpty()`, because no match assertion means "not all elements
+ *   match".
+ * - Assertions with more assertions chained after them, such as
+ *   `assertThat(collection.filter { predicate }).isNotEmpty().hasSize(2)`, because the chained assertions would then
+ *   run on the whole collection instead of the matching elements.
+ * - Predicates that call suspend functions, because the match assertions take a Java `Predicate`, which cannot call
+ *   them.
  *
- * Auto-correct skips predicates that use a label such as `return@all`: once the call is renamed to `allMatch`, that
- * label no longer refers to the predicate. The rule still reports these calls. To fix one by hand, change the label to
- * the new function name, such as `return@allMatch`.
+ * Auto-correct skips predicates that contain a return, unless it is inside a function declared in the predicate. A
+ * label such as `return@all` no longer refers to the predicate once the call is renamed to `allMatch`, and a `return`
+ * from the enclosing function only works in an inline lambda, which a Java `Predicate` is not. The rule still reports
+ * these calls. To fix a labelled return by hand, change the label to the new function name, such as `return@allMatch`.
  */
 internal class UseMatchAssertionsOnCollections(config: Config = Config.empty) :
     AutoCorrectRule(
@@ -77,6 +89,8 @@ internal class UseMatchAssertionsOnCollections(config: Config = Config.empty) :
   override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
     super.visitDotQualifiedExpression(expression)
 
+    if ((expression.parent as? KtQualifiedExpression)?.receiverExpression == expression) return
+
     val assertionCall = expression.selectorExpression as? KtCallExpression ?: return
     if (assertionCall.valueArguments.isNotEmpty()) return
     val assertion = assertionCall.calleeExpression?.text ?: return
@@ -87,11 +101,12 @@ internal class UseMatchAssertionsOnCollections(config: Config = Config.empty) :
         ?.getArgumentExpression() as? KtDotQualifiedExpression ?: return
 
     val predicateCall = assertThatArgument.selectorExpression as? KtCallExpression ?: return
-    if (predicateCall.valueArguments.size != 1) return
+    val predicateArgument = predicateCall.valueArguments.singleOrNull() ?: return
+    val predicate = predicateArgument.getArgumentExpression() ?: return
     val predicateFunction = predicateCall.calleeExpression?.text ?: return
 
     val matchAssertion = MATCH_ASSERTIONS[predicateFunction to assertion] ?: return
-    if (!assertThatArgument.isCollectionsCallOnIterable(predicateCall)) return
+    if (!hasMatchAssertion(assertThatCall, assertThatArgument, predicateCall, predicate)) return
 
     report(
         Finding(
@@ -101,20 +116,28 @@ internal class UseMatchAssertionsOnCollections(config: Config = Config.empty) :
         ),
     )
 
-    if (!autoCorrect || predicateCall.hasReturnLabelled(predicateFunction)) return
+    if (!autoCorrect || predicate.hasReturnOutsideOwnFunctions()) return
 
-    // The match assertions are Java methods, so a named argument such as `predicate = ...` would not compile
-    val predicate = predicateCall.valueArguments.single().getArgumentExpression() ?: return
-    val predicateText = if (predicate is KtLambdaExpression) " ${predicate.text}" else "(${predicate.text})"
+    val predicateText = predicateArgument.toJavaPredicateArgumentText(newCall = expression) ?: return
     val collection = assertThatArgument.receiverExpression.text
     pending.add(expression.text to "assertThat($collection).$matchAssertion$predicateText")
   }
 
-  private fun KtDotQualifiedExpression.isCollectionsCallOnIterable(call: KtCallExpression): Boolean = analyze(this) {
-    val receiverType = receiverExpression.expressionType ?: return@analyze false
-    val callableId = call.resolveToCall()?.successfulFunctionCallOrNull()?.symbol?.callableId
-    callableId?.packageName == KOTLIN_COLLECTIONS_PACKAGE &&
+  private fun hasMatchAssertion(
+      assertThatCall: KtCallExpression,
+      assertThatArgument: KtDotQualifiedExpression,
+      predicateCall: KtCallExpression,
+      predicate: KtExpression,
+  ): Boolean = analyze(assertThatCall) {
+    fun KtCallExpression.resolvedSymbol() = resolveToCall()?.successfulFunctionCallOrNull()?.symbol
+
+    val receiverType = assertThatArgument.receiverExpression.expressionType ?: return@analyze false
+    assertThatCall.resolvedSymbol()?.callableId?.packageName == ASSERTJ_PACKAGE &&
+        predicateCall.resolvedSymbol()?.callableId?.packageName == KOTLIN_COLLECTIONS_PACKAGE &&
         receiverType.isSubtypeOf(ITERABLE_CLASS_ID) &&
-        !receiverType.isSubtypeOf(PATH_CLASS_ID)
+        !receiverType.isSubtypeOf(PATH_CLASS_ID) &&
+        !predicate.anyDescendantOfType<KtCallExpression> {
+          (it.resolvedSymbol() as? KaNamedFunctionSymbol)?.isSuspend == true
+        }
   }
 }
