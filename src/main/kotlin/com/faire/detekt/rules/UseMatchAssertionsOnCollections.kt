@@ -21,6 +21,11 @@ import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 
 private val ASSERTJ_PACKAGE = FqName("org.assertj.core.api")
+
+// AssertionsForClassTypes has no Iterable overload, so its assertThat(collection) has no match assertions.
+private val ASSERTIONS_FOR_CLASS_TYPES_CLASS_ID =
+    ClassId.topLevel(FqName("org.assertj.core.api.AssertionsForClassTypes"))
+
 private val KOTLIN_COLLECTIONS_PACKAGE = FqName("kotlin.collections")
 private val ITERABLE_CLASS_ID = ClassId.topLevel(FqName("kotlin.collections.Iterable"))
 
@@ -131,8 +136,10 @@ internal class UseMatchAssertionsOnCollections(config: Config = Config.empty) :
   ): Boolean = analyze(assertThatCall) {
     fun KtCallExpression.resolvedSymbol() = resolveToCall()?.successfulFunctionCallOrNull()?.symbol
 
+    val assertThatId = assertThatCall.resolvedSymbol()?.callableId ?: return@analyze false
     val receiverType = assertThatArgument.receiverExpression.expressionType ?: return@analyze false
-    assertThatCall.resolvedSymbol()?.callableId?.packageName == ASSERTJ_PACKAGE &&
+    assertThatId.packageName == ASSERTJ_PACKAGE &&
+        assertThatId.classId != ASSERTIONS_FOR_CLASS_TYPES_CLASS_ID &&
         predicateCall.resolvedSymbol()?.callableId?.packageName == KOTLIN_COLLECTIONS_PACKAGE &&
         receiverType.isSubtypeOf(ITERABLE_CLASS_ID) &&
         !receiverType.isSubtypeOf(PATH_CLASS_ID) &&

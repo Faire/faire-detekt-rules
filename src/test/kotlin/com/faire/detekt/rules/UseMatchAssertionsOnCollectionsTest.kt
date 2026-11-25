@@ -20,6 +20,11 @@ object Assertions {
   fun assertThat(actual: Any?): ObjectAssert = TODO()
 }
 
+object AssertionsForClassTypes {
+  fun assertThat(actual: Boolean): ObjectAssert = TODO()
+  fun <T> assertThat(actual: T): ObjectAssert = TODO()
+}
+
 class IterableAssert<T> {
   fun isEmpty() {}
   fun isNotEmpty(): IterableAssert<T> = this
@@ -625,6 +630,19 @@ internal class UseMatchAssertionsOnCollectionsTest(private val env: KotlinEnviro
     assertNoViolations(
         """
         import com.google.common.truth.Truth.assertThat
+
+        fun test(numbers: List<Int>) {
+          assertThat(numbers.all { it > 0 }).isTrue()
+        }
+        """,
+    )
+  }
+
+  @Test
+  fun `assertThat from AssertionsForClassTypes is not reported`() {
+    assertNoViolations(
+        """
+        import org.assertj.core.api.AssertionsForClassTypes.assertThat
 
         fun test(numbers: List<Int>) {
           assertThat(numbers.all { it > 0 }).isTrue()
