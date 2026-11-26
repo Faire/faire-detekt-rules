@@ -74,7 +74,7 @@ detekt {
   buildUponDefaultConfig = true
   config.from(rootProject.file("detekt.yaml"))
 
-  allRules = false // true would activate all available rules, including unstable ones.
+  allRules = false // activate all available (even unstable) rules if enabled.
 }
 
 tasks.test {
