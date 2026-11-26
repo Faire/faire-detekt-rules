@@ -78,7 +78,7 @@ internal class UseNoneMatchInsteadOfFirstOrNullIsNull(config: Config = Config.em
         if (predicate is KtLambdaExpression) " ${predicate.text}" else "(${predicate.text})"
       }
 
-      pending.add(expression.text to "assertThat($collectionExpression).noneMatch$predicateArgs")
+      replace(expression, "assertThat($collectionExpression).noneMatch$predicateArgs")
     }
   }
 }

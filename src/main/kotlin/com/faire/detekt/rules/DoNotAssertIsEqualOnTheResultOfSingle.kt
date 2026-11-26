@@ -53,7 +53,7 @@ internal class DoNotAssertIsEqualOnTheResultOfSingle(config: Config = Config.emp
       val collectionExpr = (argumentForAssertThatExpression as KtDotQualifiedExpression).receiverExpression.text
       val isEqualArgs = (isEqualExpression as? KtCallExpression)?.valueArgumentList?.text
 
-      pending.add(expression.text to "assertThat($collectionExpr).containsOnly$isEqualArgs")
+      replace(expression, "assertThat($collectionExpr).containsOnly$isEqualArgs")
     }
   }
 
